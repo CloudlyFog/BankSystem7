@@ -5,27 +5,27 @@ namespace BankSystem7.AppContext
 {
     internal sealed class BankAccountContext : DbContext
     {
-        private readonly string connection = @"Server=localhost\\SQLEXPRESS;Data Source=maxim;Initial Catalog=CabManagementSystem;Integrated Security=True;Persist Security Info=False;Pooling=False;MultipleActiveResultSets=False;Encrypt=False;TrustServerCertificate=False";
-        private readonly string table = "CabManagementSystem";
-        private readonly string dataSource = "maxim";
-        private readonly DatabaseType type = DatabaseType.MSSQL;
+        private readonly string _connection = @"Server=localhost\\SQLEXPRESS;Data Source=maxim;Initial Catalog=CabManagementSystem;Integrated Security=True;Persist Security Info=False;Pooling=False;MultipleActiveResultSets=False;Encrypt=False;TrustServerCertificate=False";
+        private readonly string _table = "CabManagementSystem";
+        private readonly string _dataSource = "maxim";
+        private readonly DatabaseType _type = DatabaseType.MSSQL;
         
         public BankAccountContext(string connection)
         {
-            this.connection = connection;
+            _connection = connection;
             Database.EnsureCreated();
         }
 
         public BankAccountContext(DatabaseType type, string connection)
         {
-            this.connection = connection;
-            this.type = type;
+            _connection = connection;
+            _type = type;
             Database.EnsureCreated();
         }
 
         public BankAccountContext(string database, string dataSource)
         {
-            connection =
+            _connection =
                 @$"Server=localhost\\SQLEXPRESS;Data Source={dataSource};Initial Catalog={database};
                 Integrated Security=True;Persist Security Info=False;Pooling=False;MultipleActiveResultSets=False;Encrypt=False;TrustServerCertificate=False";
         }
@@ -33,16 +33,16 @@ namespace BankSystem7.AppContext
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.EnableSensitiveDataLogging();
-            switch (type)
+            switch (_type)
             {
                 case DatabaseType.MySql:
-                    optionsBuilder.UseMySQL(connection);
+                    optionsBuilder.UseMySQL(_connection);
                     break;
                 case DatabaseType.MSSQL:
-                    optionsBuilder.UseSqlServer(connection);
+                    optionsBuilder.UseSqlServer(_connection);
                     break;
                 case DatabaseType.PostgreSql:
-                    optionsBuilder.UseNpgsql(connection);
+                    optionsBuilder.UseNpgsql(_connection);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

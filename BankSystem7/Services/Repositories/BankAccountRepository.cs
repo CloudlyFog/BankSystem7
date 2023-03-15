@@ -17,20 +17,12 @@ namespace BankSystem7.Services.Repositories
 
         public BankAccountRepository()
         {
-            _bankRepository = new BankRepository();
+            _bankRepository = new BankRepository(Connection);
             _bankAccountContext = new BankAccountContext(Connection);
             _bankContext = _bankRepository.BankContext;
         }
-        public BankAccountRepository(bool initializable)
+        public BankAccountRepository(BankRepository bankRepository)
         {
-            if (!initializable) return;
-            _bankAccountContext = new BankAccountContext(Connection);
-            _bankContext = new BankContext();
-            _bankRepository = new BankRepository();
-        }
-        public BankAccountRepository(bool initializable, BankRepository bankRepository)
-        {
-            if (!initializable) return;
             _bankRepository = bankRepository;
         }
         public BankAccountRepository(string connection)
@@ -40,6 +32,7 @@ namespace BankSystem7.Services.Repositories
             _bankRepository = new BankRepository(connection);
         }
 
+        [Obsolete("This constructor has bad implementation. We don't recommend to use it.")]
         public BankAccountRepository(DatabaseType type, string connection)
         {
             _bankAccountContext = new BankAccountContext(connection);
@@ -53,6 +46,7 @@ namespace BankSystem7.Services.Repositories
             Dispose(true);
             GC.SuppressFinalize(this);
         }
+        
         // Protected implementation of Dispose pattern.
         private void Dispose(bool disposing)
         {
@@ -76,14 +70,14 @@ namespace BankSystem7.Services.Repositories
             if (from is null || to is null || transferAmount <= 0)
                 return ExceptionModel.OperationFailed;
             
-            if (!Exist(from.ID) || !Exist(to.ID))
+            if (!Exist(x => x.ID == from.ID) || !Exist(x => x.ID == to.ID))
                 return ExceptionModel.OperationFailed;
             
-            using var transaction = _bankContext.Database.BeginTransaction(IsolationLevel.ReadUncommitted);
+            using var transaction = _bankContext.Database.BeginTransaction(IsolationLevel.RepeatableRead);
             await WithdrawAsync(from, transferAmount);
             await AccrualAsync(to, transferAmount);
             transaction.Commit();
-            return ExceptionModel.Successfull;
+            return ExceptionModel.Successfully;
         }
 
         /// <summary>
@@ -94,14 +88,7 @@ namespace BankSystem7.Services.Repositories
         /// <returns>object of <see cref="ExceptionModel"/></returns>
         private async Task AccrualAsync(BankAccount? item, decimal amountAccrual)
         {
-            if (item is null)
-                throw new Exception("Passed instance of BankAccount is null.");
-            
-            if (!_bankAccountContext.Users.AsNoTracking().Any(x => x.ID == item.UserID))
-                throw new Exception("Doesn't exist user with specified ID in the database.");
-
-            if (!Exist(item.ID)) 
-                throw new Exception($"Doesn't exist bank with id {{{item.ID}}}");
+            CheckBankAccount(item);
 
             var operation = new Operation()
             {
@@ -113,11 +100,11 @@ namespace BankSystem7.Services.Repositories
             };
             var createOperation = _bankContext.CreateOperation(operation, OperationKind.Accrual);
             
-            if (createOperation != ExceptionModel.Successfull)
+            if (createOperation != ExceptionModel.Successfully)
                 throw new Exception($"Operation can't create due to exception: {createOperation}");
             
             var bank = _bankRepository.Get(x => x.BankID == operation.BankID);
-            if (_bankRepository.BankAccountAccrual(item, bank, operation) != ExceptionModel.Successfull)
+            if (_bankRepository.BankAccountAccrual(item, bank, operation) != ExceptionModel.Successfully)
                 throw new Exception($"Failed withdraw money from {bank}");
         }
 
@@ -129,14 +116,7 @@ namespace BankSystem7.Services.Repositories
         /// <returns>object of <see cref="ExceptionModel"/></returns>
         private async Task WithdrawAsync(BankAccount? item, decimal amountAccrual)
         {
-            if (item is null)
-                throw new Exception("Passed instance of BankAccount is null.");
-            
-            if (!_bankAccountContext.Users.AsNoTracking().Any(x => x.ID == item.UserID))
-                throw new Exception("Doesn't exist user with specified ID in the database.");
-
-            if (!Exist(item.ID))
-                throw new Exception($"Doesn't exist bank with id {{{item.ID}}}");
+            CheckBankAccount(item);
 
             var operation = new Operation()
             {
@@ -148,12 +128,12 @@ namespace BankSystem7.Services.Repositories
             };
             
             var createOperation = _bankContext.CreateOperation(operation, OperationKind.Withdraw);
-            if (createOperation != ExceptionModel.Successfull)
+            if (createOperation != ExceptionModel.Successfully)
                 throw new Exception($"Operation can't create due to exception: {createOperation}");
             
             var bank = _bankRepository.Get(x => x.BankID == operation.BankID);
             var withdraw = _bankRepository.BankAccountWithdraw(item, bank, operation);
-            if (withdraw != ExceptionModel.Successfull)
+            if (withdraw != ExceptionModel.Successfully)
                 throw new Exception($"Failed withdraw money from {bank}\nException: {withdraw}");
         }
 
@@ -164,16 +144,14 @@ namespace BankSystem7.Services.Repositories
         /// <returns>object of <see cref="ExceptionModel"/></returns>
         public ExceptionModel Create(BankAccount item)
         {
-            if (item is null || Exist(item.ID))
+            if (item is null || Exist(x => x.ID == item.ID))
                 return ExceptionModel.VariableIsNull;
             _bankAccountContext.BankAccounts.Add(item);
             _bankAccountContext.SaveChanges();
-            return ExceptionModel.Successfull;
+            return ExceptionModel.Successfully;
         }
 
         public IEnumerable<BankAccount> All => _bankAccountContext.BankAccounts.AsNoTracking();
-
-        public BankAccount? Get(Guid id) => _bankAccountContext.BankAccounts.AsNoTracking().FirstOrDefault(x => x.ID == id);
 
         public BankAccount? Get(Expression<Func<BankAccount, bool>> predicate) => _bankAccountContext.BankAccounts.AsNoTracking().FirstOrDefault(predicate);
 
@@ -184,11 +162,11 @@ namespace BankSystem7.Services.Repositories
         /// <returns></returns>
         public ExceptionModel Update(BankAccount item)
         {
-            if (item is null || Exist(item.ID))
+            if (item is null || Exist(x => x.ID == item.ID))
                 return ExceptionModel.VariableIsNull;
             _bankAccountContext.BankAccounts.Update(item);
             _bankAccountContext.SaveChanges();
-            return ExceptionModel.Successfull;
+            return ExceptionModel.Successfully;
         }
 
         /// <summary>
@@ -198,21 +176,19 @@ namespace BankSystem7.Services.Repositories
         /// <returns>object of <see cref="ExceptionModel"/></returns>
         public ExceptionModel Delete(BankAccount item)
         {
-            if (item is null || !Exist(item.ID))
+            if (item is null || !Exist(x => x.ID == item.ID))
                 return ExceptionModel.VariableIsNull;
             _bankAccountContext.BankAccounts.Remove(item);
             _bankAccountContext.SaveChanges();
-            return ExceptionModel.Successfull;
+            return ExceptionModel.Successfully;
         }
-
-        public bool Exist(Guid id) => _bankAccountContext.BankAccounts.AsNoTracking().Any(x => x.ID == id);
 
         public bool Exist(Expression<Func<BankAccount, bool>> predicate)
             => _bankAccountContext.BankAccounts.AsNoTracking().Any(predicate);
 
         public ExceptionModel Update(BankAccount item, User user, Card card)
         {
-            if (item is null || !Exist(item.ID))
+            if (item is null || !Exist(x => x.ID == item.ID))
                 return ExceptionModel.VariableIsNull;
 
             if (user is null || !_bankRepository.Exist(x => x.ID == user.ID))
@@ -228,7 +204,19 @@ namespace BankSystem7.Services.Repositories
             _bankAccountContext.SaveChanges(); 
             transaction.Commit();
 
-            return ExceptionModel.Successfull;
+            return ExceptionModel.Successfully;
+        }
+
+        private void CheckBankAccount(BankAccount item)
+        {
+            if (item is null)
+                throw new Exception("Passed instance of BankAccount is null.");
+            
+            if (!_bankAccountContext.Users.AsNoTracking().Any(x => x.ID == item.UserID))
+                throw new Exception("Doesn't exist user with specified ID in the database.");
+
+            if (!Exist(x => x.ID == item.ID)) 
+                throw new Exception($"Doesn't exist bank with id {{{item.ID}}}");
         }
 
         ~BankAccountRepository()

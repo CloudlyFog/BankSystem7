@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Standart7.Models;
 using System.Linq.Expressions;
 using BankSystem7.AppContext;
+using Standart7.Middleware;
+using Standart7.Services;
 
 namespace BankSystem7.Services.Repositories
 {
@@ -17,20 +19,6 @@ namespace BankSystem7.Services.Repositories
         {
             _bankAccountContext = new BankAccountContext();
             _bankContext = new BankContext();
-            BankContext = _bankContext;
-        }
-        public BankRepository(bool initializable)
-        {
-            if (!initializable) return;
-            _bankAccountContext = new BankAccountContext();
-            _bankContext = new BankContext();
-            BankContext = _bankContext;
-        }
-        public BankRepository(bool initializable, string connection)
-        {
-            if (!initializable) return;
-            _bankAccountContext = new BankAccountContext(connection);
-            _bankContext = new BankContext(connection);
             BankContext = _bankContext;
         }
         public BankRepository(string connection)
@@ -51,13 +39,16 @@ namespace BankSystem7.Services.Repositories
             if (_disposedValue) return;
             if (disposing)
             {
+                if (BankContext is null) return;
                 _bankAccountContext.Dispose();
                 _bankContext.Dispose();
+                BankContext.Dispose();
             }
 
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
             _bankContext = null;
             _bankAccountContext = null;
+            BankContext = null;
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
             _disposedValue = true;
         }
@@ -71,9 +62,9 @@ namespace BankSystem7.Services.Repositories
         /// <exception cref="Exception"></exception>
         public ExceptionModel BankAccountAccrual(BankAccount bankAccount, Bank bank, Operation operation)
         {
-            if (bankAccount is null || bank is null || !Exist(bank.ID))
+            if (bankAccount is null || bank is null || !Exist(x => x.ID == bank.ID))
                 return ExceptionModel.VariableIsNull;
-            if (operation.OperationStatus != StatusOperationCode.Successfull)
+            if (operation.OperationStatus != StatusOperationCode.Successfully)
                 return (ExceptionModel)operation.OperationStatus.GetHashCode();
 
             var user = _bankContext.Users.FirstOrDefault(x => x.ID == bankAccount.UserID);
@@ -96,14 +87,14 @@ namespace BankSystem7.Services.Repositories
             try
             {
                 _bankContext.SaveChanges();
-                _bankContext.DeleteOperation(operation); 
+                _bankContext.DeleteOperation(operation);
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
                 throw;
             }
-            return ExceptionModel.Successfull;
+            return ExceptionModel.Successfully;
         }
 
         /// <summary>
@@ -117,9 +108,10 @@ namespace BankSystem7.Services.Repositories
         {
             if (bankAccount is null || bank is null)
                 return ExceptionModel.VariableIsNull;
-            if (operation.OperationStatus != StatusOperationCode.Successfull)
+            if (operation.OperationStatus != StatusOperationCode.Successfully)
                 return (ExceptionModel)operation.OperationStatus.GetHashCode();
 
+            
             var user = _bankContext.Users.FirstOrDefault(x => x.ID == bankAccount.UserID);
             if (user is null)
                 return ExceptionModel.VariableIsNull;
@@ -147,36 +139,32 @@ namespace BankSystem7.Services.Repositories
                 Console.WriteLine(e);
                 throw;
             }
-            return ExceptionModel.Successfull;
+            return ExceptionModel.Successfully;
         }
 
         public ExceptionModel Create(Bank item)
         {
-            if (item is null || !Exist(item.ID))
+            if (item is null || !Exist(x => x.ID == item.ID))
                 return ExceptionModel.OperationFailed;
 
             _bankContext.Add(item);
             _bankContext.SaveChanges();
-            return ExceptionModel.Successfull;
+            return ExceptionModel.Successfully;
         }
 
         public ExceptionModel Delete(Bank item)
         {
-            if (item is null || !Exist(item.ID))
+            if (item is null || !Exist(x => x.ID == item.ID))
                 return ExceptionModel.OperationFailed;
 
             _bankContext.Remove(item);
             _bankContext.SaveChanges();
-            return ExceptionModel.Successfull;
+            return ExceptionModel.Successfully;
         }
-
-        public bool Exist(Guid id) => _bankContext.Banks.AsNoTracking().Any(x => x.ID == id);
 
         public bool Exist(Expression<Func<Bank, bool>> predicate) => _bankContext.Banks.AsNoTracking().Any(predicate);
 
         public IEnumerable<Bank> All => _bankContext.Banks.AsNoTracking();
-
-        public Bank? Get(Guid id) => _bankContext.Banks.AsNoTracking().FirstOrDefault(x => x.ID == id);
 
         public Bank? Get(Expression<Func<Bank, bool>> predicate) => _bankContext.Banks.AsNoTracking().FirstOrDefault(predicate);
 
@@ -200,12 +188,12 @@ namespace BankSystem7.Services.Repositories
 
         public ExceptionModel Update(Bank item)
         {
-            if (item is null || !Exist(item.ID))
+            if (item is null || !Exist(x => x.ID == item.ID))
                 return ExceptionModel.OperationFailed;
 
             _bankContext.Banks.Update(item);
             _bankContext.SaveChanges();
-            return ExceptionModel.Successfull;
+            return ExceptionModel.Successfully;
         }
 
         ~BankRepository()

@@ -3,23 +3,23 @@ using MongoDB.Driver;
 using System.Data;
 using BankSystem7.Services;
 using Standart7.Models;
+using Standart7.Services;
 
 namespace BankSystem7.AppContext
 {
     internal sealed class BankContext : DbContext
     {
-        private readonly string connection = @"Server=localhost\\SQLEXPRESS;Data Source=maxim;Initial Catalog=CabManagementSystem;Integrated Security=True;Persist Security Info=False;Pooling=False;MultipleActiveResultSets=False;Encrypt=False;TrustServerCertificate=False";
-        private readonly OperationService operationService;
+        private readonly OperationService<Operation> _operationService;
 
         public BankContext()
         {
-            operationService = new OperationService();
+            _operationService = new OperationService<Operation>();
             Database.EnsureCreated();
         }
         public BankContext(string connection)
         {
-            operationService = new OperationService();
-            this.connection = connection;
+            ServiceConfiguration.SetConnection(connection);
+            _operationService = new OperationService<Operation>("CabManagementSystemReborn");
             Database.EnsureCreated();
         }
 
@@ -28,32 +28,25 @@ namespace BankSystem7.AppContext
         /// </summary>
         /// <param name="database"></param>
         /// <param name="dataSource"></param>
-        public BankContext(string database, string dataSource)
+        public BankContext(string database, string dataSource = "maxim")
         {
-            operationService = new OperationService();
-            connection =
+            _operationService = new OperationService<Operation>(database);
+            var connection =
                 @$"Server=localhost\\SQLEXPRESS;Data Source={dataSource};Initial Catalog={database};
                 Integrated Security=True;Persist Security Info=False;Pooling=False;MultipleActiveResultSets=False;Encrypt=False;TrustServerCertificate=False";
+            ServiceConfiguration.SetConnection(connection);
         }
         public DbSet<User> Users { get; set; } = null!;
         public DbSet<Bank> Banks { get; set; } = null!;
         public DbSet<BankAccount> BankAccounts { get; set; } = null!;
         public DbSet<Card> Cards { get; set; } = null!;
         
-        // ReSharper disable once MemberCanBePrivate.Global
         public DbSet<Credit> Credits { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.EnableSensitiveDataLogging();
-            optionsBuilder.UseSqlServer(connection);
-        }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<User>()
-                .Ignore(x => x.Initiable);
-            base.OnModelCreating(modelBuilder);
+            optionsBuilder.UseSqlServer(ServiceConfiguration.Connection);
         }
 
         /// <summary>
@@ -69,15 +62,15 @@ namespace BankSystem7.AppContext
             // Find(Builders<Operation>.Filter.Eq(predicate)).Any() equals
             // Operations.Any(predicate)
             // we find and in the same time check is there object in database
-            if (operationService.Collection.Find(Builders<Operation>.Filter.Eq(x => x.ID, operation.ID)).Any())
+            if (_operationService.Collection.Find(Builders<Operation>.Filter.Eq(x => x.ID, operation.ID)).Any())
                 return ExceptionModel.OperationNotExist;
 
             operation.OperationStatus = StatusOperation(operation, operationKind);
-            if (operation.OperationStatus != StatusOperationCode.Successfull)
+            if (operation.OperationStatus != StatusOperationCode.Successfully)
                 return ExceptionModel.OperationRestricted;
 
-            operationService.Collection.InsertOne(operation);
-            return ExceptionModel.Successfull;
+            _operationService.Collection.InsertOne(operation);
+            return ExceptionModel.Successfully;
         }
 
         /// <summary>
@@ -89,11 +82,11 @@ namespace BankSystem7.AppContext
         {
             if (operation is null)
                 return ExceptionModel.VariableIsNull;
-            if (operationService.Collection.Find(Builders<Operation>.Filter.Eq(x => x.ID, operation.ID)).Any())
+            if (_operationService.Collection.Find(Builders<Operation>.Filter.Eq(x => x.ID, operation.ID)).Any())
                 return ExceptionModel.OperationNotExist;
 
-            operationService.Collection.DeleteOne(x => x.ID == operation.ID);
-            return ExceptionModel.Successfull;
+            _operationService.Collection.DeleteOne(x => x.ID == operation.ID);
+            return ExceptionModel.Successfully;
         }
 
         /// <summary>
@@ -117,21 +110,21 @@ namespace BankSystem7.AppContext
             };
             using var transaction = Database.BeginTransaction(IsolationLevel.Serializable);
 
-            if (CreateOperation(operationAccrualOnUserAccount, OperationKind.Accrual) != ExceptionModel.Successfull)
+            if (CreateOperation(operationAccrualOnUserAccount, OperationKind.Accrual) != ExceptionModel.Successfully)
                 return (ExceptionModel)operationAccrualOnUserAccount.OperationStatus.GetHashCode();
             
             // accrual money to user's bank account
             if (BankAccountAccrual(bankAccountModel, 
                     Banks.AsNoTracking().FirstOrDefault(x => x.BankID == bankAccountModel.BankID), 
-                         operationAccrualOnUserAccount) != ExceptionModel.Successfull)
+                         operationAccrualOnUserAccount) != ExceptionModel.Successfully)
                 return (ExceptionModel)operationAccrualOnUserAccount.OperationStatus.GetHashCode();
 
-            if (AddCredit(creditModel) != ExceptionModel.Successfull)
+            if (AddCredit(creditModel) != ExceptionModel.Successfully)
                 return (ExceptionModel)operationAccrualOnUserAccount.OperationStatus.GetHashCode();
 
             transaction.Commit();
             
-            return ExceptionModel.Successfull;
+            return ExceptionModel.Successfully;
         }
 
         /// <summary>
@@ -155,21 +148,21 @@ namespace BankSystem7.AppContext
             };
             using var transaction = Database.BeginTransaction(IsolationLevel.Serializable);
 
-            if (CreateOperation(operationAccrualOnUserAccount, OperationKind.Accrual) != ExceptionModel.Successfull) // here creates operation for accrual money on user bank account
+            if (CreateOperation(operationAccrualOnUserAccount, OperationKind.Accrual) != ExceptionModel.Successfully) // here creates operation for accrual money on user bank account
                 return (ExceptionModel)operationAccrualOnUserAccount.OperationStatus.GetHashCode();
 
             // withdraw money to user's bank account
             if (BankAccountWithdraw(bankAccountModel,
                     Banks.AsNoTracking().FirstOrDefault(x => x.BankID == bankAccountModel.BankID),
-                         operationAccrualOnUserAccount) != ExceptionModel.Successfull)
+                         operationAccrualOnUserAccount) != ExceptionModel.Successfully)
                 return (ExceptionModel)operationAccrualOnUserAccount.OperationStatus.GetHashCode();
 
-            if (RemoveCredit(creditModel) != ExceptionModel.Successfull)
+            if (RemoveCredit(creditModel) != ExceptionModel.Successfully)
                 return (ExceptionModel)operationAccrualOnUserAccount.OperationStatus.GetHashCode();
 
             transaction.Commit();
 
-            return ExceptionModel.Successfull;
+            return ExceptionModel.Successfully;
         }
 
         /// <summary>
@@ -183,7 +176,7 @@ namespace BankSystem7.AppContext
         {
             if (bankAccount is null || bank is null)
                 return ExceptionModel.VariableIsNull;
-            if (operation.OperationStatus != StatusOperationCode.Successfull)
+            if (operation.OperationStatus != StatusOperationCode.Successfully)
                 return (ExceptionModel)operation.OperationStatus.GetHashCode();
 
             var user = Users.AsNoTracking().FirstOrDefault(x => x.ID == bankAccount.UserID);
@@ -198,9 +191,9 @@ namespace BankSystem7.AppContext
             Banks.Update(bank);
             Users.Update(user);
             SaveChanges();
-            return DeleteOperation(operation) != ExceptionModel.Successfull
+            return DeleteOperation(operation) != ExceptionModel.Successfully
                 ? ExceptionModel.OperationFailed
-                : ExceptionModel.Successfull;
+                : ExceptionModel.Successfully;
         }
 
         /// <summary>
@@ -214,7 +207,7 @@ namespace BankSystem7.AppContext
         {
             if (bankAccount is null || bank is null)
                 return ExceptionModel.VariableIsNull;
-            if (operation.OperationStatus != StatusOperationCode.Successfull)
+            if (operation.OperationStatus != StatusOperationCode.Successfully)
                 return (ExceptionModel)operation.OperationStatus.GetHashCode();
 
             var user = Users.AsNoTracking().FirstOrDefault(x => x.ID == bankAccount.UserID);
@@ -229,9 +222,9 @@ namespace BankSystem7.AppContext
             Update(bank);
             Update(user);
             SaveChanges();
-            return DeleteOperation(operation) != ExceptionModel.Successfull
+            return DeleteOperation(operation) != ExceptionModel.Successfully
                 ? ExceptionModel.OperationFailed
-                : ExceptionModel.Successfull;
+                : ExceptionModel.Successfully;
 
         }
 
@@ -243,7 +236,7 @@ namespace BankSystem7.AppContext
                 return ExceptionModel.OperationFailed;
             Add(creditModel);
             SaveChanges();
-            return ExceptionModel.Successfull;
+            return ExceptionModel.Successfully;
         }
 
         private ExceptionModel RemoveCredit(Credit? creditModel)
@@ -254,7 +247,7 @@ namespace BankSystem7.AppContext
                 return ExceptionModel.OperationFailed;
             Remove(creditModel);
             SaveChanges();
-            return ExceptionModel.Successfull;
+            return ExceptionModel.Successfully;
         }
 
         /// <summary>
@@ -266,7 +259,7 @@ namespace BankSystem7.AppContext
         /// </summary>
         /// <param name="operationModel"></param>
         /// <param name="operationKind"></param>
-        /// <returns>status of operation, default - successfull</returns>
+        /// <returns>status of operation, default - Successfully</returns>
         /// <exception cref="ArgumentNullException"></exception>
         private StatusOperationCode StatusOperation(Operation? operationModel, OperationKind operationKind)
         {

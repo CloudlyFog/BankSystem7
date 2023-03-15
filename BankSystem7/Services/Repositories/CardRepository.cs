@@ -20,21 +20,13 @@ namespace BankSystem7.Services.Repositories
             _cardContext = new CardContext(_connection);
             _bankAccountRepository = new BankAccountRepository(_connection);
         }
-        public CardRepository(bool initializable)
+        public CardRepository(BankAccountRepository bankAccountRepository)
         {
-            if (!initializable) return;
-            _cardContext = new CardContext(_connection);
-            _bankAccountRepository = new BankAccountRepository(_connection);
-        }
-        public CardRepository(bool initializable, BankAccountRepository bankAccountRepository)
-        {
-            if (!initializable) return;
             _bankAccountRepository = bankAccountRepository;
             _cardContext = new CardContext(_connection);
         }
-        public CardRepository(bool initializable, BankAccountRepository bankAccountRepository, string connection)
+        public CardRepository(BankAccountRepository bankAccountRepository, string connection)
         {
-            if (!initializable) return;
             _connection = connection;
             _bankAccountRepository = bankAccountRepository;
             _cardContext = new CardContext(connection);
@@ -60,6 +52,7 @@ namespace BankSystem7.Services.Repositories
             if (disposing)
             {
                 _cardContext.Dispose();
+                _bankAccountRepository.Dispose();
             }
             _cardContext = null;
             _bankAccountRepository = null;
@@ -69,86 +62,6 @@ namespace BankSystem7.Services.Repositories
         public async Task<ExceptionModel> Transfer(BankAccount? from, BankAccount? to, decimal transferAmount) 
             => await _bankAccountRepository.Transfer(from, to, transferAmount);
 
-        /// <summary>
-        /// use this method for designing cards
-        /// </summary>
-        /// <param name="card"></param>
-        /// <param name="bankAccount"></param>
-        /// <returns></returns>
-        public async Task<ExceptionModel> CreateAsync(Card? card, BankAccount? bankAccount)
-        {
-            if (card is null || bankAccount is null)
-                return ExceptionModel.VariableIsNull;
-            if (card.Exception != Warning.NoRestrictions)
-                return ExceptionModel.OperationRestricted;
-            if (Exist(card.ID) || _bankAccountRepository.Exist(bankAccount.ID))
-                return ExceptionModel.OperationFailed;
-            card.BankAccountID = bankAccount.ID;
-            bankAccount.CardID = card.ID;
-            await Task.Run(async () =>
-            {
-                using var transaction = await _cardContext.Database.BeginTransactionAsync();
-                _cardContext.Cards.Add(card);
-                _bankAccountRepository.Create(bankAccount);
-                await _cardContext.SaveChangesAsync();
-                await transaction.CommitAsync();
-            });
-            return ExceptionModel.Successfull;
-        }
-
-        public async Task<ExceptionModel> DeleteAsync(Card? card, BankAccount? bankAccount)
-        {
-            if (card is null || bankAccount is null)
-                return ExceptionModel.VariableIsNull;
-            if (!Exist(card.ID) || _bankAccountRepository.Exist(bankAccount.ID))
-                return ExceptionModel.OperationFailed;
-            await Task.Run(async () =>
-            {
-                using var transaction = await _cardContext.Database.BeginTransactionAsync();
-                _cardContext.Cards.Remove(card);
-                _bankAccountRepository.Delete(bankAccount);
-                await _cardContext.SaveChangesAsync();
-                await transaction.CommitAsync();
-            });
-            return ExceptionModel.Successfull;
-        }
-
-        public async Task<ExceptionModel> UpdateAsync(Card? card, BankAccount? bankAccount)
-        {
-            if (card is null || bankAccount is null)
-                return ExceptionModel.VariableIsNull;
-            if (!Exist(card.ID) || _bankAccountRepository.Exist(bankAccount.ID))
-                return ExceptionModel.OperationFailed;
-            await Task.Run(async () =>
-            {
-                using var transaction = await _cardContext.Database.BeginTransactionAsync();
-                _cardContext.Cards.Update(card);
-                _bankAccountRepository.Update(bankAccount);
-                await _cardContext.SaveChangesAsync();
-                await transaction.CommitAsync();
-            });
-            return ExceptionModel.Successfull;
-        }
-
-        public async Task<ExceptionModel> UpdateAsync(BankAccount? bankAccount, User? user, Card? card)
-        {
-            if (card is null || bankAccount is null || user is null)
-                return ExceptionModel.VariableIsNull;
-            if (!Exist(card.ID) || _bankAccountRepository.Exist(bankAccount.ID) || !_cardContext.Users.Any(x => x.ID == user.ID))
-                return ExceptionModel.OperationFailed;
-            await Task.Run(async () =>
-            {
-                _cardContext.ChangeTracker.Clear();
-                using var transaction = await _cardContext.Database.BeginTransactionAsync();
-                _cardContext.Cards.Update(card);
-                _cardContext.Users.Update(user);
-                _bankAccountRepository.Update(bankAccount);
-                await _cardContext.SaveChangesAsync();
-                await transaction.CommitAsync();
-            });
-            return ExceptionModel.Successfull;
-        }
-
         public ExceptionModel Update(Card item)
         {
             if (item is null)
@@ -157,7 +70,7 @@ namespace BankSystem7.Services.Repositories
                 return ExceptionModel.OperationFailed;
             _cardContext.Cards.Update(item);
             _cardContext.SaveChanges();
-            return ExceptionModel.Successfull;
+            return ExceptionModel.Successfully;
         }
 
         /// <summary>
@@ -176,7 +89,7 @@ namespace BankSystem7.Services.Repositories
                 return ExceptionModel.OperationFailed;
             _cardContext.Cards.Add(item);
             _cardContext.SaveChanges();
-            return ExceptionModel.Successfull;
+            return ExceptionModel.Successfully;
         }
 
         public ExceptionModel Delete(Card item)
@@ -187,7 +100,7 @@ namespace BankSystem7.Services.Repositories
                 return ExceptionModel.OperationFailed;
             _cardContext.Cards.Remove(item);
             _cardContext.SaveChanges();
-            return ExceptionModel.Successfull;
+            return ExceptionModel.Successfully;
         }
 
         public bool Exist(Guid id) => _cardContext.Cards.AsNoTracking().Any(card => card.ID == id);

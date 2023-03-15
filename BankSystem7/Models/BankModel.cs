@@ -16,7 +16,7 @@ namespace BankSystem.Models
         public Guid ReceiverID { get; set; } = Guid.NewGuid();
         public Guid SenderID { get; set; } = Guid.NewGuid();
         public decimal TransferAmount { get; set; }
-        public StatusOperationCode OperationStatus { get; set; } = StatusOperationCode.Successfull;
+        public StatusOperationCode OperationStatus { get; set; } = StatusOperationCode.Successfully;
         public OperationKind OperationKind { get; set; }
 
     }
@@ -28,7 +28,7 @@ namespace BankSystem.Models
         public decimal CreditAmount { get; set; }
 
         [NotMapped]
-        public StatusOperationCode Operationstatus { get; set; } = StatusOperationCode.Successfull;
+        public StatusOperationCode OperationStatus { get; set; } = StatusOperationCode.Successfully;
     }
 
     public class BankAccount
@@ -87,7 +87,7 @@ namespace BankSystem.Models
     }
     public enum StatusOperationCode
     {
-        Successfull = 200,
+        Successfully = 200,
         Restricted = 300,
         Error = 400,
     }
@@ -95,5 +95,22 @@ namespace BankSystem.Models
     {
         Accrual = 1,
         Withdraw
+    }
+    
+    /// <summary>
+    /// defines model of possible exceptions of methods'es returns
+    /// </summary>
+    public enum ExceptionModel
+    {
+        VariableIsNull = 100,
+        Successfully = 200,
+        OperationRestricted = 300,
+        OperationFailed = 400,
+        OperationNotExist = 401
+    }
+    public enum Warning
+    {
+        NoRestrictions,
+        AgeRestricted,
     }
 }

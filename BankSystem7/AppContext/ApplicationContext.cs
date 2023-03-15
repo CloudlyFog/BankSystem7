@@ -1,37 +1,46 @@
-using System;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.EntityFrameworkCore;
 using Standart7.Models;
+using Standart7.Services;
 
 namespace BankSystem7.AppContext;
 
 public class ApplicationContext : DbContext
 {
-    public const string Connection =
-        @"Server=localhost\\SQLEXPRESS;Data Source=maxim;Initial Catalog=NationBankUnion;Integrated Security=True;
-            Persist Security Info=False;Pooling=False;MultipleActiveResultSets=False;
-            Encrypt=False;TrustServerCertificate=False";
-
-    protected internal DbSet<User> Users { get; set; } = null!;
+    public static bool EnsureDeleted { get; set; }
+    public static bool EnsureCreated { get; set; } = true;
+    protected DbSet<User> Users { get; set; } = null!;
     protected internal DbSet<BankAccount> BankAccounts { get; set; } = null!;
     protected internal DbSet<Operation> Operations { get; set; } = null!;
     protected internal DbSet<Bank> Banks { get; set; } = null!;
     protected internal DbSet<Card> Cards { get; set; } = null!;
+    protected internal DbSet<Credit> Credits { get; set; } = null!;
 
 
     public ApplicationContext()
     {
-        Database.EnsureCreated();
+        if (EnsureDeleted)
+            Database.EnsureDeleted();
+        if (EnsureCreated)
+            Database.EnsureCreated();
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
+        ServiceConfiguration.SetConnection(databaseName: "CabManagementSystemReborn");
         optionsBuilder.EnableSensitiveDataLogging();
-        optionsBuilder.UseSqlServer(Connection);
+        optionsBuilder.UseSqlServer(ServiceConfiguration.Connection);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        ModelConfiguration.Invoke(modelBuilder);
+        
+        
+        
+        base.OnModelCreating(modelBuilder);
+    }
+
+    private void FillDatabase(ModelBuilder modelBuilder)
     {
         var users = new List<User>()
         {
@@ -97,28 +106,8 @@ public class ApplicationContext : DbContext
                 AccountType = AccountType.User
             }
         };
-        //
-        modelBuilder.Entity<User>()
-            .Ignore(nameof(Exception))
-            .Ignore(nameof(Warning))
-            .Ignore(nameof(User.Initiable));
         modelBuilder.Entity<User>().HasData(users);
-        //
         modelBuilder.Entity<BankAccount>().HasData(bankAccounts);
         modelBuilder.Entity<Bank>().HasData(banks);
-        base.OnModelCreating(modelBuilder);
-    }
-    public string HashPassword(string password)
-    {
-        // generate a 128-bit salt using a cryptographically strong random sequence of nonzero values
-        var salt = new byte[128 / 8];
-
-        // derive a 256-bit subkey (use HMACSHA256 with 100,000 iterations)
-        return Convert.ToBase64String(KeyDerivation.Pbkdf2(
-            password: password,
-            salt: salt,
-            prf: KeyDerivationPrf.HMACSHA256,
-            iterationCount: 100000,
-            numBytesRequested: 256 / 8));
     }
 }
