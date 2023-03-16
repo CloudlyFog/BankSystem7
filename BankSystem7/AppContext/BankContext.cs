@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
 using System.Data;
 using BankSystem7.Services;
+using Standart7.Middleware;
 using Standart7.Models;
 using Standart7.Services;
 
@@ -14,13 +15,13 @@ namespace BankSystem7.AppContext
         public BankContext()
         {
             _operationService = new OperationService<Operation>();
-            Database.EnsureCreated();
+            DatabaseHandle();
         }
         public BankContext(string connection)
         {
             ServiceConfiguration.SetConnection(connection);
-            _operationService = new OperationService<Operation>("CabManagementSystemReborn");
-            Database.EnsureCreated();
+            _operationService = new OperationService<Operation>(ServiceConfigurationMiddleware.Options.DatabaseName ?? "CabManagementSystemReborn");
+            DatabaseHandle();
         }
 
         /// <summary>
@@ -35,6 +36,7 @@ namespace BankSystem7.AppContext
                 @$"Server=localhost\\SQLEXPRESS;Data Source={dataSource};Initial Catalog={database};
                 Integrated Security=True;Persist Security Info=False;Pooling=False;MultipleActiveResultSets=False;Encrypt=False;TrustServerCertificate=False";
             ServiceConfiguration.SetConnection(connection);
+            DatabaseHandle();
         }
         public DbSet<User> Users { get; set; } = null!;
         public DbSet<Bank> Banks { get; set; } = null!;
@@ -47,6 +49,14 @@ namespace BankSystem7.AppContext
         {
             optionsBuilder.EnableSensitiveDataLogging();
             optionsBuilder.UseSqlServer(ServiceConfiguration.Connection);
+        }
+        
+        private void DatabaseHandle()
+        {
+            if (BankServicesOptions.EnsureDeleted)
+                Database.EnsureDeleted();
+            if (BankServicesOptions.EnsureCreated)
+                Database.EnsureCreated();
         }
 
         /// <summary>

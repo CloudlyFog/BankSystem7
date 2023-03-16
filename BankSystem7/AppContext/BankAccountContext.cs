@@ -1,3 +1,4 @@
+using BankSystem7.Services;
 using Microsoft.EntityFrameworkCore;
 using Standart7.Models;
 
@@ -13,23 +14,26 @@ namespace BankSystem7.AppContext
         public BankAccountContext(string connection)
         {
             _connection = connection;
-            Database.EnsureCreated();
+            DatabaseHandle();
         }
 
         public BankAccountContext(DatabaseType type, string connection)
         {
             _connection = connection;
             _type = type;
-            Database.EnsureCreated();
+            DatabaseHandle();
+
         }
 
         public BankAccountContext(string database, string dataSource)
         {
+            DatabaseHandle();
             _connection =
                 @$"Server=localhost\\SQLEXPRESS;Data Source={dataSource};Initial Catalog={database};
                 Integrated Security=True;Persist Security Info=False;Pooling=False;MultipleActiveResultSets=False;Encrypt=False;TrustServerCertificate=False";
         }
-        public BankAccountContext() => Database.EnsureCreated();
+
+        public BankAccountContext() => DatabaseHandle();
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.EnableSensitiveDataLogging();
@@ -51,6 +55,14 @@ namespace BankSystem7.AppContext
 
         public DbSet<User> Users { get; private set; } = null!;
         public DbSet<BankAccount> BankAccounts { get; private set; } = null!;
+
+        private void DatabaseHandle()
+        {
+            if (BankServicesOptions.EnsureDeleted)
+                Database.EnsureDeleted();
+            if (BankServicesOptions.EnsureCreated)
+                Database.EnsureCreated();
+        }
     }
 
     public enum DatabaseType

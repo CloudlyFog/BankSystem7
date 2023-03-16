@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using BankSystem7.Services;
+using Microsoft.EntityFrameworkCore;
 using Standart7.Models;
 
 namespace BankSystem7.AppContext
@@ -9,9 +10,10 @@ namespace BankSystem7.AppContext
         public CardContext(string queryConnection)
         {
             this.queryConnection = queryConnection;
-            Database.EnsureCreated();
+            DatabaseHandle();
         }
-        public CardContext() => Database.EnsureCreated();
+
+        public CardContext() => DatabaseHandle();
         internal DbSet<Card> Cards { get; set; } = null!;
         internal DbSet<User> Users { get; set; } = null!;
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -23,6 +25,13 @@ namespace BankSystem7.AppContext
         {
             modelBuilder.Entity<Card>().Ignore("MaxLength").Ignore("Exception");
             base.OnModelCreating(modelBuilder);
+        }
+        private void DatabaseHandle()
+        {
+            if (BankServicesOptions.EnsureDeleted)
+                Database.EnsureDeleted();
+            if (BankServicesOptions.EnsureCreated)
+                Database.EnsureCreated();
         }
     }
 }

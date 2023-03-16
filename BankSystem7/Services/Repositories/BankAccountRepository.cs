@@ -17,9 +17,10 @@ namespace BankSystem7.Services.Repositories
 
         public BankAccountRepository()
         {
-            _bankRepository = new BankRepository(Connection);
             _bankAccountContext = new BankAccountContext(Connection);
             _bankContext = _bankRepository.BankContext;
+            SetBankServicesOptions();
+            _bankRepository = new BankRepository(Connection);
         }
         public BankAccountRepository(BankRepository bankRepository)
         {
@@ -27,8 +28,9 @@ namespace BankSystem7.Services.Repositories
         }
         public BankAccountRepository(string connection)
         {
-            _bankAccountContext = new BankAccountContext(connection);
-            _bankContext = new BankContext(connection);
+            _bankAccountContext = BankServicesOptions.BankAccountContext ?? new BankAccountContext(connection);
+            _bankContext = BankServicesOptions.BankContext ?? new BankContext(connection);
+            SetBankServicesOptions();
             _bankRepository = new BankRepository(connection);
         }
 
@@ -217,6 +219,12 @@ namespace BankSystem7.Services.Repositories
 
             if (!Exist(x => x.ID == item.ID)) 
                 throw new Exception($"Doesn't exist bank with id {{{item.ID}}}");
+        }
+
+        private void SetBankServicesOptions()
+        {
+            BankServicesOptions.BankContext = _bankContext;
+            BankServicesOptions.BankAccountContext = _bankAccountContext;
         }
 
         ~BankAccountRepository()

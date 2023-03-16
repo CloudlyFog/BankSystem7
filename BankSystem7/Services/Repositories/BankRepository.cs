@@ -15,14 +15,14 @@ namespace BankSystem7.Services.Repositories
         private bool _disposedValue;
         public BankRepository()
         {
-            _bankAccountContext = new BankAccountContext();
-            _bankContext = new BankContext();
+            _bankAccountContext = BankServicesOptions.BankAccountContext ?? new BankAccountContext();
+            _bankContext = BankServicesOptions.BankContext ?? new BankContext();
             BankContext = _bankContext;
         }
         public BankRepository(string connection)
         {
-            _bankAccountContext = new BankAccountContext(connection);
-            _bankContext = new BankContext(connection);
+            _bankAccountContext = BankServicesOptions.BankAccountContext ?? new BankAccountContext(connection);
+            _bankContext = BankServicesOptions.BankContext ?? new BankContext(connection);
             BankContext = _bankContext;
         }
         public void Dispose()
