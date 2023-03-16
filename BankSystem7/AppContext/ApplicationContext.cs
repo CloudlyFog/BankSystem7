@@ -1,3 +1,4 @@
+using BankSystem7.Services.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Standart7.Models;
 using Standart7.Services;
@@ -18,15 +19,22 @@ public class ApplicationContext : DbContext
 
     public ApplicationContext()
     {
-        if (EnsureDeleted)
-            Database.EnsureDeleted();
-        if (EnsureCreated)
-            Database.EnsureCreated();
+        DatabaseHandle();
+    }
+
+    public ApplicationContext(string connection)
+    {
+        ServiceConfiguration.SetConnection(connection);
+        DatabaseHandle();
+    }
+
+    public ApplicationContext(BankAccountRepository bankAccountRepository)
+    {
+        DatabaseHandle();
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        ServiceConfiguration.SetConnection(databaseName: "CabManagementSystemReborn");
         optionsBuilder.EnableSensitiveDataLogging();
         optionsBuilder.UseSqlServer(ServiceConfiguration.Connection);
     }
@@ -34,8 +42,6 @@ public class ApplicationContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         ModelConfiguration.Invoke(modelBuilder);
-        
-        
         
         base.OnModelCreating(modelBuilder);
     }
@@ -109,5 +115,13 @@ public class ApplicationContext : DbContext
         modelBuilder.Entity<User>().HasData(users);
         modelBuilder.Entity<BankAccount>().HasData(bankAccounts);
         modelBuilder.Entity<Bank>().HasData(banks);
+    }
+
+    private void DatabaseHandle()
+    {
+        if (EnsureDeleted)
+            Database.EnsureDeleted();
+        if (EnsureCreated)
+            Database.EnsureCreated();
     }
 }

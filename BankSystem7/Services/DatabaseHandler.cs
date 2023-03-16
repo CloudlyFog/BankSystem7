@@ -3,7 +3,7 @@ using Standart7.Models;
 
 namespace BankSystem7.Services;
 
-public sealed class DatabaseHandler : DbContext
+internal sealed class DatabaseHandler : DbContext
 {
     private static string _connection = string.Empty;
     

@@ -3,8 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Standart7.Models;
 using System.Linq.Expressions;
 using BankSystem7.AppContext;
-using Standart7.Middleware;
-using Standart7.Services;
 
 namespace BankSystem7.Services.Repositories
 {

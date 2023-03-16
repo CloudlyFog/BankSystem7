@@ -19,11 +19,11 @@ namespace BankSystem7.Services.Repositories
         {
             _bankAccountRepository = new BankAccountRepository();
         }
-        public UserRepository(string connection)
+        public UserRepository(string connection) : base(connection)
         {
             _bankAccountRepository = new BankAccountRepository(connection);
         }
-        public UserRepository(BankAccountRepository repository)
+        public UserRepository(BankAccountRepository repository) : base(repository)
         {
             _bankAccountRepository = repository;
         }

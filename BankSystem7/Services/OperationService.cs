@@ -4,7 +4,7 @@ using Standart7.Models;
 
 namespace BankSystem7.Services;
 
-public class OperationService<T> where T : class
+internal class OperationService<T> where T : class
 {
     public IMongoCollection<T> Collection { get; private set; }
     private IMongoDatabase _database;
