@@ -125,7 +125,7 @@ namespace BankSystem7.AppContext
             
             // accrual money to user's bank account
             if (BankAccountAccrual(bankAccountModel, 
-                    Banks.AsNoTracking().FirstOrDefault(x => x.BankID == bankAccountModel.BankID), 
+                    Banks.AsNoTracking().FirstOrDefault(x => x.ID == bankAccountModel.BankID), 
                          operationAccrualOnUserAccount) != ExceptionModel.Successfully)
                 return (ExceptionModel)operationAccrualOnUserAccount.OperationStatus.GetHashCode();
 
@@ -163,7 +163,7 @@ namespace BankSystem7.AppContext
 
             // withdraw money to user's bank account
             if (BankAccountWithdraw(bankAccountModel,
-                    Banks.AsNoTracking().FirstOrDefault(x => x.BankID == bankAccountModel.BankID),
+                    Banks.AsNoTracking().FirstOrDefault(x => x.ID == bankAccountModel.BankID),
                          operationAccrualOnUserAccount) != ExceptionModel.Successfully)
                 return (ExceptionModel)operationAccrualOnUserAccount.OperationStatus.GetHashCode();
 
@@ -195,7 +195,6 @@ namespace BankSystem7.AppContext
 
             bank.AccountAmount += operation.TransferAmount;
             bankAccount.BankAccountAmount -= operation.TransferAmount;
-            user.BankAccountAmount = bankAccount.BankAccountAmount;
             ChangeTracker.Clear();
             BankAccounts.Update(bankAccount);
             Banks.Update(bank);
@@ -226,7 +225,6 @@ namespace BankSystem7.AppContext
 
             bank.AccountAmount -= operation.TransferAmount;
             bankAccount.BankAccountAmount += operation.TransferAmount;
-            user.BankAccountAmount = bankAccount.BankAccountAmount;
             ChangeTracker.Clear();
             Update(bankAccount);
             Update(bank);
@@ -280,23 +278,23 @@ namespace BankSystem7.AppContext
             {
                 // SenderID is ID of bank
                 // ReceiverID is ID of user
-                if (!Banks.AsNoTracking().Any(x => x.BankID == operationModel.SenderID) || !Users.Any(x => x.ID == operationModel.ReceiverID))
+                if (!Banks.AsNoTracking().Any(x => x.ID == operationModel.SenderID) || !Users.Any(x => x.ID == operationModel.ReceiverID))
                     operationModel.OperationStatus = StatusOperationCode.Error;
 
-                if (Banks.AsNoTracking().FirstOrDefault(x => x.BankID == operationModel.SenderID)?.AccountAmount < operationModel.TransferAmount)
+                if (Banks.AsNoTracking().FirstOrDefault(x => x.ID == operationModel.SenderID)?.AccountAmount < operationModel.TransferAmount)
                     operationModel.OperationStatus = StatusOperationCode.Restricted;
             }
             else
             {
                 // SenderID is ID of user
                 // ReceiverID is ID of bank
-                if (!Banks.AsNoTracking().Any(x => x.BankID == operationModel.ReceiverID) || !Users.Any(x => x.ID == operationModel.SenderID))
+                if (!Banks.AsNoTracking().Any(x => x.ID == operationModel.ReceiverID) || !Users.Any(x => x.ID == operationModel.SenderID))
                     operationModel.OperationStatus = StatusOperationCode.Error;
                 if (BankAccounts.AsNoTracking().FirstOrDefault(x => x.UserID == operationModel.SenderID)?.BankAccountAmount < operationModel.TransferAmount)
                     operationModel.OperationStatus = StatusOperationCode.Restricted;
             }
 
-            if (!Banks.AsNoTracking().Any(x => x.BankID == operationModel.BankID))
+            if (!Banks.AsNoTracking().Any(x => x.ID == operationModel.BankID))
                 operationModel.OperationStatus = StatusOperationCode.Error;
 
             return operationModel.OperationStatus;

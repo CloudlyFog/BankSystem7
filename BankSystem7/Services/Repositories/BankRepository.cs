@@ -69,19 +69,14 @@ namespace BankSystem7.Services.Repositories
             if (user is null)
                 return ExceptionModel.VariableIsNull;
 
-            var card = _bankContext.Cards.FirstOrDefault(x => x.BankAccountID == user.BankAccountID);
-            if (card is null)
-                return ExceptionModel.VariableIsNull;
-
             bank.AccountAmount -= operation.TransferAmount;
             bankAccount.BankAccountAmount += operation.TransferAmount;
-            user.BankAccountAmount = bankAccount.BankAccountAmount;
-            card.Amount = user.BankAccountAmount;
+            user.Card.Amount = bankAccount.BankAccountAmount;
             _bankContext.ChangeTracker.Clear();
             _bankContext.BankAccounts.Update(bankAccount);
             _bankContext.Banks.Update(bank);
             _bankContext.Users.Update(user);
-            _bankContext.Cards.Update(card);
+            _bankContext.Cards.Update(user.Card);
             try
             {
                 _bankContext.SaveChanges();
@@ -114,19 +109,14 @@ namespace BankSystem7.Services.Repositories
             if (user is null)
                 return ExceptionModel.VariableIsNull;
 
-            var card = _bankContext.Cards.FirstOrDefault(x => x.BankAccountID == user.BankAccountID);
-            if (card is null)
-                return ExceptionModel.VariableIsNull;
-
             bank.AccountAmount += operation.TransferAmount;
             bankAccount.BankAccountAmount -= operation.TransferAmount;
-            user.BankAccountAmount = bankAccount.BankAccountAmount;
-            card.Amount = user.BankAccountAmount;
+            user.Card.Amount = bankAccount.BankAccountAmount;
             _bankContext.ChangeTracker.Clear();
             _bankContext.BankAccounts.Update(bankAccount);
             _bankContext.Banks.Update(bank);
             _bankContext.Users.Update(user);
-            _bankContext.Cards.Update(card);
+            _bankContext.Cards.Update(user.Card);
             try
             {
                 _bankContext.SaveChanges();

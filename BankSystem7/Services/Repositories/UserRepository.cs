@@ -3,6 +3,7 @@
 // Project-level suppressions either have no target or are given
 // a specific target and scoped to a namespace, type, member, etc.
 
+using System.Data;
 using Standart7.Models;
 using System.Linq.Expressions;
 using BankSystem7.AppContext;
@@ -15,35 +16,41 @@ namespace BankSystem7.Services.Repositories
     {
         private BankAccountRepository _bankAccountRepository;
         private bool _disposed;
+        private readonly BankAccountContext _bankAccountContext;
         public UserRepository()
         {
             _bankAccountRepository = new BankAccountRepository();
+            _bankAccountContext = BankServicesOptions.BankAccountContext ??
+                                  new BankAccountContext(BankServicesOptions.Connection);
         }
         public UserRepository(string connection) : base(connection)
         {
             _bankAccountRepository = new BankAccountRepository(connection);
+            _bankAccountContext = BankServicesOptions.BankAccountContext ??
+                                  new BankAccountContext(connection);
         }
         public UserRepository(BankAccountRepository repository) : base(repository)
         {
             _bankAccountRepository = repository;
+            _bankAccountContext = BankServicesOptions.BankAccountContext ??
+                                  new BankAccountContext(BankServicesOptions.Connection);
         }
         public ExceptionModel Create(User item)
         {
             if (item is null)
                 return ExceptionModel.OperationFailed;
-            if (Exist(x => x.ID == item.ID))//if user isn`t exist method will send false
+            
+            //if user isn`t exist method will send false
+            if (Exist(x => x.ID == item.ID))
                 return ExceptionModel.OperationFailed;
-            item.Password = new Password().GetHash(item.Password);
+            
             item.Authenticated = true;
-            item.ID = Guid.NewGuid();
-            var bankAccountModel = new BankAccount()
-            {
-                ID = item.BankAccountID,
-                UserID = item.ID
-            };
-            var operation = _bankAccountRepository.Create(bankAccountModel);
-            if (operation != ExceptionModel.Successfully)
-                return operation;
+
+            using var userCreationTransaction = _bankAccountContext.Database.CurrentTransaction ??
+                                                _bankAccountContext.Database.BeginTransaction(IsolationLevel
+                                                    .RepeatableRead);
+            
+            // before save instance of BankAccount need save instance of User
             Users.Add(item);
             try
             {
@@ -54,6 +61,16 @@ namespace BankSystem7.Services.Repositories
                 Console.WriteLine(ex.Message);
                 throw;
             }
+            
+            var createBankAccountOperation = _bankAccountRepository.Create(item.Card.BankAccount);
+            if (createBankAccountOperation != ExceptionModel.Successfully)
+            {
+                userCreationTransaction.Rollback();
+                return createBankAccountOperation;
+            }
+            
+            
+            userCreationTransaction.Commit();
             return ExceptionModel.Successfully;
         }
 
@@ -79,10 +96,11 @@ namespace BankSystem7.Services.Repositories
                 return ExceptionModel.OperationFailed;
             if (Exist(x => x.ID == item.ID))
                 return ExceptionModel.OperationFailed;
-            var bankAccountModel = _bankAccountRepository.Get(x => x.UserID == item.ID);
-            var operation = _bankAccountRepository.Delete(bankAccountModel);
-            if (operation != ExceptionModel.Successfully)
-                return operation;
+            
+            using var userDeleteTransaction = _bankAccountContext.Database.CurrentTransaction ??
+                                              _bankAccountContext.Database.BeginTransaction(IsolationLevel
+                                                  .RepeatableRead);
+            
             Users.Remove(item);
             try
             {
@@ -93,6 +111,14 @@ namespace BankSystem7.Services.Repositories
                 Console.WriteLine(ex.Message);
                 throw;
             }
+            var bankAccountDeleteOperation = _bankAccountRepository.Delete(item.Card.BankAccount);
+            if (bankAccountDeleteOperation != ExceptionModel.Successfully)
+            {
+                userDeleteTransaction.Rollback();
+                return bankAccountDeleteOperation;
+            }
+
+            userDeleteTransaction.Commit();
             return ExceptionModel.Successfully;
         }
 
@@ -108,6 +134,9 @@ namespace BankSystem7.Services.Repositories
                 return ExceptionModel.OperationFailed;
             if (Exist(x => x.ID == item.ID))
                 return ExceptionModel.OperationFailed;
+            using var userUpdateTransaction = _bankAccountContext.Database.CurrentTransaction ??
+                                              _bankAccountContext.Database.BeginTransaction(IsolationLevel
+                                                  .RepeatableRead);
             Users.Update(item);
             try
             {
@@ -118,6 +147,15 @@ namespace BankSystem7.Services.Repositories
                 Console.WriteLine(ex.Message);
                 throw;
             }
+
+            var bankAccountUpdateOperation = _bankAccountRepository.Update(item.Card.BankAccount);
+            if (bankAccountUpdateOperation != ExceptionModel.Successfully)
+            {
+                userUpdateTransaction.Rollback();
+                return bankAccountUpdateOperation;
+            }
+            
+            userUpdateTransaction.Commit();
             return ExceptionModel.Successfully;
         }
 

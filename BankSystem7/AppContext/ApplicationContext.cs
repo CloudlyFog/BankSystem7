@@ -58,10 +58,7 @@ public class ApplicationContext : DbContext
                 Password = "ZWMrBybtiDYhRBOSVdG0t2Y+dMPtYbxfcP171UTazXE=",
                 Authenticated = false,
                 PhoneNumber = "79431134423",
-                BankAccountID = new Guid("e26ccdd6-4e91-4611-93be-baefeb7f5047"),
                 BankID = new Guid("bed62930-9356-477a-bed5-b84d59336122"),
-                CardID = new Guid("8b38f63b-0433-485c-9a6c-dff20d808a14"),
-                BankAccountAmount = 18_000,
                 Age = 23
             }
         };
@@ -70,21 +67,18 @@ public class ApplicationContext : DbContext
             new()
             {
                 ID = new Guid("ae59b1df-089d-4823-a32a-41a44f878b4b"),
-                BankID = new Guid("bed62930-9356-477a-bed5-b84d59336122"),
                 BankName = "Tinkoff",
                 AccountAmount = 234523450
             },
             new()
             {
                 ID = new Guid("c2c4fc26-e503-4d48-8a24-ad9233e0e603"),
-                BankID = new Guid("e4c18139-f2c8-4a4b-a8b8-cf0d230b37fa"),
                 BankName = "SberBank",
                 AccountAmount = 1043200000
             },
             new()
             {
                 ID = new Guid("335ba509-2994-4068-9a50-f703490891ba"),
-                BankID = new Guid("b56c8051-6eee-4441-a7de-7cb4789de362"),
                 BankName = "PochtaBank",
                 AccountAmount = 100650000
             },
@@ -96,7 +90,6 @@ public class ApplicationContext : DbContext
                 ID = new Guid("a39a83d4-4947-4d63-8911-34346d9d5425"),
                 BankID = new Guid("bed62930-9356-477a-bed5-b84d59336122"),
                 UserID = new Guid("b5616fe2-0517-4a2f-aff3-e409fdbcafa0"),
-                CardID = new Guid("5c7b3546-6450-4962-a208-1e656bddcc64"),
                 BankAccountAmount = 100_000,
                 PhoneNumber = "9431234423",
                 AccountType = AccountType.User
@@ -106,7 +99,6 @@ public class ApplicationContext : DbContext
                 ID = new Guid("e26ccdd6-4e91-4611-93be-baefeb7f5047"),
                 BankID = new Guid("bed62930-9356-477a-bed5-b84d59336122"),
                 UserID = new Guid("b5616fe2-0517-4a2f-aff3-e409fdbcafa0"),
-                CardID = new Guid("8b38f63b-0433-485c-9a6c-dff20d808a14"),
                 BankAccountAmount = 10_000,
                 PhoneNumber = "9431134423",
                 AccountType = AccountType.User

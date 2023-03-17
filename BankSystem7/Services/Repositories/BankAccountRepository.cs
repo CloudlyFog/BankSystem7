@@ -92,7 +92,7 @@ namespace BankSystem7.Services.Repositories
         {
             CheckBankAccount(item);
 
-            var operation = new Operation()
+            var operation = new Operation
             {
                 BankID = item.BankID,
                 SenderID = item.BankID,
@@ -105,7 +105,7 @@ namespace BankSystem7.Services.Repositories
             if (createOperation != ExceptionModel.Successfully)
                 throw new Exception($"Operation can't create due to exception: {createOperation}");
             
-            var bank = _bankRepository.Get(x => x.BankID == operation.BankID);
+            var bank = _bankRepository.Get(x => x.ID == operation.BankID);
             if (_bankRepository.BankAccountAccrual(item, bank, operation) != ExceptionModel.Successfully)
                 throw new Exception($"Failed withdraw money from {bank}");
         }
@@ -120,7 +120,7 @@ namespace BankSystem7.Services.Repositories
         {
             CheckBankAccount(item);
 
-            var operation = new Operation()
+            var operation = new Operation
             {
                 BankID = item.BankID,
                 SenderID = item.UserID,
@@ -133,7 +133,7 @@ namespace BankSystem7.Services.Repositories
             if (createOperation != ExceptionModel.Successfully)
                 throw new Exception($"Operation can't create due to exception: {createOperation}");
             
-            var bank = _bankRepository.Get(x => x.BankID == operation.BankID);
+            var bank = _bankRepository.Get(x => x.ID == operation.BankID);
             var withdraw = _bankRepository.BankAccountWithdraw(item, bank, operation);
             if (withdraw != ExceptionModel.Successfully)
                 throw new Exception($"Failed withdraw money from {bank}\nException: {withdraw}");
@@ -181,6 +181,7 @@ namespace BankSystem7.Services.Repositories
             if (item is null || !Exist(x => x.ID == item.ID))
                 return ExceptionModel.VariableIsNull;
             _bankAccountContext.BankAccounts.Remove(item);
+            
             _bankAccountContext.SaveChanges();
             return ExceptionModel.Successfully;
         }
