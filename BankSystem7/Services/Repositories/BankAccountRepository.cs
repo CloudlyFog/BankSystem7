@@ -180,6 +180,7 @@ namespace BankSystem7.Services.Repositories
         {
             if (item is null || !Exist(x => x.ID == item.ID))
                 return ExceptionModel.VariableIsNull;
+            item.Bank = null;
             _bankAccountContext.BankAccounts.Remove(item);
             
             _bankAccountContext.SaveChanges();

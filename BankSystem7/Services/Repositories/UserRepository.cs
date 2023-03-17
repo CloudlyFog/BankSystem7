@@ -15,25 +15,33 @@ namespace BankSystem7.Services.Repositories
     public sealed class UserRepository : ApplicationContext, IRepository<User>
     {
         private BankAccountRepository _bankAccountRepository;
+        private BankRepository _bankRepository;
+        private CardRepository _cardRepository;
+        private BankAccountContext _bankAccountContext;
         private bool _disposed;
-        private readonly BankAccountContext _bankAccountContext;
         public UserRepository()
         {
-            _bankAccountRepository = new BankAccountRepository();
+            _bankAccountRepository = new BankAccountRepository(BankServicesOptions.Connection);
             _bankAccountContext = BankServicesOptions.BankAccountContext ??
                                   new BankAccountContext(BankServicesOptions.Connection);
+            _bankRepository = new BankRepository(BankServicesOptions.Connection);
+            _cardRepository = new CardRepository(_bankAccountRepository);
         }
         public UserRepository(string connection) : base(connection)
         {
             _bankAccountRepository = new BankAccountRepository(connection);
             _bankAccountContext = BankServicesOptions.BankAccountContext ??
-                                  new BankAccountContext(connection);
+                                  new BankAccountContext(BankServicesOptions.Connection);
+            _bankRepository = new BankRepository(connection);
+            _cardRepository = new CardRepository(_bankAccountRepository);
         }
         public UserRepository(BankAccountRepository repository) : base(repository)
         {
             _bankAccountRepository = repository;
             _bankAccountContext = BankServicesOptions.BankAccountContext ??
                                   new BankAccountContext(BankServicesOptions.Connection);
+            _bankRepository = new BankRepository(BankServicesOptions.Connection);
+            _cardRepository = new CardRepository(_bankAccountRepository);
         }
         public ExceptionModel Create(User item)
         {
@@ -85,8 +93,14 @@ namespace BankSystem7.Services.Repositories
             if (disposing)
             {
                 _bankAccountRepository.Dispose();
+                _bankRepository.Dispose();
+                _cardRepository.Dispose();
+                _bankAccountContext.Dispose();
             }
             _bankAccountRepository = null;
+            _bankRepository = null;
+            _cardRepository = null;
+            _bankAccountContext = null;
             _disposed = true;
         }
 
@@ -94,12 +108,18 @@ namespace BankSystem7.Services.Repositories
         {
             if (item is null)
                 return ExceptionModel.OperationFailed;
-            if (Exist(x => x.ID == item.ID))
+            if (!Exist(x => x.ID == item.ID))
                 return ExceptionModel.OperationFailed;
             
             using var userDeleteTransaction = _bankAccountContext.Database.CurrentTransaction ??
                                               _bankAccountContext.Database.BeginTransaction(IsolationLevel
                                                   .RepeatableRead);
+            var bankAccountDeleteOperation = _bankAccountRepository.Delete(item.Card.BankAccount);
+            if (bankAccountDeleteOperation != ExceptionModel.Successfully)
+            {
+                userDeleteTransaction.Rollback();
+                return bankAccountDeleteOperation;
+            }
             
             Users.Remove(item);
             try
@@ -111,12 +131,7 @@ namespace BankSystem7.Services.Repositories
                 Console.WriteLine(ex.Message);
                 throw;
             }
-            var bankAccountDeleteOperation = _bankAccountRepository.Delete(item.Card.BankAccount);
-            if (bankAccountDeleteOperation != ExceptionModel.Successfully)
-            {
-                userDeleteTransaction.Rollback();
-                return bankAccountDeleteOperation;
-            }
+            
 
             userDeleteTransaction.Commit();
             return ExceptionModel.Successfully;
@@ -126,13 +141,20 @@ namespace BankSystem7.Services.Repositories
 
         public IEnumerable<User> All => Users.AsNoTracking();
 
-        public User? Get(Expression<Func<User, bool>> predicate) => Users.AsNoTracking().FirstOrDefault(predicate);
+        public User? Get(Expression<Func<User, bool>> predicate)
+        {
+            var user = Users.AsNoTracking().FirstOrDefault(predicate);
+            user.Card = _cardRepository.Get(x => x.UserID == user.ID);
+            user.Card.BankAccount = _bankAccountRepository.Get(x => x.UserID == user.ID);
+            user.Card.BankAccount.Bank = _bankRepository.Get(x => x.BankAccounts.Contains(user.Card.BankAccount));
+            return user;
+        }
 
         public ExceptionModel Update(User item)
         {
             if (item is null)
                 return ExceptionModel.OperationFailed;
-            if (Exist(x => x.ID == item.ID))
+            if (!Exist(x => x.ID == item.ID))
                 return ExceptionModel.OperationFailed;
             using var userUpdateTransaction = _bankAccountContext.Database.CurrentTransaction ??
                                               _bankAccountContext.Database.BeginTransaction(IsolationLevel

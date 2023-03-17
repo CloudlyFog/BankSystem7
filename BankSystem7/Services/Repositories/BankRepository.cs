@@ -106,6 +106,7 @@ namespace BankSystem7.Services.Repositories
 
             
             var user = _bankContext.Users.FirstOrDefault(x => x.ID == bankAccount.UserID);
+            
             if (user is null)
                 return ExceptionModel.VariableIsNull;
 
