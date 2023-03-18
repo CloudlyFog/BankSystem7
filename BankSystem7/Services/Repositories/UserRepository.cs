@@ -162,15 +162,7 @@ namespace BankSystem7.Services.Repositories
             using var userUpdateTransaction = _bankAccountContext.Database.CurrentTransaction ??
                                               _bankAccountContext.Database.BeginTransaction(IsolationLevel
                                                   .RepeatableRead);
-            var bankAccountUpdateOperation = _bankAccountRepository.Update(item.Card.BankAccount);
-            if (bankAccountUpdateOperation != ExceptionModel.Successfully)
-            {
-                userUpdateTransaction.Rollback();
-                return bankAccountUpdateOperation;
-            }
             
-            item.Card.BankAccount = null;
-            item.Card = null;
             
             Users.Update(item);
             try
