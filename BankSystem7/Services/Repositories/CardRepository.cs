@@ -3,6 +3,7 @@ using Standart7.Models;
 using System.Linq.Expressions;
 using BankSystem7.AppContext;
 using BankSystem7.Services.Interfaces;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace BankSystem7.Services.Repositories
 {
@@ -66,7 +67,7 @@ namespace BankSystem7.Services.Repositories
         {
             if (item is null)
                 return ExceptionModel.VariableIsNull;
-            if (Exist(item.ID))
+            if (Exist(x => x.ID == item.ID))
                 return ExceptionModel.OperationFailed;
             _cardContext.Cards.Update(item);
             _cardContext.SaveChanges();
@@ -85,7 +86,7 @@ namespace BankSystem7.Services.Repositories
                 return ExceptionModel.OperationRestricted;
             if (item is null)
                 return ExceptionModel.VariableIsNull;
-            if (Exist(item.ID))
+            if (Exist(x => x.ID == item.ID))
                 return ExceptionModel.OperationFailed;
             _cardContext.Cards.Add(item);
             _cardContext.SaveChanges();
@@ -96,18 +97,17 @@ namespace BankSystem7.Services.Repositories
         {
             if (item is null)
                 return ExceptionModel.VariableIsNull;
-            if (!Exist(item.ID))
+            if (!Exist(x => x.ID == item.ID))
                 return ExceptionModel.OperationFailed;
+            var user = item.User;
+            item.User = null;
             _cardContext.Cards.Remove(item);
             _cardContext.SaveChanges();
+            item.User = user;
             return ExceptionModel.Successfully;
         }
 
-        public bool Exist(Guid id) => _cardContext.Cards.AsNoTracking().Any(card => card.ID == id);
-
         public bool Exist(Expression<Func<Card, bool>> predicate) => _cardContext.Cards.AsNoTracking().Any(predicate);
-
-        public Card? Get(Guid id) => _cardContext.Cards.AsNoTracking().FirstOrDefault(x => x.ID == id);
 
         public Card? Get(Expression<Func<Card, bool>> predicate) => _cardContext.Cards.AsNoTracking().FirstOrDefault(predicate);
 

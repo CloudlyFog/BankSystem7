@@ -67,6 +67,7 @@ namespace BankSystem7.Services.Repositories
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
+                userCreationTransaction.Rollback();
                 throw;
             }
             
@@ -114,12 +115,6 @@ namespace BankSystem7.Services.Repositories
             using var userDeleteTransaction = _bankAccountContext.Database.CurrentTransaction ??
                                               _bankAccountContext.Database.BeginTransaction(IsolationLevel
                                                   .RepeatableRead);
-            var bankAccountDeleteOperation = _bankAccountRepository.Delete(item.Card.BankAccount);
-            if (bankAccountDeleteOperation != ExceptionModel.Successfully)
-            {
-                userDeleteTransaction.Rollback();
-                return bankAccountDeleteOperation;
-            }
             
             Users.Remove(item);
             try
@@ -129,7 +124,15 @@ namespace BankSystem7.Services.Repositories
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
+                userDeleteTransaction.Rollback();
                 throw;
+            }
+            
+            var bankAccountDeleteOperation = _bankAccountRepository.Delete(item.Card.BankAccount);
+            if (bankAccountDeleteOperation != ExceptionModel.Successfully)
+            {
+                userDeleteTransaction.Rollback();
+                return bankAccountDeleteOperation;
             }
             
 
@@ -159,6 +162,16 @@ namespace BankSystem7.Services.Repositories
             using var userUpdateTransaction = _bankAccountContext.Database.CurrentTransaction ??
                                               _bankAccountContext.Database.BeginTransaction(IsolationLevel
                                                   .RepeatableRead);
+            var bankAccountUpdateOperation = _bankAccountRepository.Update(item.Card.BankAccount);
+            if (bankAccountUpdateOperation != ExceptionModel.Successfully)
+            {
+                userUpdateTransaction.Rollback();
+                return bankAccountUpdateOperation;
+            }
+            
+            item.Card.BankAccount = null;
+            item.Card = null;
+            
             Users.Update(item);
             try
             {
@@ -167,16 +180,10 @@ namespace BankSystem7.Services.Repositories
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
+                userUpdateTransaction.Rollback();
                 throw;
             }
 
-            var bankAccountUpdateOperation = _bankAccountRepository.Update(item.Card.BankAccount);
-            if (bankAccountUpdateOperation != ExceptionModel.Successfully)
-            {
-                userUpdateTransaction.Rollback();
-                return bankAccountUpdateOperation;
-            }
-            
             userUpdateTransaction.Commit();
             return ExceptionModel.Successfully;
         }
