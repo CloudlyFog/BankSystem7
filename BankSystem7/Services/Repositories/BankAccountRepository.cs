@@ -4,6 +4,7 @@ using System.Linq.Expressions;
 using BankSystem7.AppContext;
 using BankSystem7.Services.Interfaces;
 using Standart7.Models;
+using Standart7.Services;
 
 namespace BankSystem7.Services.Repositories
 {
@@ -31,7 +32,7 @@ namespace BankSystem7.Services.Repositories
             _bankAccountContext = BankServicesOptions.BankAccountContext ?? new BankAccountContext(connection);
             _bankContext = BankServicesOptions.BankContext ?? new BankContext(connection);
             SetBankServicesOptions();
-            _bankRepository = new BankRepository(connection);
+            _bankRepository = BankServicesOptions.ServiceConfiguration?.BankRepository ?? new BankRepository(connection);
         }
 
         [Obsolete("This constructor has bad implementation. We don't recommend to use it.")]

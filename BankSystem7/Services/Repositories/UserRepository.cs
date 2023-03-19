@@ -9,6 +9,7 @@ using System.Linq.Expressions;
 using BankSystem7.AppContext;
 using BankSystem7.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Standart7.Services;
 
 namespace BankSystem7.Services.Repositories
 {
@@ -40,8 +41,8 @@ namespace BankSystem7.Services.Repositories
             _bankAccountRepository = repository;
             _bankAccountContext = BankServicesOptions.BankAccountContext ??
                                   new BankAccountContext(BankServicesOptions.Connection);
-            _bankRepository = new BankRepository(BankServicesOptions.Connection);
-            _cardRepository = new CardRepository(_bankAccountRepository);
+            _bankRepository = BankServicesOptions.ServiceConfiguration?.BankRepository ?? new BankRepository(BankServicesOptions.Connection);
+            _cardRepository = BankServicesOptions.ServiceConfiguration?.CardRepository ?? new CardRepository(_bankAccountRepository);
         }
         public ExceptionModel Create(User item)
         {
