@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
-namespace Standart7.Middleware;
+namespace BankSystem7.Middleware;
 
 
 /// <summary>
