@@ -66,6 +66,8 @@ namespace BankSystem7.Services.Repositories
                 return (ExceptionModel)operation.OperationStatus.GetHashCode();
 
             var user = _bankContext.Users.FirstOrDefault(x => x.ID == bankAccount.UserID);
+            user.Card = _bankContext.Cards.FirstOrDefault(x => x.UserID == user.ID);
+            
             if (user is null)
                 return ExceptionModel.VariableIsNull;
 
@@ -73,10 +75,48 @@ namespace BankSystem7.Services.Repositories
             bankAccount.BankAccountAmount += operation.TransferAmount;
             user.Card.Amount = bankAccount.BankAccountAmount;
             _bankContext.ChangeTracker.Clear();
+            _bankAccountContext.ChangeTracker.Clear();
             _bankContext.BankAccounts.Update(bankAccount);
             _bankContext.Banks.Update(bank);
             _bankContext.Users.Update(user);
             _bankContext.Cards.Update(user.Card);
+            try
+            {
+                _bankContext.SaveChanges();
+                _bankContext.DeleteOperation(operation);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+            return ExceptionModel.Successfully;
+        }
+        
+        /// <summary>
+        /// asynchronously accrual money to user bank account from bank's account
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="bank"></param>
+        /// <param name="operation"></param>
+        /// <exception cref="Exception"></exception>
+        public ExceptionModel BankAccountAccrual(User user, Bank bank, Operation operation)
+        {
+            if (user is null || operation is null || user.Card is null || user.Card.BankAccount is null ||
+                bank is null || !Exist(x => x.ID == bank.ID))
+                return ExceptionModel.VariableIsNull;
+            if (operation.OperationStatus != StatusOperationCode.Successfully)
+                return (ExceptionModel)operation.OperationStatus.GetHashCode();
+            
+            if (user is null)
+                return ExceptionModel.VariableIsNull;
+
+            bank.AccountAmount -= operation.TransferAmount;
+            user.Card.BankAccount.BankAccountAmount += operation.TransferAmount;
+            user.Card.Amount = user.Card.BankAccount.BankAccountAmount;
+            _bankContext.ChangeTracker.Clear();
+            _bankContext.Users.Update(user);
+            _bankContext.Banks.Update(bank);
             try
             {
                 _bankContext.SaveChanges();
@@ -106,6 +146,7 @@ namespace BankSystem7.Services.Repositories
 
             
             var user = _bankContext.Users.FirstOrDefault(x => x.ID == bankAccount.UserID);
+            user.Card = _bankContext.Cards.FirstOrDefault(x => x.UserID == user.ID);
             
             if (user is null)
                 return ExceptionModel.VariableIsNull;
@@ -114,6 +155,7 @@ namespace BankSystem7.Services.Repositories
             bankAccount.BankAccountAmount -= operation.TransferAmount;
             user.Card.Amount = bankAccount.BankAccountAmount;
             _bankContext.ChangeTracker.Clear();
+            _bankAccountContext.ChangeTracker.Clear();
             _bankContext.BankAccounts.Update(bankAccount);
             _bankContext.Banks.Update(bank);
             _bankContext.Users.Update(user);
@@ -131,6 +173,39 @@ namespace BankSystem7.Services.Repositories
             return ExceptionModel.Successfully;
         }
 
+        
+        /// <summary>
+        /// asynchronously withdraw money from user bank account and accrual to bank's account
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="bank"></param>
+        /// <param name="operation"></param>
+        /// <exception cref="Exception"></exception>
+        public ExceptionModel BankAccountWithdraw(User user, Bank bank, Operation operation)
+        {
+            if (user is null || bank is null)
+                return ExceptionModel.VariableIsNull;
+            if (operation.OperationStatus != StatusOperationCode.Successfully)
+                return (ExceptionModel)operation.OperationStatus.GetHashCode();
+
+            bank.AccountAmount += operation.TransferAmount;
+            user.Card.BankAccount.BankAccountAmount -= operation.TransferAmount;
+            user.Card.Amount = user.Card.BankAccount.BankAccountAmount;
+            _bankContext.ChangeTracker.Clear();
+            _bankContext.Users.Update(user);
+            _bankContext.Banks.Update(bank);
+            try
+            {
+                _bankContext.SaveChanges();
+                _bankContext.DeleteOperation(operation); // doesn't exist operation
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+            return ExceptionModel.Successfully;
+        }
         public ExceptionModel Create(Bank item)
         {
             if (item is null || !Exist(x => x.ID == item.ID))

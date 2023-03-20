@@ -67,6 +67,22 @@ namespace BankSystem7.Services.Repositories
             _disposedValue = true;
         }
 
+        public async Task<ExceptionModel> Transfer(User? from, User? to, decimal transferAmount)
+        {
+            if (from is null || to is null || from.Card is null || to.Card is null || from.Card.BankAccount is null ||
+                to.Card.BankAccount is null || transferAmount <= 0)
+                return ExceptionModel.OperationFailed;
+            
+            if (!Exist(x => x.ID == from.Card.BankAccount.ID) || !Exist(x => x.ID == to.Card.BankAccount.ID))
+                return ExceptionModel.OperationFailed;
+            
+            using var transaction = _bankContext.Database.BeginTransaction(IsolationLevel.RepeatableRead);
+            await WithdrawAsync(from, transferAmount);
+            await AccrualAsync(to, transferAmount);
+            transaction.Commit();
+            return ExceptionModel.Successfully;
+        }
+        
         public async Task<ExceptionModel> Transfer(BankAccount? from, BankAccount? to, decimal transferAmount)
         {
             if (from is null || to is null || transferAmount <= 0)
@@ -109,6 +125,33 @@ namespace BankSystem7.Services.Repositories
             if (_bankRepository.BankAccountAccrual(item, bank, operation) != ExceptionModel.Successfully)
                 throw new Exception($"Failed withdraw money from {bank}");
         }
+        
+        /// <summary>
+        /// asynchronously accrual money on account with the same user id
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="amountAccrual"></param>
+        /// <returns>object of <see cref="ExceptionModel"/></returns>
+        private async Task AccrualAsync(User? item, decimal amountAccrual)
+        {
+            CheckBankAccount(item.Card.BankAccount);
+
+            var operation = new Operation
+            {
+                BankID = item.BankID,
+                SenderID = item.BankID,
+                ReceiverID = item.ID,
+                TransferAmount = amountAccrual,
+                OperationKind = OperationKind.Accrual
+            };
+            var createOperation = _bankContext.CreateOperation(operation, OperationKind.Accrual);
+            
+            if (createOperation != ExceptionModel.Successfully)
+                throw new Exception($"Operation can't create due to exception: {createOperation}");
+            
+            if (_bankRepository.BankAccountAccrual(item, item.Card.BankAccount.Bank, operation) != ExceptionModel.Successfully)
+                throw new Exception($"Failed withdraw money from {item.Card.BankAccount.Bank.BankName}");
+        }
 
         /// <summary>
         /// withdraw money from account with the same user id
@@ -137,6 +180,37 @@ namespace BankSystem7.Services.Repositories
             var withdraw = _bankRepository.BankAccountWithdraw(item, bank, operation);
             if (withdraw != ExceptionModel.Successfully)
                 throw new Exception($"Failed withdraw money from {bank}\nException: {withdraw}");
+        }
+        
+        /// <summary>
+        /// withdraw money from account with the same user id
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="amountAccrual"></param>
+        /// <returns>object of <see cref="ExceptionModel"/></returns>
+        private async Task WithdrawAsync(User? item, decimal amountAccrual)
+        {
+            if (item.Card is null)
+                throw new Exception("Passed instance of Card is null.");
+            
+            CheckBankAccount(item.Card.BankAccount);
+
+            var operation = new Operation
+            {
+                BankID = item.BankID,
+                SenderID = item.ID,
+                ReceiverID = item.BankID,
+                TransferAmount = amountAccrual,
+                OperationKind = OperationKind.Withdraw
+            };
+            
+            var createOperation = _bankContext.CreateOperation(operation, OperationKind.Withdraw);
+            if (createOperation != ExceptionModel.Successfully)
+                throw new Exception($"Operation can't create due to exception: {createOperation}");
+            
+            var withdraw = _bankRepository.BankAccountWithdraw(item, item.Card.BankAccount.Bank, operation);
+            if (withdraw != ExceptionModel.Successfully)
+                throw new Exception($"Failed withdraw money from {item.Card.BankAccount.Bank.BankName}\nException: {withdraw}");
         }
 
         /// <summary>
