@@ -2,9 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using BankSystem7.AppContext;
+using BankSystem7.Models;
 using BankSystem7.Services.Interfaces;
-using Standart7.Models;
-using Standart7.Services;
 
 namespace BankSystem7.Services.Repositories
 {

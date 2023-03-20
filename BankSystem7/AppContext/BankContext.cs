@@ -1,10 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
 using System.Data;
+using BankSystem7.Models;
 using BankSystem7.Services;
 using Standart7.Middleware;
-using Standart7.Models;
-using Standart7.Services;
 
 namespace BankSystem7.AppContext
 {

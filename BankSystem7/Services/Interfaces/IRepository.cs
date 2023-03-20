@@ -1,5 +1,5 @@
-﻿using Standart7.Models;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
+using BankSystem7.Models;
 
 namespace BankSystem7.Services.Interfaces
 {

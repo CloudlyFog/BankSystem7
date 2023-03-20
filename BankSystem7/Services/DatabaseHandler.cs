@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Standart7.Models;
+﻿using BankSystem7.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace BankSystem7.Services;
 

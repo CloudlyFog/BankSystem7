@@ -1,6 +1,6 @@
+using BankSystem7.Models;
 using BankSystem7.Services;
 using Microsoft.EntityFrameworkCore;
-using Standart7.Models;
 
 namespace BankSystem7.AppContext
 {

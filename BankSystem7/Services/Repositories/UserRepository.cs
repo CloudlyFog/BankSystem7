@@ -4,12 +4,11 @@
 // a specific target and scoped to a namespace, type, member, etc.
 
 using System.Data;
-using Standart7.Models;
 using System.Linq.Expressions;
 using BankSystem7.AppContext;
+using BankSystem7.Models;
 using BankSystem7.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Standart7.Services;
 
 namespace BankSystem7.Services.Repositories
 {
