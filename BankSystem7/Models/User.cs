@@ -7,7 +7,6 @@ namespace BankSystem7.Models;
 public class User
 {
     private string _phoneNumber;
-    private string _passwordValue;
 
     [Key]
     public Guid ID { get; set; } = Guid.NewGuid();
@@ -16,11 +15,7 @@ public class User
     
     public string Email { get; set; } = string.Empty;
 
-    public string Password
-    {
-        get => _passwordValue;
-        set => _passwordValue = SecurePasswordHasher.Hash(value);
-    }
+    public string Password { get; set; }
     
     public bool Authenticated { get; set; }
 

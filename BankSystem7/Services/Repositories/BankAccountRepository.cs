@@ -76,10 +76,19 @@ namespace BankSystem7.Services.Repositories
             if (!Exist(x => x.ID == from.Card.BankAccount.ID) || !Exist(x => x.ID == to.Card.BankAccount.ID))
                 return ExceptionModel.OperationFailed;
             
-            using var transaction = _bankContext.Database.BeginTransaction(IsolationLevel.RepeatableRead);
-            await WithdrawAsync(from, transferAmount);
-            await AccrualAsync(to, transferAmount);
-            transaction.Commit();
+            //using var transaction = _bankContext.Database.BeginTransaction(IsolationLevel.RepeatableRead);
+            try
+            {
+                await WithdrawAsync(from, transferAmount);
+                await AccrualAsync(to, transferAmount);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                //transaction.Rollback();
+                throw;
+            }
+            //transaction.Commit();
             return ExceptionModel.Successfully;
         }
         
