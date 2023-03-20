@@ -50,10 +50,12 @@ public class BankAccount
     {
         
     }
-    public BankAccount(User user)
+    public BankAccount(User user, Bank bank)
     {
         _phoneNumber = user.PhoneNumber;
         UserID = user.ID;
+        Bank = bank;
+        BankID = bank.ID;
     }
     
     [Key]

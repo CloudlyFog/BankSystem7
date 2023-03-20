@@ -17,13 +17,13 @@ namespace BankSystem7.Services.Repositories
 
         public CardRepository()
         {
-            _cardContext = new CardContext(_connection);
-            _bankAccountRepository = new BankAccountRepository(_connection);
+            _cardContext = new CardContext(BankServicesOptions.Connection);
+            _bankAccountRepository = new BankAccountRepository(BankServicesOptions.Connection);
         }
         public CardRepository(BankAccountRepository bankAccountRepository)
         {
             _bankAccountRepository = bankAccountRepository;
-            _cardContext = new CardContext(_connection);
+            _cardContext = new CardContext(BankServicesOptions.Connection);
         }
         public CardRepository(BankAccountRepository bankAccountRepository, string connection)
         {

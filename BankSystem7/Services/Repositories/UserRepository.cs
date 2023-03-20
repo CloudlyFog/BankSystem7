@@ -147,9 +147,17 @@ namespace BankSystem7.Services.Repositories
         public User? Get(Expression<Func<User, bool>> predicate)
         {
             var user = Users.AsNoTracking().FirstOrDefault(predicate);
+            if (user is null)
+                return null;
             user.Card = _cardRepository.Get(x => x.UserID == user.ID);
+            if (user.Card is null)
+                return null;
             user.Card.BankAccount = _bankAccountRepository.Get(x => x.UserID == user.ID);
+            if (user.Card.BankAccount is null)
+                return null;
             user.Card.BankAccount.Bank = _bankRepository.Get(x => x.BankAccounts.Contains(user.Card.BankAccount));
+            if (user.Card.BankAccount.Bank is null)
+                return null;
             return user;
         }
 
