@@ -7,11 +7,12 @@ namespace BankSystem7.Services;
 public class ServiceConfiguration
 {
     public static string Connection { get; private set; } =
-        @$"Server=localhost\\SQLEXPRESS;Data Source=maxim;Initial Catalog=Test;
+        @"Server=localhost\\SQLEXPRESS;Data Source=maxim;Initial Catalog=Test;
             Integrated Security=True;Persist Security Info=False;Pooling=False;
             MultipleActiveResultSets=False; Encrypt=False;TrustServerCertificate=False";
 
     private const string DefaultConnectionValue = "default";
+    private const string DefaultDataSource = "maxim";
 
     
     private bool _disposed;
@@ -34,19 +35,22 @@ public class ServiceConfiguration
         CreateInstance(options);
     }
 
-    public static void SetConnection(string connection = DefaultConnectionValue, string? databaseName = null)
+    public static void SetConnection(string connection = DefaultConnectionValue, string? databaseName = null, string dataSource = DefaultDataSource)
     {
-        if (connection == null && databaseName is null || connection == string.Empty)
-            return;
-
-        if (connection != DefaultConnectionValue && connection is not null)
+        if (connection != DefaultConnectionValue && connection is not null && connection != string.Empty)
         {
             Connection = connection;
             BankServicesOptions.Connection = Connection;
             return;
         }
+
+        if (databaseName is null || dataSource is null)
+        {
+            BankServicesOptions.Connection = Connection;
+            return;
+        }
         
-        Connection = @$"Server=localhost\\SQLEXPRESS;Data Source=maxim;Initial Catalog={databaseName};
+        Connection = @$"Server=localhost\\SQLEXPRESS;Data Source={dataSource};Initial Catalog={databaseName};
             Integrated Security=True;Persist Security Info=False;Pooling=False;
             MultipleActiveResultSets=False; Encrypt=False;TrustServerCertificate=False";
         BankServicesOptions.Connection = Connection;

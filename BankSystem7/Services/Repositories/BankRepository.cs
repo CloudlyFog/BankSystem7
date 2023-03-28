@@ -172,8 +172,7 @@ public sealed class BankRepository : IRepository<Bank>
         }
         return ExceptionModel.Successfully;
     }
-
-        
+    
     /// <summary>
     /// asynchronously withdraw money from user bank account and accrual to bank's account
     /// </summary>
