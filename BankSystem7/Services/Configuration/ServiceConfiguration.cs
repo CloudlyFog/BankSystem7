@@ -29,9 +29,9 @@ public class ServiceConfiguration
         BankRepository = new BankRepository(Connection);
     }
 
-    public ServiceConfiguration(RequestDelegate next)
+    public ServiceConfiguration(RequestDelegate next, ConfigurationOptions options)
     {
-        CreateInstance();
+        CreateInstance(options);
     }
 
     public static void SetConnection(string connection = DefaultConnectionValue, string? databaseName = null)

@@ -1,15 +1,12 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Data.HashFunction.Jenkins;
-using System.Text;
 
 namespace BankSystem7.Models;
 public class User
 {
-    private string _phoneNumber;
 
     [Key]
-    public Guid ID { get; set; } = Guid.NewGuid();
+    public Guid? ID { get; set; } = Guid.NewGuid();
     
     public string Name { get; set; } = string.Empty;
     
@@ -19,11 +16,7 @@ public class User
     
     public bool Authenticated { get; set; }
 
-    public string PhoneNumber
-    {
-        get => _phoneNumber;
-        set => _phoneNumber = $"7{value}";
-    }
+    public string PhoneNumber { get; set; }
 
     public Guid? BankID { get; set; } = Guid.Empty;
     

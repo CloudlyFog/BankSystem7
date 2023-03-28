@@ -44,7 +44,6 @@ public class Credit
 
 public class BankAccount
 {
-    private string _phoneNumber = string.Empty;
 
     public BankAccount()
     {
@@ -52,7 +51,7 @@ public class BankAccount
     }
     public BankAccount(User user, Bank bank)
     {
-        _phoneNumber = user.PhoneNumber;
+        PhoneNumber = user.PhoneNumber;
         UserID = user.ID;
         Bank = bank;
         BankID = bank.ID;
@@ -67,11 +66,7 @@ public class BankAccount
     public Bank? Bank { get; set; }
     public User? User { get; set; }
 
-    public string PhoneNumber
-    {
-        get => _phoneNumber;
-        set => _phoneNumber = $"7{value}";
-    }
+    public string PhoneNumber { get; set; }
 
     public AccountType AccountType { get; set; } = AccountType.User;
     public decimal BankAccountAmount { get; set; }

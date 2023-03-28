@@ -15,7 +15,7 @@ public sealed class ServiceConfigurationMiddleware : ServiceConfiguration, IDisp
 
     private bool _disposed;
 
-    public ServiceConfigurationMiddleware(RequestDelegate next, ConfigurationOptions options) : base(next)
+    public ServiceConfigurationMiddleware(RequestDelegate next, ConfigurationOptions options) : base(next, options)
     {
         Options = options;
         _next = next;

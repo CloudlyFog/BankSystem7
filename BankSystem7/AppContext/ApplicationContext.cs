@@ -46,6 +46,12 @@ public class ApplicationContext : DbContext
         base.OnModelCreating(modelBuilder);
     }
 
+    public override int SaveChanges()
+    {
+        
+        return base.SaveChanges();
+    }
+
     private void FillDatabase(ModelBuilder modelBuilder)
     {
         var users = new List<User>()
