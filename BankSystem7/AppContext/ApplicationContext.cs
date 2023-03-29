@@ -39,7 +39,7 @@ public class ApplicationContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        ModelConfiguration.Invoke(modelBuilder);
+        new ModelConfiguration().Invoke(modelBuilder);
         
         base.OnModelCreating(modelBuilder);
     }

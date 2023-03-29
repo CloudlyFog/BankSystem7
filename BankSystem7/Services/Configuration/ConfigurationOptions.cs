@@ -1,7 +1,7 @@
 ﻿
 namespace BankSystem7.Services;
 
-public class ConfigurationOptions
+public sealed class ConfigurationOptions
 {
     public bool EnsureDeleted { get; set; }
     public bool EnsureCreated { get; set; } = true;

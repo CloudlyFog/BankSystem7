@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BankSystem7.Services;
 
-public sealed class ModelConfiguration
+public class ModelConfiguration
 {
-    public static void Invoke(ModelBuilder modelBuilder)
+    public virtual void Invoke(ModelBuilder modelBuilder)
     {
         ConfigureCardRelationships(modelBuilder);
         ConfigureCreditRelationShips(modelBuilder);
