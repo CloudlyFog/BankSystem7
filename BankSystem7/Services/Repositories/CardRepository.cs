@@ -11,7 +11,7 @@ public sealed class CardRepository : IRepository<Card>
     private CardContext _cardContext;
     private BankAccountRepository _bankAccountRepository;
     private bool _disposedValue;
-    private readonly string _connection = @"Server=localhost\\SQLEXPRESS;Data Source=maxim;Initial Catalog=CabManagementSystem;Integrated Security=True;
+    private readonly string _connection = @"Server=localhost\\SQLEXPRESS;Data Source=maxim;Initial Catalog=Test;Integrated Security=True;
             Persist Security Info=False;Pooling=False;MultipleActiveResultSets=False;
             Encrypt=False;TrustServerCertificate=False";
 

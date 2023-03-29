@@ -4,8 +4,21 @@
         <TargetFrameworks>net7.0;net6.0</TargetFrameworks>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <PackageVersion>0.2.8</PackageVersion>
+        <Authors>CloudlyFog</Authors>
+        <Copyright>Copyright (c) CloudlyFog 2023</Copyright>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <Description>This package was developed for common using and learning definite technology. It also let everybody to use bank system in its projects and change logic for your needs.</Description>
+        <PackageLicenseUrl>https://mit-license.org/</PackageLicenseUrl>
+        <PackageTags>bank;account;banksystem;credit;transfer;money;bankaccount</PackageTags>
+        <PackageReleaseNotes>Added some documentation to code.</PackageReleaseNotes>
     </PropertyGroup>
 
+    <ItemGroup>
+        <None Include="docs\README.md" Pack="true" PackagePath="\" />
+    </ItemGroup>
+    
     <ItemGroup>
       <PackageReference Include="Microsoft.AspNetCore.Cryptography.KeyDerivation" Version="7.0.0-rc.1.22427.2" />
       <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />

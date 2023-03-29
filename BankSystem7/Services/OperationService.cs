@@ -3,14 +3,14 @@ using MongoDB.Driver;
 
 namespace BankSystem7.Services;
 
-internal class OperationService<T> where T : class
+internal sealed class OperationService<T> where T : class
 {
     public IMongoCollection<T> Collection { get; private set; }
     private IMongoDatabase _database;
     private MongoClientSettings _settings;
     private MongoClient _client;
     public const string DefaultConnection = "mongodb://localhost:27017";
-    public const string DefaultDatabaseName = "BankSystem";
+    public const string DefaultDatabaseName = "Test";
     public const string DefaultCollectionName = "Operations";
     
     [Obsolete("This constructor contains logic which now in development.")]
@@ -77,7 +77,7 @@ internal class OperationService<T> where T : class
     // }
 }
 
-public class OperationOptionsBuilder<T> where T : class
+internal sealed class OperationOptionsBuilder<T> where T : class
 {
     [Required] public string Name { get; set; } = "Default";
     public string Connection { get; set; } = OperationService<T>.DefaultConnection;

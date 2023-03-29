@@ -1,6 +1,5 @@
 ﻿using BankSystem7.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace BankSystem7.Services;
 
@@ -31,8 +30,6 @@ public sealed class ModelConfiguration
             .HasForeignKey<Credit>(credit => credit.UserID)
             .OnDelete(DeleteBehavior.Cascade);
     }
-    
-    
 
     private static void ConfigureCardRelationships(ModelBuilder modelBuilder)
     {

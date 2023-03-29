@@ -4,14 +4,19 @@ This package was developed for common using and learning definite technology.
 It also let everybody to use bank system in its projects and change logic for your needs.
 
 **It's a beta version of library. Some exceptions can be weren't found.**
+
+Version 0.2.8-beta is the last maximum stable version without critical bugs but can contain some invisible for us bugs and it can cause to exceptions.
+For avoid that You can write to cloudyfg@gmail.com with title "**BANKSYSTEM REPORT BUG**" and in the body write about vulnerability or bug as detailed as possible. 
+It can help us to fix bug or remove vulnerability.
+****
 # Documentation
 
 ## Structure of project
 
- 1. Folder **AppContext** is folder where contain context classes for interaction with database without buisness logic.
+ 1. Folder **AppContext** is folder where contain context classes for interaction with database without business logic.
  2.  Folder **Services** contains 2 sub folders: **Interfaces** and **Repositories**.
  3.  Folder **Interfaces** contains interfaces which describes structure of inherited classes.
- 4.  Folder **Repositories** is folder with all buisness logic of project. Only there simple developer has access.
+ 4.  Folder **Repositories** is folder with all business logic of project. Only there simple developer has access.
 
 ## How to interact with database?
 Developer can interact with database using class BankServiceOptions that provides properties for a little configuration. Set connection string you can by set value to property Connection. Ensure create or delete database by setting value to properties EnsureCreated and EnsureDeleted.
@@ -33,7 +38,7 @@ There are 2 classes context:
 **Methods:**
  1. `public ExceptionModel CreateOperation(Operation operation,`     						     `OperationKind operationKind)` - creates transaction operation.
  2. `public ExceptionModel DeleteOperation(Operation operation)` - delete transaction operation
- 3. `public ExceptionModel TakeCredit(BankAccount bankAccount, Credit credit)` - gives money to user which creditionals specified in `Credit`.
+ 3. `public ExceptionModel TakeCredit(BankAccount bankAccount, Credit credit)` - gives money to user which data specified in `Credit`.
  4. `public ExceptionModel RepayCredit(BankAccount bankAccount, Credit credit)` - handles repaying credit.
  5. `private ExceptionModel BankAccountWithdraw(Bank bank, Operation operation)` - withdraw money from bank's account.
  6. `public ExceptionModel BankAccountWithdraw(BankAccount bankAccount, Bank bank, Operation operation)` - withdraw money from user bank account and accrual to bank's account.

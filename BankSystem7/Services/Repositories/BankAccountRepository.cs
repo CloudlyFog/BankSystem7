@@ -13,14 +13,14 @@ public sealed class BankAccountRepository : IRepository<BankAccount>
     private BankAccountContext _bankAccountContext;
     private BankContext _bankContext;
     private bool _disposedValue;
-    private const string Connection = @"Server=localhost\\SQLEXPRESS;Data Source=maxim;Initial Catalog=CabManagementSystem;Integrated Security=True;Persist Security Info=False;Pooling=False;MultipleActiveResultSets=False;Encrypt=False;TrustServerCertificate=False";
+    private const string ConnectionString = @"Server=localhost\\SQLEXPRESS;Data Source=maxim;Initial Catalog=Test;Integrated Security=True;Persist Security Info=False;Pooling=False;MultipleActiveResultSets=False;Encrypt=False;TrustServerCertificate=False";
 
     public BankAccountRepository()
     {
-        _bankAccountContext = new BankAccountContext(Connection);
+        _bankAccountContext = new BankAccountContext(ConnectionString);
         _bankContext = _bankRepository.BankContext;
         SetBankServicesOptions();
-        _bankRepository = new BankRepository(Connection);
+        _bankRepository = new BankRepository(ConnectionString);
     }
     public BankAccountRepository(BankRepository bankRepository)
     {
@@ -37,9 +37,10 @@ public sealed class BankAccountRepository : IRepository<BankAccount>
     [Obsolete("This constructor has bad implementation. We don't recommend to use it.")]
     public BankAccountRepository(DatabaseType type, string connection)
     {
-        _bankAccountContext = new BankAccountContext(connection);
-        _bankContext = new BankContext(connection);
-        _bankRepository = new BankRepository(connection);
+        _bankAccountContext = BankServicesOptions.BankAccountContext ?? new BankAccountContext(type, connection);
+        _bankContext = BankServicesOptions.BankContext ?? new BankContext(connection);
+        SetBankServicesOptions();
+        _bankRepository = BankServicesOptions.ServiceConfiguration?.BankRepository ?? new BankRepository(connection);
     }
 
     // Public implementation of Dispose pattern callable by consumers.
@@ -222,11 +223,6 @@ public sealed class BankAccountRepository : IRepository<BankAccount>
             throw new Exception($"Failed withdraw money from {item.Card.BankAccount.Bank.BankName}\nException: {withdraw}");
     }
 
-    /// <summary>
-    /// adds bank account of user
-    /// </summary>
-    /// <param name="item"></param>
-    /// <returns>object of <see cref="ExceptionModel"/></returns>
     public ExceptionModel Create(BankAccount item)
     {
         if (item is null || Exist(x => x.ID == item.ID) || item.Bank is null)

@@ -11,12 +11,10 @@ public class ApplicationContext : DbContext
     public static bool EnsureCreated { get; set; } = true;
     protected DbSet<User> Users { get; set; } = null!;
     protected internal DbSet<BankAccount> BankAccounts { get; set; } = null!;
-    protected internal DbSet<Operation> Operations { get; set; } = null!;
     protected internal DbSet<Bank> Banks { get; set; } = null!;
     protected internal DbSet<Card> Cards { get; set; } = null!;
     protected internal DbSet<Credit> Credits { get; set; } = null!;
-
-
+    
     public ApplicationContext()
     {
         DatabaseHandle();
@@ -44,12 +42,6 @@ public class ApplicationContext : DbContext
         ModelConfiguration.Invoke(modelBuilder);
         
         base.OnModelCreating(modelBuilder);
-    }
-
-    public override int SaveChanges()
-    {
-        
-        return base.SaveChanges();
     }
 
     private void FillDatabase(ModelBuilder modelBuilder)
