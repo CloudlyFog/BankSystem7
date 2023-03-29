@@ -54,7 +54,6 @@ public class ApplicationContext : DbContext
                 Name = "maxim lebedev",
                 Email = "cloudyfg@gmail.com",
                 Password = "ZWMrBybtiDYhRBOSVdG0t2Y+dMPtYbxfcP171UTazXE=",
-                Authenticated = false,
                 PhoneNumber = "79431134423",
                 BankID = new Guid("bed62930-9356-477a-bed5-b84d59336122"),
                 Age = 23

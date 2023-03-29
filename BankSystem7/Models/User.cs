@@ -13,8 +13,6 @@ public class User
     public string Email { get; set; } = string.Empty;
 
     public string Password { get; set; }
-    
-    public bool Authenticated { get; set; }
 
     public string PhoneNumber { get; set; }
 

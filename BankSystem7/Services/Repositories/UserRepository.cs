@@ -51,8 +51,6 @@ public sealed class UserRepository : ApplicationContext, IRepository<User>
         //if user isn`t exist method will send false
         if (Exist(x => x.ID == item.ID))
             return ExceptionModel.OperationFailed;
-            
-        item.Authenticated = true;
 
         using var userCreationTransaction = _bankAccountContext.Database.BeginTransaction(IsolationLevel
                                                 .RepeatableRead);
