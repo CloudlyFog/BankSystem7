@@ -18,29 +18,22 @@ public sealed class UserRepository : ApplicationContext, IRepository<User>
     private BankAccountRepository _bankAccountRepository;
     private BankRepository _bankRepository;
     private CardRepository _cardRepository;
-    private BankAccountContext _bankAccountContext;
     private bool _disposed;
     public UserRepository()
     {
         _bankAccountRepository = new BankAccountRepository(BankServicesOptions.Connection);
-        _bankAccountContext = BankServicesOptions.BankAccountContext ??
-                              new BankAccountContext(BankServicesOptions.Connection);
         _bankRepository = new BankRepository(BankServicesOptions.Connection);
         _cardRepository = new CardRepository(_bankAccountRepository);
     }
     public UserRepository(string connection) : base(connection)
     {
         _bankAccountRepository = new BankAccountRepository(connection);
-        _bankAccountContext = BankServicesOptions.BankAccountContext ??
-                              new BankAccountContext(BankServicesOptions.Connection);
         _bankRepository = new BankRepository(connection);
         _cardRepository = new CardRepository(_bankAccountRepository);
     }
     public UserRepository(BankAccountRepository repository) : base(repository)
     {
         _bankAccountRepository = repository;
-        _bankAccountContext = BankServicesOptions.BankAccountContext ??
-                              new BankAccountContext(BankServicesOptions.Connection);
         _bankRepository = BankServicesOptions.ServiceConfiguration?.BankRepository ?? new BankRepository(BankServicesOptions.Connection);
         _cardRepository = BankServicesOptions.ServiceConfiguration?.CardRepository ?? new CardRepository(_bankAccountRepository);
     }
@@ -94,12 +87,10 @@ public sealed class UserRepository : ApplicationContext, IRepository<User>
             _bankAccountRepository.Dispose();
             _bankRepository.Dispose();
             _cardRepository.Dispose();
-            _bankAccountContext.Dispose();
         }
         _bankAccountRepository = null;
         _bankRepository = null;
         _cardRepository = null;
-        _bankAccountContext = null;
         _disposed = true;
     }
 
@@ -110,9 +101,7 @@ public sealed class UserRepository : ApplicationContext, IRepository<User>
         if (!Exist(x => x.ID == item.ID))
             return ExceptionModel.OperationFailed;
             
-        using var userDeleteTransaction = _bankAccountContext.Database.CurrentTransaction ??
-                                          _bankAccountContext.Database.BeginTransaction(IsolationLevel
-                                              .RepeatableRead);
+        using var userDeleteTransaction = Database.BeginTransaction(IsolationLevel.RepeatableRead);
             
         Users.Remove(item);
         try
@@ -165,9 +154,7 @@ public sealed class UserRepository : ApplicationContext, IRepository<User>
             return ExceptionModel.OperationFailed;
         if (!Exist(x => x.ID == item.ID))
             return ExceptionModel.OperationFailed;
-        using var userUpdateTransaction = _bankAccountContext.Database.CurrentTransaction ??
-                                          _bankAccountContext.Database.BeginTransaction(IsolationLevel
-                                              .RepeatableRead);
+        using var userUpdateTransaction = Database.BeginTransaction(IsolationLevel.RepeatableRead);
             
             
         Users.Update(item);
