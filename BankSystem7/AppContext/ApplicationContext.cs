@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BankSystem7.AppContext;
 
-public class ApplicationContext : DbContext
+public abstract class ApplicationContext : DbContext
 {
     public static bool EnsureDeleted { get; set; }
     public static bool EnsureCreated { get; set; } = true;

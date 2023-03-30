@@ -6,22 +6,19 @@ using BankSystem7.Models;
 
 namespace BankSystem7.Services.Repositories;
 
-public sealed class BankRepository : IRepository<Bank>
+public sealed class BankRepository : ApplicationContext, IRepository<Bank>
 {
-    private BankAccountContext _bankAccountContext;
     private BankContext _bankContext;
     internal BankContext? BankContext { get; set; }
 
     private bool _disposedValue;
     public BankRepository()
     {
-        _bankAccountContext = BankServicesOptions.BankAccountContext ?? new BankAccountContext();
         _bankContext = BankServicesOptions.BankContext ?? new BankContext();
         BankContext = _bankContext;
     }
     public BankRepository(string connection)
     {
-        _bankAccountContext = BankServicesOptions.BankAccountContext ?? new BankAccountContext(connection);
         _bankContext = BankServicesOptions.BankContext ?? new BankContext(connection);
         BankContext = _bankContext;
     }
@@ -34,18 +31,18 @@ public sealed class BankRepository : IRepository<Bank>
     // Protected implementation of Dispose pattern.
     private void Dispose(bool disposing)
     {
-        if (_disposedValue) return;
+        if (_disposedValue) 
+            return;
         if (disposing)
         {
-            if (BankContext is null) return;
-            _bankAccountContext.Dispose();
-            _bankContext.Dispose();
+            if (BankContext is null) 
+                return;
+            Dispose();
             BankContext.Dispose();
         }
 
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
         _bankContext = null;
-        _bankAccountContext = null;
         BankContext = null;
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
         _disposedValue = true;
@@ -65,8 +62,8 @@ public sealed class BankRepository : IRepository<Bank>
         if (operation.OperationStatus != StatusOperationCode.Successfully)
             return (ExceptionModel)operation.OperationStatus.GetHashCode();
 
-        var user = _bankContext.Users.FirstOrDefault(x => x.ID == bankAccount.UserID);
-        user.Card = _bankContext.Cards.FirstOrDefault(x => x.UserID == user.ID);
+        var user = Users.FirstOrDefault(x => x.ID == bankAccount.UserID);
+        user.Card = Cards.FirstOrDefault(x => x.UserID == user.ID);
             
         if (user is null)
             return ExceptionModel.VariableIsNull;
@@ -74,16 +71,14 @@ public sealed class BankRepository : IRepository<Bank>
         bank.AccountAmount -= operation.TransferAmount;
         bankAccount.BankAccountAmount += operation.TransferAmount;
         user.Card.Amount = bankAccount.BankAccountAmount;
-        _bankContext.ChangeTracker.Clear();
-        _bankAccountContext.ChangeTracker.Clear();
-        _bankContext.BankAccounts.Update(bankAccount);
-        _bankContext.Banks.Update(bank);
-        _bankContext.Users.Update(user);
-        _bankContext.Cards.Update(user.Card);
+        ChangeTracker.Clear();
+        BankAccounts.Update(bankAccount);
+        Banks.Update(bank);
+        Users.Update(user);
+        Cards.Update(user.Card);
         try
         {
-            _bankContext.SaveChanges();
-            _bankContext.DeleteOperation(operation);
+            SaveChanges();
         }
         catch (Exception e)
         {
@@ -114,13 +109,12 @@ public sealed class BankRepository : IRepository<Bank>
         bank.AccountAmount -= operation.TransferAmount;
         user.Card.BankAccount.BankAccountAmount += operation.TransferAmount;
         user.Card.Amount = user.Card.BankAccount.BankAccountAmount;
-        _bankContext.ChangeTracker.Clear();
-        _bankContext.Users.Update(user);
-        _bankContext.Banks.Update(bank);
+        ChangeTracker.Clear();
+        Users.Update(user);
+        Banks.Update(bank);
         try
         {
-            _bankContext.SaveChanges();
-            _bankContext.DeleteOperation(operation);
+            SaveChanges();
         }
         catch (Exception e)
         {
@@ -145,8 +139,8 @@ public sealed class BankRepository : IRepository<Bank>
             return (ExceptionModel)operation.OperationStatus.GetHashCode();
 
             
-        var user = _bankContext.Users.FirstOrDefault(x => x.ID == bankAccount.UserID);
-        user.Card = _bankContext.Cards.FirstOrDefault(x => x.UserID == user.ID);
+        var user = Users.FirstOrDefault(x => x.ID == bankAccount.UserID);
+        user.Card = Cards.FirstOrDefault(x => x.UserID == user.ID);
             
         if (user is null)
             return ExceptionModel.VariableIsNull;
@@ -154,16 +148,14 @@ public sealed class BankRepository : IRepository<Bank>
         bank.AccountAmount += operation.TransferAmount;
         bankAccount.BankAccountAmount -= operation.TransferAmount;
         user.Card.Amount = bankAccount.BankAccountAmount;
-        _bankContext.ChangeTracker.Clear();
-        _bankAccountContext.ChangeTracker.Clear();
-        _bankContext.BankAccounts.Update(bankAccount);
-        _bankContext.Banks.Update(bank);
-        _bankContext.Users.Update(user);
-        _bankContext.Cards.Update(user.Card);
+        ChangeTracker.Clear();
+        BankAccounts.Update(bankAccount); 
+        Banks.Update(bank);
+        Users.Update(user);
+        Cards.Update(user.Card);
         try
         {
-            _bankContext.SaveChanges();
-            _bankContext.DeleteOperation(operation); // doesn't exist operation
+            SaveChanges();
         }
         catch (Exception e)
         {
@@ -190,13 +182,12 @@ public sealed class BankRepository : IRepository<Bank>
         bank.AccountAmount += operation.TransferAmount;
         user.Card.BankAccount.BankAccountAmount -= operation.TransferAmount;
         user.Card.Amount = user.Card.BankAccount.BankAccountAmount;
-        _bankContext.ChangeTracker.Clear();
-        _bankContext.Users.Update(user);
-        _bankContext.Banks.Update(bank);
+        ChangeTracker.Clear();
+        Users.Update(user);
+        Banks.Update(bank);
         try
         {
-            _bankContext.SaveChanges();
-            _bankContext.DeleteOperation(operation); // doesn't exist operation
+            SaveChanges();
         }
         catch (Exception e)
         {
@@ -211,11 +202,11 @@ public sealed class BankRepository : IRepository<Bank>
             return ExceptionModel.VariableIsNull;
 
         if (Exist(x => x.ID == item.ID))
-            _bankContext.Update(item);
+            Update(item);
         else
-            _bankContext.Add(item);
+            Add(item);
         
-        _bankContext.SaveChanges();
+        SaveChanges();
         return ExceptionModel.Successfully;
     }
 
@@ -224,25 +215,16 @@ public sealed class BankRepository : IRepository<Bank>
         if (item is null || !Exist(x => x.ID == item.ID))
             return ExceptionModel.OperationFailed;
 
-        _bankContext.Remove(item);
-        _bankContext.SaveChanges();
+        Remove(item);
+        SaveChanges();
         return ExceptionModel.Successfully;
     }
 
-    public bool Exist(Expression<Func<Bank, bool>> predicate) => _bankContext.Banks.AsNoTracking().Any(predicate);
+    public bool Exist(Expression<Func<Bank, bool>> predicate) => Banks.AsNoTracking().Any(predicate);
 
-    public IEnumerable<Bank> All => _bankContext.Banks.AsNoTracking();
+    public IEnumerable<Bank> All => Banks.AsNoTracking();
 
-    public Bank? Get(Expression<Func<Bank, bool>> predicate) => _bankContext.Banks.AsNoTracking().FirstOrDefault(predicate);
-
-    /// <summary>
-    /// repays user's credit
-    /// removes from the table field with credit's data of user
-    /// </summary>
-    /// <param name="bankAccount"></param>
-    /// <param name="credit"></param>
-    /// <returns></returns>
-    public ExceptionModel RepayCredit(BankAccount bankAccount, Credit credit) => _bankContext.RepayCredit(bankAccount, credit);
+    public Bank? Get(Expression<Func<Bank, bool>> predicate) => Banks.AsNoTracking().FirstOrDefault(predicate);
 
     /// <summary>
     /// repays user's credit
@@ -251,15 +233,26 @@ public sealed class BankRepository : IRepository<Bank>
     /// <param name="bankAccount"></param>
     /// <param name="credit"></param>
     /// <returns></returns>
-    public ExceptionModel TakeCredit(BankAccount bankAccount, Credit credit) => _bankContext.TakeCredit(bankAccount, credit);
+    public ExceptionModel RepayCredit(BankAccount bankAccount, Credit credit) => 
+        _bankContext.RepayCredit(bankAccount, credit);
+
+    /// <summary>
+    /// repays user's credit
+    /// removes from the table field with credit's data of user
+    /// </summary>
+    /// <param name="bankAccount"></param>
+    /// <param name="credit"></param>
+    /// <returns></returns>
+    public ExceptionModel TakeCredit(BankAccount bankAccount, Credit credit) =>
+        _bankContext.TakeCredit(bankAccount, credit);
 
     internal ExceptionModel AvoidDuplication(Bank item)
     {
         foreach (var bankAccount in item.BankAccounts)
-            _bankContext.Entry(bankAccount).State = EntityState.Unchanged;
+            Entry(bankAccount).State = EntityState.Unchanged;
 
         foreach (var credit in item.Credits)
-            _bankContext.Entry(credit).State = EntityState.Unchanged;
+            Entry(credit).State = EntityState.Unchanged;
 
         return ExceptionModel.Successfully;
     }
@@ -272,8 +265,8 @@ public sealed class BankRepository : IRepository<Bank>
         if (!Exist(x => x.ID == item.ID))
             return ExceptionModel.OperationFailed;
 
-        _bankContext.Banks.Update(item);
-        _bankContext.SaveChanges();
+        Banks.Update(item);
+        SaveChanges();
         return ExceptionModel.Successfully;
     }
 

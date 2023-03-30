@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BankSystem7.Services.Repositories;
 
+
 public sealed class UserRepository : ApplicationContext, IRepository<User>
 {
     private BankAccountRepository _bankAccountRepository;
@@ -52,7 +53,7 @@ public sealed class UserRepository : ApplicationContext, IRepository<User>
         if (Exist(x => x.ID == item.ID))
             return ExceptionModel.OperationFailed;
 
-        using var userCreationTransaction = _bankAccountContext.Database.BeginTransaction(IsolationLevel
+        using var userCreationTransaction = Database.BeginTransaction(IsolationLevel
                                                 .RepeatableRead);
             
         
