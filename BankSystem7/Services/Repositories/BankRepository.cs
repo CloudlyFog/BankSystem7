@@ -95,10 +95,9 @@ public sealed class BankRepository : ApplicationContext, IRepository<Bank>
     /// <param name="bank"></param>
     /// <param name="operation"></param>
     /// <exception cref="Exception"></exception>
-    public ExceptionModel BankAccountAccrual(User user, Bank bank, Operation operation)
+    public ExceptionModel BankAccountAccrual(User user, Operation operation)
     {
-        if (user is null || operation is null || user.Card is null || user.Card.BankAccount is null ||
-            bank is null || !Exist(x => x.ID == bank.ID))
+        if (user?.Card?.BankAccount?.Bank is null || !Exist(x => x.ID == user.Card.BankAccount.Bank.ID))
             return ExceptionModel.VariableIsNull;
         if (operation.OperationStatus != StatusOperationCode.Successfully)
             return (ExceptionModel)operation.OperationStatus.GetHashCode();
@@ -106,15 +105,14 @@ public sealed class BankRepository : ApplicationContext, IRepository<Bank>
         if (user is null)
             return ExceptionModel.VariableIsNull;
 
-        bank.AccountAmount -= operation.TransferAmount;
+        user.Card.BankAccount.Bank.AccountAmount -= operation.TransferAmount;
         user.Card.BankAccount.BankAccountAmount += operation.TransferAmount;
         user.Card.Amount = user.Card.BankAccount.BankAccountAmount;
-        ChangeTracker.Clear();
-        Users.Update(user);
-        Banks.Update(bank);
+        _bankContext.ChangeTracker.Clear();
+        _bankContext.Update(user);
         try
         {
-            SaveChanges();
+            _bankContext.SaveChanges();
         }
         catch (Exception e)
         {
@@ -172,22 +170,21 @@ public sealed class BankRepository : ApplicationContext, IRepository<Bank>
     /// <param name="bank"></param>
     /// <param name="operation"></param>
     /// <exception cref="Exception"></exception>
-    public ExceptionModel BankAccountWithdraw(User user, Bank bank, Operation operation)
+    public ExceptionModel BankAccountWithdraw(User user, Operation operation)
     {
-        if (user is null || bank is null)
+        if (user?.Card?.BankAccount?.Bank is null || !Exist(x => x.ID == user.Card.BankAccount.Bank.ID))
             return ExceptionModel.VariableIsNull;
         if (operation.OperationStatus != StatusOperationCode.Successfully)
             return (ExceptionModel)operation.OperationStatus.GetHashCode();
 
-        bank.AccountAmount += operation.TransferAmount;
+        user.Card.BankAccount.Bank.AccountAmount += operation.TransferAmount;
         user.Card.BankAccount.BankAccountAmount -= operation.TransferAmount;
         user.Card.Amount = user.Card.BankAccount.BankAccountAmount;
-        ChangeTracker.Clear();
-        Users.Update(user);
-        Banks.Update(bank);
+        _bankContext.ChangeTracker.Clear();
+        _bankContext.Update(user);
         try
         {
-            SaveChanges();
+            _bankContext.SaveChanges();
         }
         catch (Exception e)
         {

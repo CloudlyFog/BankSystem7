@@ -159,7 +159,7 @@ public sealed class BankAccountRepository : IRepository<BankAccount>
         if (createOperation != ExceptionModel.Successfully)
             throw new Exception($"Operation can't create due to exception: {createOperation}");
             
-        if (_bankRepository.BankAccountAccrual(item, item.Card.BankAccount.Bank, operation) != ExceptionModel.Successfully)
+        if (_bankRepository.BankAccountAccrual(item, operation) != ExceptionModel.Successfully)
             throw new Exception($"Failed withdraw money from {item.Card.BankAccount.Bank.BankName}");
     }
 
@@ -218,7 +218,7 @@ public sealed class BankAccountRepository : IRepository<BankAccount>
         if (createOperation != ExceptionModel.Successfully)
             throw new Exception($"Operation can't create due to exception: {createOperation}");
             
-        var withdraw = _bankRepository.BankAccountWithdraw(item, item.Card.BankAccount.Bank, operation);
+        var withdraw = _bankRepository.BankAccountWithdraw(item, operation);
         if (withdraw != ExceptionModel.Successfully)
             throw new Exception($"Failed withdraw money from {item.Card.BankAccount.Bank.BankName}\nException: {withdraw}");
     }
