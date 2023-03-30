@@ -19,7 +19,7 @@ namespace BankSystem7.AppContext
         public BankContext(string connection)
         {
             ServiceConfiguration.SetConnection(connection);
-            _operationService = new OperationService<Operation>(ServiceConfigurationMiddleware.Options.DatabaseName ?? "CabManagementSystemReborn");
+            _operationService = new OperationService<Operation>(ServiceConfiguration.Options.DatabaseName ?? "CabManagementSystemReborn");
             DatabaseHandle();
         }
 

@@ -17,7 +17,8 @@ public sealed class BankRepository : ApplicationContext, IRepository<Bank>
         _bankContext = BankServicesOptions.BankContext ?? new BankContext();
         BankContext = _bankContext;
     }
-    public BankRepository(string connection)
+
+    public BankRepository(string connection) : base(connection)
     {
         _bankContext = BankServicesOptions.BankContext ?? new BankContext(connection);
         BankContext = _bankContext;
