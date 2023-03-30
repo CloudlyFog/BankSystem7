@@ -72,6 +72,7 @@ public sealed class BankAccountRepository : ApplicationContext, IRepository<Bank
             return ExceptionModel.OperationFailed;
             
         using var transaction = _bankContext.Database.BeginTransaction(IsolationLevel.RepeatableRead);
+        _bankRepository.AnotherBankTransactionOperation = AnotherBankTransactionOperation(from, to);
         try
         {
             await WithdrawAsync(from, transferAmount);
@@ -296,6 +297,11 @@ public sealed class BankAccountRepository : ApplicationContext, IRepository<Bank
 
         if (!Exist(x => x.ID == item.ID)) 
             throw new Exception($"Doesn't exist bank with id {{{item.ID}}}");
+    }
+    
+    private bool AnotherBankTransactionOperation(User from, User to)
+    {
+        return from.Card.BankAccount.Bank != to.Card.BankAccount.Bank;
     }
 
     private void SetBankServicesOptions()

@@ -6,7 +6,7 @@ using BankSystem7.Services.Interfaces;
 
 namespace BankSystem7.Services.Repositories;
 
-public sealed class CardRepository : IRepository<Card>
+public sealed class CardRepository : ApplicationContext, IRepository<Card>
 {
     private CardContext _cardContext;
     private BankAccountRepository _bankAccountRepository;
@@ -68,7 +68,7 @@ public sealed class CardRepository : IRepository<Card>
             return ExceptionModel.VariableIsNull;
         if (Exist(x => x.ID == item.ID))
             return ExceptionModel.OperationFailed;
-        _cardContext.Cards.Update(item);
+        Cards.Update(item);
         _cardContext.SaveChanges();
         return ExceptionModel.Successfully;
     }
@@ -87,7 +87,7 @@ public sealed class CardRepository : IRepository<Card>
             return ExceptionModel.VariableIsNull;
         if (Exist(x => x.ID == item.ID))
             return ExceptionModel.OperationFailed;
-        _cardContext.Cards.Add(item);
+        Cards.Add(item);
         _cardContext.SaveChanges();
         return ExceptionModel.Successfully;
     }
@@ -100,18 +100,18 @@ public sealed class CardRepository : IRepository<Card>
             return ExceptionModel.OperationFailed;
         var user = item.User;
         item.User = null;
-        _cardContext.Cards.Remove(item);
+        Cards.Remove(item);
         _cardContext.SaveChanges();
         item.User = user;
         return ExceptionModel.Successfully;
     }
 
-    public bool Exist(Expression<Func<Card, bool>> predicate) => _cardContext.Cards.AsNoTracking().Any(predicate);
+    public bool Exist(Expression<Func<Card, bool>> predicate) => Cards.AsNoTracking().Any(predicate);
 
-    public Card? Get(Expression<Func<Card, bool>> predicate) => _cardContext.Cards.AsNoTracking().FirstOrDefault(predicate);
+    public Card? Get(Expression<Func<Card, bool>> predicate) => Cards.AsNoTracking().FirstOrDefault(predicate);
 
-    public IEnumerable<Card> All => _cardContext.Cards.AsNoTracking();
-    public void ChangeTrackerCardContext() => _cardContext.ChangeTracker.Clear();
+    public IEnumerable<Card> All => Cards.AsNoTracking();
+    public void ChangeTrackerCardContext() => ChangeTracker.Clear();
 
     ~CardRepository()
     {

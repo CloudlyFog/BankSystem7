@@ -10,6 +10,7 @@ public sealed class BankRepository : ApplicationContext, IRepository<Bank>
 {
     private BankContext _bankContext;
     internal BankContext? BankContext { get; set; }
+    internal bool AnotherBankTransactionOperation { get; set; }
 
     private bool _disposedValue;
     public BankRepository()
@@ -108,7 +109,9 @@ public sealed class BankRepository : ApplicationContext, IRepository<Bank>
         if (user is null)
             return ExceptionModel.VariableIsNull;
 
-        user.Card.BankAccount.Bank.AccountAmount -= operation.TransferAmount;
+        if (AnotherBankTransactionOperation)
+            user.Card.BankAccount.Bank.AccountAmount -= operation.TransferAmount;
+        
         user.Card.BankAccount.BankAccountAmount += operation.TransferAmount;
         user.Card.Amount = user.Card.BankAccount.BankAccountAmount;
         _bankContext.ChangeTracker.Clear();
@@ -181,7 +184,9 @@ public sealed class BankRepository : ApplicationContext, IRepository<Bank>
         if (operation.OperationStatus != StatusOperationCode.Successfully)
             return (ExceptionModel)operation.OperationStatus.GetHashCode();
 
-        user.Card.BankAccount.Bank.AccountAmount += operation.TransferAmount;
+        if (AnotherBankTransactionOperation)
+            user.Card.BankAccount.Bank.AccountAmount += operation.TransferAmount;
+        
         user.Card.BankAccount.BankAccountAmount -= operation.TransferAmount;
         user.Card.Amount = user.Card.BankAccount.BankAccountAmount;
         _bankContext.ChangeTracker.Clear();
@@ -246,7 +251,7 @@ public sealed class BankRepository : ApplicationContext, IRepository<Bank>
     /// <returns></returns>
     public ExceptionModel TakeCredit(BankAccount bankAccount, Credit credit) =>
         _bankContext.TakeCredit(bankAccount, credit);
-
+    
     internal ExceptionModel AvoidDuplication(Bank item)
     {
         foreach (var bankAccount in item.BankAccounts)
