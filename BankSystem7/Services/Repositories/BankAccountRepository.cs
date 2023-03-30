@@ -239,8 +239,8 @@ public sealed class BankAccountRepository : ApplicationContext, IRepository<Bank
     /// <returns></returns>
     public ExceptionModel Update(BankAccount item)
     {
-        if (item is null || Exist(x => x.ID == item.ID))
-            return ExceptionModel.VariableIsNull;
+        if (!FitsConditions(item))
+            return ExceptionModel.OperationFailed;
         BankAccounts.Update(item);
         SaveChanges();
         return ExceptionModel.Successfully;
@@ -253,8 +253,8 @@ public sealed class BankAccountRepository : ApplicationContext, IRepository<Bank
     /// <returns>object of <see cref="ExceptionModel"/></returns>
     public ExceptionModel Delete(BankAccount item)
     {
-        if (item is null || !Exist(x => x.ID == item.ID))
-            return ExceptionModel.VariableIsNull;
+        if (!FitsConditions(item))
+            return ExceptionModel.OperationFailed;
         item.Bank = null;
         item.Card = null;
         item.User = null;
@@ -266,10 +266,15 @@ public sealed class BankAccountRepository : ApplicationContext, IRepository<Bank
     public bool Exist(Expression<Func<BankAccount, bool>> predicate)
         => BankAccounts.AsNoTracking().Any(predicate);
 
+    public bool FitsConditions(BankAccount item)
+    {
+        return item is not null && Exist(x => x.ID == item.ID) && item.Bank is not null;
+    }
+
     public ExceptionModel Update(BankAccount item, User user, Card card)
     {
-        if (item is null || !Exist(x => x.ID == item.ID))
-            return ExceptionModel.VariableIsNull;
+        if (!FitsConditions(item))
+            return ExceptionModel.OperationFailed;
 
         if (user is null || !_bankRepository.Exist(x => x.ID == user.ID))
             return ExceptionModel.VariableIsNull;

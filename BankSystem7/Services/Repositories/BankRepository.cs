@@ -218,7 +218,7 @@ public sealed class BankRepository : ApplicationContext, IRepository<Bank>
 
     public ExceptionModel Delete(Bank item)
     {
-        if (item is null || !Exist(x => x.ID == item.ID))
+        if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;
 
         Remove(item);
@@ -227,6 +227,10 @@ public sealed class BankRepository : ApplicationContext, IRepository<Bank>
     }
 
     public bool Exist(Expression<Func<Bank, bool>> predicate) => Banks.AsNoTracking().Any(predicate);
+    public bool FitsConditions(Bank item)
+    {
+        return item is not null && Exist(x => x.ID == item.ID);
+    }
 
     public IEnumerable<Bank> All => Banks.AsNoTracking();
 
@@ -265,10 +269,7 @@ public sealed class BankRepository : ApplicationContext, IRepository<Bank>
 
     public ExceptionModel Update(Bank item)
     {
-        if (item is null)
-            return ExceptionModel.VariableIsNull;
-
-        if (!Exist(x => x.ID == item.ID))
+        if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;
 
         Banks.Update(item);

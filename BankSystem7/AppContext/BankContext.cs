@@ -102,20 +102,20 @@ namespace BankSystem7.AppContext
         /// gives to user credit with the definite amount of money
         /// adds to the table field with credit's data of user
         /// </summary>
-        /// <param name="bankAccountModel"></param>
-        /// <param name="creditModel"></param>
+        /// <param name="bankAccount"></param>
+        /// <param name="credit"></param>
         /// <returns></returns>
-        public ExceptionModel TakeCredit(BankAccount? bankAccountModel, Credit? creditModel)
+        public ExceptionModel TakeCredit(BankAccount? bankAccount, Credit? credit)
         {
-            if (bankAccountModel is null || creditModel is null)
+            if (bankAccount is null || credit is null)
                 return ExceptionModel.VariableIsNull;
 
             var operationAccrualOnUserAccount = new Operation()
             {
-                BankID = creditModel.BankID,
-                ReceiverID = creditModel.UserBankAccountID,
-                SenderID = creditModel.BankID,
-                TransferAmount = creditModel.CreditAmount
+                BankID = credit.BankID,
+                ReceiverID = credit.UserBankAccountID,
+                SenderID = credit.BankID,
+                TransferAmount = credit.CreditAmount
             };
             using var transaction = Database.BeginTransaction(IsolationLevel.Serializable);
 
@@ -123,12 +123,12 @@ namespace BankSystem7.AppContext
                 return (ExceptionModel)operationAccrualOnUserAccount.OperationStatus.GetHashCode();
             
             // accrual money to user's bank account
-            if (BankAccountAccrual(bankAccountModel, 
-                    Banks.AsNoTracking().FirstOrDefault(x => x.ID == bankAccountModel.BankID), 
+            if (BankAccountAccrual(bankAccount, 
+                    Banks.AsNoTracking().FirstOrDefault(x => x.ID == bankAccount.BankID), 
                          operationAccrualOnUserAccount) != ExceptionModel.Successfully)
                 return (ExceptionModel)operationAccrualOnUserAccount.OperationStatus.GetHashCode();
 
-            if (AddCredit(creditModel) != ExceptionModel.Successfully)
+            if (AddCredit(credit) != ExceptionModel.Successfully)
                 return (ExceptionModel)operationAccrualOnUserAccount.OperationStatus.GetHashCode();
 
             transaction.Commit();
@@ -137,23 +137,23 @@ namespace BankSystem7.AppContext
         }
 
         /// <summary>
-        /// repays user's credit
-        /// removes from the table field with credit's data of user
+        /// 
         /// </summary>
-        /// <param name="bankAccountModel"></param>
-        /// <param name="creditModel"></param>
+        /// <param name="bankAccount"></param>
+        /// <param name="credit"></param>
+        /// <param name="payAmount"></param>
         /// <returns></returns>
-        public ExceptionModel RepayCredit(BankAccount? bankAccountModel, Credit? creditModel)
+        public ExceptionModel PayCredit(BankAccount? bankAccount, Credit credit, decimal payAmount)
         {
-            if (bankAccountModel is null || creditModel is null)
+            if (bankAccount is null || credit is null)
                 return ExceptionModel.VariableIsNull;
 
             var operationAccrualOnUserAccount = new Operation()
             {
-                BankID = creditModel.BankID,
-                ReceiverID = creditModel.UserBankAccountID,
-                SenderID = creditModel.BankID,
-                TransferAmount = creditModel.CreditAmount
+                BankID = credit.BankID,
+                ReceiverID = credit.UserBankAccountID,
+                SenderID = credit.BankID,
+                TransferAmount = payAmount
             };
             using var transaction = Database.BeginTransaction(IsolationLevel.Serializable);
 
@@ -161,18 +161,30 @@ namespace BankSystem7.AppContext
                 return (ExceptionModel)operationAccrualOnUserAccount.OperationStatus.GetHashCode();
 
             // withdraw money to user's bank account
-            if (BankAccountWithdraw(bankAccountModel,
-                    Banks.AsNoTracking().FirstOrDefault(x => x.ID == bankAccountModel.BankID),
-                         operationAccrualOnUserAccount) != ExceptionModel.Successfully)
+            if (BankAccountWithdraw(bankAccount,
+                    Banks.AsNoTracking().FirstOrDefault(x => x.ID == bankAccount.BankID),
+                    operationAccrualOnUserAccount) != ExceptionModel.Successfully)
                 return (ExceptionModel)operationAccrualOnUserAccount.OperationStatus.GetHashCode();
 
-            if (RemoveCredit(creditModel) != ExceptionModel.Successfully)
+            if (RemoveCredit(credit) != ExceptionModel.Successfully)
                 return (ExceptionModel)operationAccrualOnUserAccount.OperationStatus.GetHashCode();
 
             transaction.Commit();
 
             return ExceptionModel.Successfully;
         }
+
+        /// <summary>
+        /// repays user's credit
+        /// removes from the table field with credit's data of user
+        /// </summary>
+        /// <param name="bankAccount"></param>
+        /// <param name="credit"></param>
+        /// <returns></returns>
+        [Obsolete("This method is using for repaying a credit. " +
+                  "Instead of it you can use new method PayCredit that takes as third arg a value on which credit will decrease.")]
+        public ExceptionModel RepayCredit(BankAccount? bankAccount, Credit? credit) =>
+            PayCredit(bankAccount, credit, credit.CreditAmount);
 
         /// <summary>
         /// withdraw money from user bank account and accrual to bank's account

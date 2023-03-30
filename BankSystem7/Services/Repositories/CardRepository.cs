@@ -64,9 +64,7 @@ public sealed class CardRepository : ApplicationContext, IRepository<Card>
 
     public ExceptionModel Update(Card item)
     {
-        if (item is null)
-            return ExceptionModel.VariableIsNull;
-        if (Exist(x => x.ID == item.ID))
+        if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;
         Cards.Update(item);
         _cardContext.SaveChanges();
@@ -83,9 +81,7 @@ public sealed class CardRepository : ApplicationContext, IRepository<Card>
     {
         if (item.Exception == Warning.AgeRestricted)
             return ExceptionModel.OperationRestricted;
-        if (item is null)
-            return ExceptionModel.VariableIsNull;
-        if (Exist(x => x.ID == item.ID))
+        if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;
         Cards.Add(item);
         _cardContext.SaveChanges();
@@ -94,9 +90,7 @@ public sealed class CardRepository : ApplicationContext, IRepository<Card>
 
     public ExceptionModel Delete(Card item)
     {
-        if (item is null)
-            return ExceptionModel.VariableIsNull;
-        if (!Exist(x => x.ID == item.ID))
+        if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;
         var user = item.User;
         item.User = null;
@@ -107,6 +101,10 @@ public sealed class CardRepository : ApplicationContext, IRepository<Card>
     }
 
     public bool Exist(Expression<Func<Card, bool>> predicate) => Cards.AsNoTracking().Any(predicate);
+    public bool FitsConditions(Card item)
+    {
+        return item is not null && Exist(x => x.ID == item.ID);
+    }
 
     public Card? Get(Expression<Func<Card, bool>> predicate) => Cards.AsNoTracking().FirstOrDefault(predicate);
 

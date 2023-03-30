@@ -44,4 +44,6 @@ public interface IRepository<T> : IDisposable
     /// <param name="predicate">predicate for function expression</param>
     /// <returns></returns>
     bool Exist(Expression<Func<T, bool>> predicate);
+
+    bool FitsConditions(T item);
 }

@@ -39,10 +39,10 @@ public sealed class UserRepository : ApplicationContext, IRepository<User>
     }
     public ExceptionModel Create(User item)
     {
-        if (item is null)
+        if (item?.Card?.BankAccount?.Bank is null)
             return ExceptionModel.OperationFailed;
             
-        //if user isn`t exist method will send false
+        //if user exists method will send false
         if (Exist(x => x.ID == item.ID))
             return ExceptionModel.OperationFailed;
 
@@ -96,9 +96,7 @@ public sealed class UserRepository : ApplicationContext, IRepository<User>
 
     public ExceptionModel Delete(User item)
     {
-        if (item is null)
-            return ExceptionModel.OperationFailed;
-        if (!Exist(x => x.ID == item.ID))
+        if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;
             
         using var userDeleteTransaction = Database.BeginTransaction(IsolationLevel.RepeatableRead);
@@ -128,6 +126,10 @@ public sealed class UserRepository : ApplicationContext, IRepository<User>
     }
 
     public bool Exist(Expression<Func<User, bool>> predicate) => Users.AsNoTracking().Any(predicate);
+    public bool FitsConditions(User item)
+    {
+        return item?.Card?.BankAccount?.Bank is not null && Exist(x => x.ID == item.ID);
+    }
 
     public IEnumerable<User> All => Users.AsNoTracking();
 
@@ -150,9 +152,7 @@ public sealed class UserRepository : ApplicationContext, IRepository<User>
 
     public ExceptionModel Update(User item)
     {
-        if (item is null)
-            return ExceptionModel.OperationFailed;
-        if (!Exist(x => x.ID == item.ID))
+        if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;
         using var userUpdateTransaction = Database.BeginTransaction(IsolationLevel.RepeatableRead);
             
