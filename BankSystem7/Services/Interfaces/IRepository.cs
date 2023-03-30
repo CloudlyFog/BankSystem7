@@ -6,21 +6,21 @@ namespace BankSystem7.Services.Interfaces;
 public interface IRepository<T> : IDisposable
 {
     /// <summary>
-    /// adds entity of <see cref="item"/> to database
+    /// adds entity to database
     /// </summary>
     /// <param name="item">inherited model type</param>
     /// <returns></returns>
     ExceptionModel Create(T item);
         
     /// <summary>
-    /// updates entity of <see cref="item"/> in database
+    /// updates entity in database
     /// </summary>
     /// <param name="item">inherited model type</param>
     /// <returns></returns>
     ExceptionModel Update(T item);
         
     /// <summary>
-    /// deletes entity of <see cref="item"/> in database
+    /// deletes entity in database
     /// </summary>
     /// <param name="item">inherited model type</param>
     /// <returns></returns>

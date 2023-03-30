@@ -55,6 +55,8 @@ public sealed class BankRepository : ApplicationContext, IRepository<Bank>
     /// <param name="bank"></param>
     /// <param name="operation"></param>
     /// <exception cref="Exception"></exception>
+    
+    [Obsolete("Don't use this method. Instead use the same method but with another parameters: BankAccountAccrual(User user, Operation operation)")]
     public ExceptionModel BankAccountAccrual(BankAccount bankAccount, Bank bank, Operation operation)
     {
         if (bankAccount is null || bank is null || !Exist(x => x.ID == bank.ID))
@@ -121,7 +123,7 @@ public sealed class BankRepository : ApplicationContext, IRepository<Bank>
         }
         return ExceptionModel.Successfully;
     }
-
+    
     /// <summary>
     /// asynchronously withdraw money from user bank account and accrual to bank's account
     /// </summary>
@@ -129,6 +131,7 @@ public sealed class BankRepository : ApplicationContext, IRepository<Bank>
     /// <param name="bank"></param>
     /// <param name="operation"></param>
     /// <exception cref="Exception"></exception>
+    [Obsolete("Don't use this method. Instead use the same method but with another parameters: BankAccountWithdraw(User user, Operation operation)")]
     public ExceptionModel BankAccountWithdraw(BankAccount bankAccount, Bank bank, Operation operation)
     {
         if (bankAccount is null || bank is null)
