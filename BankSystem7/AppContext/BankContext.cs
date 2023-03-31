@@ -1,25 +1,28 @@
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
 using System.Data;
-using BankSystem7.Middleware;
 using BankSystem7.Models;
 using BankSystem7.Services;
+using BankSystem7.Services.Repositories;
 
 namespace BankSystem7.AppContext
 {
     internal sealed class BankContext : DbContext
     {
         private readonly OperationService<Operation> _operationService;
+        private CreditRepository _creditRepository;
 
         public BankContext()
         {
             _operationService = new OperationService<Operation>();
+            _creditRepository = new CreditRepository(BankServicesOptions.Connection);
             DatabaseHandle();
         }
         public BankContext(string connection)
         {
             ServiceConfiguration.SetConnection(connection);
             _operationService = new OperationService<Operation>(ServiceConfiguration.Options.DatabaseName ?? "CabManagementSystemReborn");
+            _creditRepository = new CreditRepository(BankServicesOptions.Connection);
             DatabaseHandle();
         }
 
@@ -35,6 +38,8 @@ namespace BankSystem7.AppContext
                 @$"Server=localhost\\SQLEXPRESS;Data Source={dataSource};Initial Catalog={database};
                 Integrated Security=True;Persist Security Info=False;Pooling=False;MultipleActiveResultSets=False;Encrypt=False;TrustServerCertificate=False";
             ServiceConfiguration.SetConnection(connection);
+            
+            _creditRepository = new CreditRepository(BankServicesOptions.Connection);
             DatabaseHandle();
         }
         public DbSet<User> Users { get; set; } = null!;
@@ -193,7 +198,7 @@ namespace BankSystem7.AppContext
         /// <param name="bank"></param>
         /// <param name="operation"></param>
         /// <exception cref="Exception"></exception>
-        private ExceptionModel BankAccountWithdraw(BankAccount? bankAccount, Bank? bank, Operation operation)
+        internal ExceptionModel BankAccountWithdraw(BankAccount? bankAccount, Bank? bank, Operation operation)
         {
             if (bankAccount is null || bank is null)
                 return ExceptionModel.VariableIsNull;
@@ -223,7 +228,7 @@ namespace BankSystem7.AppContext
         /// <param name="bank"></param>
         /// <param name="operation"></param>
         /// <exception cref="Exception"></exception>
-        private ExceptionModel BankAccountAccrual(BankAccount? bankAccount, Bank? bank, Operation operation)
+        internal ExceptionModel BankAccountAccrual(BankAccount? bankAccount, Bank? bank, Operation operation)
         {
             if (bankAccount is null || bank is null)
                 return ExceptionModel.VariableIsNull;

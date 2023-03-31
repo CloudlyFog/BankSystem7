@@ -10,5 +10,4 @@ public sealed class BankServicesOptions
     public static ServiceConfiguration? ServiceConfiguration { get; set; } = null;
 
     internal static BankContext? BankContext { get; set; }
-    internal static BankAccountContext? BankAccountContext { get; set; }
 }

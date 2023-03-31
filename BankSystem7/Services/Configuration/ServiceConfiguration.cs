@@ -11,8 +11,8 @@ public class ServiceConfiguration
             Integrated Security=True;Persist Security Info=False;Pooling=False;
             MultipleActiveResultSets=False; Encrypt=False;TrustServerCertificate=False";
 
-    private const string DefaultConnectionValue = "default";
-    private const string DefaultDataSource = "maxim";
+    public const string DefaultDataSource = "maxim";
+    private const string DefaultDatabaseName = "Test";
 
     
     private bool _disposed;
@@ -20,6 +20,7 @@ public class ServiceConfiguration
     public BankRepository? BankRepository { get; set; }
     public CardRepository? CardRepository { get; set; }
     public UserRepository? UserRepository { get; set; }
+    public CreditRepository? CreditRepository { get; set; }
     public static ConfigurationOptions Options { get; set; }
 
     private ServiceConfiguration()
@@ -28,6 +29,7 @@ public class ServiceConfiguration
         UserRepository = new UserRepository(BankAccountRepository);
         CardRepository = new CardRepository(BankAccountRepository, Connection);
         BankRepository = new BankRepository(Connection);
+        CreditRepository = new CreditRepository(Connection);
     }
 
     public ServiceConfiguration(RequestDelegate next, ConfigurationOptions options)
@@ -35,9 +37,9 @@ public class ServiceConfiguration
         CreateInstance(options);
     }
 
-    public static void SetConnection(string connection = DefaultConnectionValue, string? databaseName = null, string dataSource = DefaultDataSource)
+    public static void SetConnection(string? connection = null, string? databaseName = DefaultDatabaseName, string? dataSource = DefaultDataSource)
     {
-        if (connection != DefaultConnectionValue && connection is not null && connection != string.Empty)
+        if (connection is not null && connection != string.Empty)
         {
             Connection = connection;
             BankServicesOptions.Connection = Connection;
@@ -62,7 +64,7 @@ public class ServiceConfiguration
         return BankServicesOptions.ServiceConfiguration;
     }
 
-    public static ServiceConfiguration CreateInstance(string connection = DefaultConnectionValue, string? databaseName = null)
+    public static ServiceConfiguration CreateInstance(string? connection = null, string? databaseName = DefaultDatabaseName)
     {
         SetConnection(connection, databaseName);
         BankServicesOptions.ServiceConfiguration = new ServiceConfiguration();
