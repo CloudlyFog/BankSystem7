@@ -13,6 +13,7 @@
         <PackageLicenseUrl>https://mit-license.org/</PackageLicenseUrl>
         <PackageTags>bank;account;banksystem;credit;transfer;money;bankaccount</PackageTags>
         <PackageReleaseNotes>Added some documentation to code.</PackageReleaseNotes>
+        <PackageProjectUrl>https://github.com/CloudlyFog/BankSystem7</PackageProjectUrl>
     </PropertyGroup>
 
     <ItemGroup>
