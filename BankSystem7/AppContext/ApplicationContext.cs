@@ -1,5 +1,6 @@
 using BankSystem7.Models;
 using BankSystem7.Services;
+using BankSystem7.Services.Configuration;
 using BankSystem7.Services.Repositories;
 using Microsoft.EntityFrameworkCore;
 

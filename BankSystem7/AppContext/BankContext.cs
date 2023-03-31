@@ -3,6 +3,7 @@ using MongoDB.Driver;
 using System.Data;
 using BankSystem7.Models;
 using BankSystem7.Services;
+using BankSystem7.Services.Configuration;
 using BankSystem7.Services.Repositories;
 
 namespace BankSystem7.AppContext

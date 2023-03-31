@@ -2,7 +2,7 @@
 using BankSystem7.Services.Repositories;
 using Microsoft.AspNetCore.Http;
 
-namespace BankSystem7.Services;
+namespace BankSystem7.Services.Configuration;
 
 public class ServiceConfiguration
 {

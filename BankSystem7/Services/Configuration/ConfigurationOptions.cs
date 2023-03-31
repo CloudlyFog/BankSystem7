@@ -1,5 +1,5 @@
 ﻿
-namespace BankSystem7.Services;
+namespace BankSystem7.Services.Configuration;
 
 public sealed class ConfigurationOptions
 {
