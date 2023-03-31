@@ -92,11 +92,8 @@ public sealed class CardRepository : ApplicationContext, IRepository<Card>
     {
         if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;
-        var user = item.User;
-        item.User = null;
         Cards.Remove(item);
-        _cardContext.SaveChanges();
-        item.User = user;
+        SaveChanges();
         return ExceptionModel.Successfully;
     }
 

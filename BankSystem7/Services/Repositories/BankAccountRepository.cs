@@ -241,8 +241,9 @@ public sealed class BankAccountRepository : ApplicationContext, IRepository<Bank
     {
         if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;
+        ChangeTracker.Clear();
         BankAccounts.Update(item);
-        SaveChanges();
+        _bankContext.SaveChanges();
         return ExceptionModel.Successfully;
     }
 
@@ -255,9 +256,7 @@ public sealed class BankAccountRepository : ApplicationContext, IRepository<Bank
     {
         if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;
-        item.Bank = null;
-        item.Card = null;
-        item.User = null;
+        ChangeTracker.Clear();
         BankAccounts.Remove(item);
         SaveChanges();
         return ExceptionModel.Successfully;

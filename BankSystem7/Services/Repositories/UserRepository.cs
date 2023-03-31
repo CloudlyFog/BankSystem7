@@ -57,6 +57,7 @@ public sealed class UserRepository : ApplicationContext, IRepository<User>
             return avoidDuplication;
         }
         
+        ChangeTracker.Clear();
         Users.Add(item);
         try
         {
@@ -98,9 +99,7 @@ public sealed class UserRepository : ApplicationContext, IRepository<User>
     {
         if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;
-            
-        using var userDeleteTransaction = Database.BeginTransaction(IsolationLevel.RepeatableRead);
-            
+        
         Users.Remove(item);
         try
         {
@@ -109,20 +108,10 @@ public sealed class UserRepository : ApplicationContext, IRepository<User>
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-            userDeleteTransaction.Rollback();
             throw;
         }
-            
-        var bankAccountDeleteOperation = _bankAccountRepository.Delete(item.Card.BankAccount);
-        if (bankAccountDeleteOperation != ExceptionModel.Successfully)
-        {
-            userDeleteTransaction.Rollback();
-            return bankAccountDeleteOperation;
-        }
-            
-
-        userDeleteTransaction.Commit();
-        return ExceptionModel.Successfully;
+        
+        return _bankAccountRepository.Delete(item.Card.BankAccount);
     }
 
     public bool Exist(Expression<Func<User, bool>> predicate) => Users.AsNoTracking().Any(predicate);
@@ -137,16 +126,16 @@ public sealed class UserRepository : ApplicationContext, IRepository<User>
     {
         var user = Users.AsNoTracking().FirstOrDefault(predicate);
         if (user is null)
-            return null;
+            return user;
         user.Card = _cardRepository.Get(x => x.UserID == user.ID);
         if (user.Card is null)
-            return null;
+            return user;
         user.Card.BankAccount = _bankAccountRepository.Get(x => x.UserID == user.ID);
         if (user.Card.BankAccount is null)
-            return null;
+            return user;
         user.Card.BankAccount.Bank = _bankRepository.Get(x => x.BankAccounts.Contains(user.Card.BankAccount));
         if (user.Card.BankAccount.Bank is null)
-            return null;
+            return user;
         return user;
     }
 
@@ -156,7 +145,14 @@ public sealed class UserRepository : ApplicationContext, IRepository<User>
             return ExceptionModel.OperationFailed;
         using var userUpdateTransaction = Database.BeginTransaction(IsolationLevel.RepeatableRead);
             
+        var bankAccountDeletionOperation = _bankAccountRepository.Update(item.Card.BankAccount);
+        if (bankAccountDeletionOperation != ExceptionModel.Successfully)
+        {
+            userUpdateTransaction.Rollback();
+            return bankAccountDeletionOperation;
+        }
             
+        ChangeTracker.Clear();
         Users.Update(item);
         try
         {

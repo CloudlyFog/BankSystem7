@@ -39,7 +39,6 @@ public sealed class BankRepository : ApplicationContext, IRepository<Bank>
         {
             if (BankContext is null) 
                 return;
-            Dispose();
             BankContext.Dispose();
         }
 
