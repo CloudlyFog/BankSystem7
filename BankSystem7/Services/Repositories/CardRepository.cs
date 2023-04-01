@@ -11,9 +11,6 @@ public sealed class CardRepository : IRepository<Card>
     private BankAccountRepository _bankAccountRepository;
     private ApplicationContext _applicationContext;
     private bool _disposedValue;
-    private readonly string _connection = @"Server=localhost\\SQLEXPRESS;Data Source=maxim;Initial Catalog=Test;Integrated Security=True;
-            Persist Security Info=False;Pooling=False;MultipleActiveResultSets=False;
-            Encrypt=False;TrustServerCertificate=False";
 
     public CardRepository()
     {
@@ -27,16 +24,8 @@ public sealed class CardRepository : IRepository<Card>
         _applicationContext = BankServicesOptions.ApplicationContext ??
                               new ApplicationContext(bankAccountRepository);
     }
-    public CardRepository(BankAccountRepository bankAccountRepository, string connection)
-    {
-        _connection = connection;
-        _bankAccountRepository = bankAccountRepository;
-        _applicationContext = BankServicesOptions.ApplicationContext ??
-                              new ApplicationContext(bankAccountRepository);
-    }
     public CardRepository(string connection)
     {
-        _connection = connection;
         _bankAccountRepository = new BankAccountRepository(connection);
         _applicationContext = BankServicesOptions.ApplicationContext ??
                               new ApplicationContext(connection);

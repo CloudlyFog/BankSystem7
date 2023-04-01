@@ -27,7 +27,7 @@ public class ServiceConfiguration
     {
         BankAccountRepository = new BankAccountRepository(Connection);
         UserRepository = new UserRepository(BankAccountRepository);
-        CardRepository = new CardRepository(BankAccountRepository, Connection);
+        CardRepository = new CardRepository(BankAccountRepository);
         BankRepository = new BankRepository(Connection);
         CreditRepository = new CreditRepository(Connection);
     }
