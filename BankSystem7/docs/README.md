@@ -11,7 +11,7 @@ It also let everybody to use bank system in its projects and change logic for yo
 - Updated checking conditions. Added new method FitsConditions to interface IRepository that implements behavior of checking conditions.
 - Added new implementation of method Transfer in BankAccountRepository that lets avoid integrity violations in table Banks in the database.
 - Changed namespace of ConfigurationOptions, ModelConfiguration, ServiceConfiguration and ServiceConfigurationMiddleware from BankSystem7.Services to BankSystem7.Services.Configuration
-- Implemented architecture with one context class for handling all of operations in the database. This class is ApplicationContext. Remark: not everywhere used this context class because some operations makes deadlocks in requests to the database.
+- Implemented architecture with one context class for handling all of operations in the database. This class is ApplicationContext. Remark: not everywhere used this context class because some operations makes deadlocks in requests to the database. That's why in the some places of code we are using another context classes.
 ****
 # Documentation
 
