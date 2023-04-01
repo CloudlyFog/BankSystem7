@@ -1,4 +1,6 @@
 
+use Test
+
 select * from Users
 select * from Cards
 select * from BankAccounts
