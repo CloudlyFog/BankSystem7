@@ -8,7 +8,6 @@ namespace BankSystem7.Services.Repositories;
 
 public sealed class CardRepository : IRepository<Card>
 {
-    private CardContext _cardContext;
     private BankAccountRepository _bankAccountRepository;
     private ApplicationContext _applicationContext;
     private bool _disposedValue;
@@ -18,7 +17,6 @@ public sealed class CardRepository : IRepository<Card>
 
     public CardRepository()
     {
-        _cardContext = new CardContext(BankServicesOptions.Connection);
         _bankAccountRepository = new BankAccountRepository(BankServicesOptions.Connection);
         _applicationContext = BankServicesOptions.ApplicationContext ??
                               new ApplicationContext(BankServicesOptions.Connection);
@@ -26,7 +24,6 @@ public sealed class CardRepository : IRepository<Card>
     public CardRepository(BankAccountRepository bankAccountRepository)
     {
         _bankAccountRepository = bankAccountRepository;
-        _cardContext = new CardContext(BankServicesOptions.Connection);
         _applicationContext = BankServicesOptions.ApplicationContext ??
                               new ApplicationContext(bankAccountRepository);
     }
@@ -34,14 +31,12 @@ public sealed class CardRepository : IRepository<Card>
     {
         _connection = connection;
         _bankAccountRepository = bankAccountRepository;
-        _cardContext = new CardContext(connection);
         _applicationContext = BankServicesOptions.ApplicationContext ??
                               new ApplicationContext(bankAccountRepository);
     }
     public CardRepository(string connection)
     {
         _connection = connection;
-        _cardContext = new CardContext(connection);
         _bankAccountRepository = new BankAccountRepository(connection);
         _applicationContext = BankServicesOptions.ApplicationContext ??
                               new ApplicationContext(connection);
@@ -60,11 +55,9 @@ public sealed class CardRepository : IRepository<Card>
         if (_disposedValue) return;
         if (disposing)
         {
-            _cardContext.Dispose();
             _bankAccountRepository.Dispose();
             _applicationContext.Dispose();
         }
-        _cardContext = null;
         _bankAccountRepository = null;
         _applicationContext = null;
         _disposedValue = true;
