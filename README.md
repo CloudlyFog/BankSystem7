@@ -5,7 +5,7 @@ It also let everybody to use bank system in its projects and change logic for yo
 
 **It's a beta version of library. Some exceptions can be weren't found.**
 
-### Updates
+### Updates in version 0.3.0-beta
 - Added new repository CreditRepository that implements behavior of credit handling.
 - Fixed bugs with CRUD operations in UserRepository. Now all tests are passed.
 - Updated checking conditions. Added new method FitsConditions to interface IRepository that implements behavior of checking conditions.
