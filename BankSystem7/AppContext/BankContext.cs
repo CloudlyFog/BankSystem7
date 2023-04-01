@@ -23,28 +23,10 @@ namespace BankSystem7.AppContext
             _operationService = new OperationService<Operation>(ServiceConfiguration.Options.DatabaseName ?? "CabManagementSystemReborn");
             DatabaseHandle();
         }
-
-        /// <summary>
-        /// dataSource is name of server.
-        /// </summary>
-        /// <param name="database"></param>
-        /// <param name="dataSource"></param>
-        public BankContext(string database, string dataSource = "maxim")
-        {
-            _operationService = new OperationService<Operation>(database);
-            var connection =
-                @$"Server=localhost\\SQLEXPRESS;Data Source={dataSource};Initial Catalog={database};
-                Integrated Security=True;Persist Security Info=False;Pooling=False;MultipleActiveResultSets=False;Encrypt=False;TrustServerCertificate=False";
-            ServiceConfiguration.SetConnection(connection);
-            
-            DatabaseHandle();
-        }
         public DbSet<User> Users { get; set; } = null!;
         public DbSet<Bank> Banks { get; set; } = null!;
         public DbSet<BankAccount> BankAccounts { get; set; } = null!;
         public DbSet<Card> Cards { get; set; } = null!;
-        
-        public DbSet<Credit> Credits { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -147,28 +129,6 @@ namespace BankSystem7.AppContext
             SaveChanges();
             return ExceptionModel.Successfully;
 
-        }
-
-        private ExceptionModel AddCredit(Credit? creditModel)
-        {
-            if (creditModel is null)
-                return ExceptionModel.VariableIsNull;
-            if (Credits.AsNoTracking().Any(x => Equals(creditModel)))
-                return ExceptionModel.OperationFailed;
-            Add(creditModel);
-            SaveChanges();
-            return ExceptionModel.Successfully;
-        }
-
-        private ExceptionModel RemoveCredit(Credit? creditModel)
-        {
-            if (creditModel is null)
-                return ExceptionModel.VariableIsNull;
-            if (!Credits.AsNoTracking().Any(x => x.ID == creditModel.ID))
-                return ExceptionModel.OperationFailed;
-            Remove(creditModel);
-            SaveChanges();
-            return ExceptionModel.Successfully;
         }
 
         /// <summary>
