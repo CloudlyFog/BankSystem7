@@ -38,16 +38,6 @@ public sealed class BankAccountRepository : IRepository<BankAccount>
                               new ApplicationContext(connection);
     }
 
-    [Obsolete("This constructor has bad implementation. We don't recommend to use it.")]
-    public BankAccountRepository(DatabaseType type, string connection)
-    {
-        _bankContext = BankServicesOptions.BankContext ?? new BankContext(connection);
-        SetBankServicesOptions();
-        _bankRepository = BankServicesOptions.ServiceConfiguration?.BankRepository ?? new BankRepository(connection);
-        _applicationContext = BankServicesOptions.ApplicationContext ??
-                              new ApplicationContext(connection);
-    }
-
     // Public implementation of Dispose pattern callable by consumers.
     public void Dispose()
     {

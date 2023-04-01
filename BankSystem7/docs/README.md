@@ -30,11 +30,12 @@ You can catch exception like "There isn't database which has been specified." be
 
 ## API documentation
 ### AppContext
-There are 2 classes context:
+There are 4 classes context:
 
  1. **BankContext** - is responsible for handling database/tables with bank resources.
- 2. **BankAccountContext** - is responsible for handling database/tables with banks accounts resources.
- 3. **CardContext** - is responsible for handling database/tables with cards resources.
+ 2. **ApplicationContext** - is responsible
+ 3. **BankAccountContext** - is responsible for handling database/tables with banks accounts resources.
+ 4. **CardContext** - is responsible for handling database/tables with cards resources.
 
 
 #### API BankContext
@@ -89,6 +90,7 @@ Repositories are implementation of various interfaces and working with context c
  2. `BankAccountRepository` - implements interface `IRepository<T>` for handling bank account model and Transfer money method.
  3. `CardRepository` - implements interface `IRepository<T>` for handling card model and Transfer money method.
  4. `UserRepository` - implements interface `IRepository<T>` for handling user model.
+ 5. `CreditRepository` - implements interface `IRepository<T>` for handling credit model and  operations with credit(loan). For example: take, pay credit.
 
 ## When cause exception or error?
 There are some points when you can catch an exception or error while using api of project:
