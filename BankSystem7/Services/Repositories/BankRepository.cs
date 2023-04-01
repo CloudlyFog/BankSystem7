@@ -6,9 +6,10 @@ using BankSystem7.Models;
 
 namespace BankSystem7.Services.Repositories;
 
-public sealed class BankRepository : ApplicationContext, IRepository<Bank>
+public sealed class BankRepository : IRepository<Bank>
 {
     private BankContext _bankContext;
+    private ApplicationContext _applicationContext;
     internal BankContext? BankContext { get; set; }
     internal bool AnotherBankTransactionOperation { get; set; }
 
@@ -17,12 +18,16 @@ public sealed class BankRepository : ApplicationContext, IRepository<Bank>
     {
         _bankContext = BankServicesOptions.BankContext ?? new BankContext();
         BankContext = _bankContext;
+        _applicationContext = BankServicesOptions.ApplicationContext ??
+                              new ApplicationContext(BankServicesOptions.Connection);
     }
 
-    public BankRepository(string connection) : base(connection)
+    public BankRepository(string connection)
     {
         _bankContext = BankServicesOptions.BankContext ?? new BankContext(connection);
         BankContext = _bankContext;
+        _applicationContext = BankServicesOptions.ApplicationContext ??
+                              new ApplicationContext(connection);
     }
     public void Dispose()
     {
@@ -40,11 +45,13 @@ public sealed class BankRepository : ApplicationContext, IRepository<Bank>
             if (BankContext is null) 
                 return;
             BankContext.Dispose();
+            _applicationContext.Dispose();
         }
 
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
         _bankContext = null;
         BankContext = null;
+        _applicationContext = null;
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
         _disposedValue = true;
     }
@@ -65,8 +72,8 @@ public sealed class BankRepository : ApplicationContext, IRepository<Bank>
         if (operation.OperationStatus != StatusOperationCode.Successfully)
             return (ExceptionModel)operation.OperationStatus.GetHashCode();
 
-        var user = Users.FirstOrDefault(x => x.ID == bankAccount.UserID);
-        user.Card = Cards.FirstOrDefault(x => x.UserID == user.ID);
+        var user = _applicationContext.Users.FirstOrDefault(x => x.ID == bankAccount.UserID);
+        user.Card = _applicationContext.Cards.FirstOrDefault(x => x.UserID == user.ID);
             
         if (user is null)
             return ExceptionModel.VariableIsNull;
@@ -74,14 +81,14 @@ public sealed class BankRepository : ApplicationContext, IRepository<Bank>
         bank.AccountAmount -= operation.TransferAmount;
         bankAccount.BankAccountAmount += operation.TransferAmount;
         user.Card.Amount = bankAccount.BankAccountAmount;
-        ChangeTracker.Clear();
-        BankAccounts.Update(bankAccount);
-        Banks.Update(bank);
-        Users.Update(user);
-        Cards.Update(user.Card);
+        _applicationContext.ChangeTracker.Clear();
+        _applicationContext.BankAccounts.Update(bankAccount);
+        _applicationContext.Banks.Update(bank);
+        _applicationContext.Users.Update(user);
+        _applicationContext.Cards.Update(user.Card);
         try
         {
-            SaveChanges();
+            _applicationContext.SaveChanges();
         }
         catch (Exception e)
         {
@@ -143,8 +150,8 @@ public sealed class BankRepository : ApplicationContext, IRepository<Bank>
             return (ExceptionModel)operation.OperationStatus.GetHashCode();
 
             
-        var user = Users.FirstOrDefault(x => x.ID == bankAccount.UserID);
-        user.Card = Cards.FirstOrDefault(x => x.UserID == user.ID);
+        var user = _applicationContext.Users.FirstOrDefault(x => x.ID == bankAccount.UserID);
+        user.Card = _applicationContext.Cards.FirstOrDefault(x => x.UserID == user.ID);
             
         if (user is null)
             return ExceptionModel.VariableIsNull;
@@ -152,14 +159,14 @@ public sealed class BankRepository : ApplicationContext, IRepository<Bank>
         bank.AccountAmount += operation.TransferAmount;
         bankAccount.BankAccountAmount -= operation.TransferAmount;
         user.Card.Amount = bankAccount.BankAccountAmount;
-        ChangeTracker.Clear();
-        BankAccounts.Update(bankAccount); 
-        Banks.Update(bank);
-        Users.Update(user);
-        Cards.Update(user.Card);
+        _applicationContext.ChangeTracker.Clear();
+        _applicationContext.BankAccounts.Update(bankAccount); 
+        _applicationContext.Banks.Update(bank);
+        _applicationContext.Users.Update(user);
+        _applicationContext.Cards.Update(user.Card);
         try
         {
-            SaveChanges();
+            _applicationContext.SaveChanges();
         }
         catch (Exception e)
         {
@@ -209,9 +216,9 @@ public sealed class BankRepository : ApplicationContext, IRepository<Bank>
         if (Exist(x => x.ID == item.ID))
             Update(item);
         else
-            Add(item);
+            _applicationContext.Add(item);
         
-        SaveChanges();
+        _applicationContext.SaveChanges();
         return ExceptionModel.Successfully;
     }
 
@@ -220,59 +227,28 @@ public sealed class BankRepository : ApplicationContext, IRepository<Bank>
         if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;
 
-        Remove(item);
-        SaveChanges();
+        _applicationContext.Remove(item);
+        _applicationContext.SaveChanges();
         return ExceptionModel.Successfully;
     }
 
-    public bool Exist(Expression<Func<Bank, bool>> predicate) => Banks.AsNoTracking().Any(predicate);
+    public bool Exist(Expression<Func<Bank, bool>> predicate) => _applicationContext.Banks.AsNoTracking().Any(predicate);
     public bool FitsConditions(Bank item)
     {
         return item is not null && Exist(x => x.ID == item.ID);
     }
 
-    public IEnumerable<Bank> All => Banks.AsNoTracking();
+    public IEnumerable<Bank> All => _applicationContext.Banks.AsNoTracking();
 
-    public Bank? Get(Expression<Func<Bank, bool>> predicate) => Banks.AsNoTracking().FirstOrDefault(predicate);
-
-    /// <summary>
-    /// repays user's credit
-    /// removes from the table field with credit's data of user
-    /// </summary>
-    /// <param name="bankAccount"></param>
-    /// <param name="credit"></param>
-    /// <returns></returns>
-    public ExceptionModel RepayCredit(BankAccount bankAccount, Credit credit) => 
-        _bankContext.RepayCredit(bankAccount, credit);
-
-    /// <summary>
-    /// repays user's credit
-    /// removes from the table field with credit's data of user
-    /// </summary>
-    /// <param name="bankAccount"></param>
-    /// <param name="credit"></param>
-    /// <returns></returns>
-    public ExceptionModel TakeCredit(BankAccount bankAccount, Credit credit) =>
-        _bankContext.TakeCredit(bankAccount, credit);
-    
-    internal ExceptionModel AvoidDuplication(Bank item)
-    {
-        foreach (var bankAccount in item.BankAccounts)
-            Entry(bankAccount).State = EntityState.Unchanged;
-
-        foreach (var credit in item.Credits)
-            Entry(credit).State = EntityState.Unchanged;
-
-        return ExceptionModel.Successfully;
-    }
+    public Bank? Get(Expression<Func<Bank, bool>> predicate) => _applicationContext.Banks.AsNoTracking().FirstOrDefault(predicate);
 
     public ExceptionModel Update(Bank item)
     {
         if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;
 
-        Banks.Update(item);
-        SaveChanges();
+        _applicationContext.Banks.Update(item);
+        _applicationContext.SaveChanges();
         return ExceptionModel.Successfully;
     }
 

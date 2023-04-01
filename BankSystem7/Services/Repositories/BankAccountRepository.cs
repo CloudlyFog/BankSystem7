@@ -7,10 +7,11 @@ using BankSystem7.Services.Interfaces;
 
 namespace BankSystem7.Services.Repositories;
 
-public sealed class BankAccountRepository : ApplicationContext, IRepository<BankAccount>
+public sealed class BankAccountRepository : IRepository<BankAccount>
 {
     private BankRepository _bankRepository;
     private BankContext _bankContext;
+    private ApplicationContext _applicationContext;
     private bool _disposedValue;
     private const string ConnectionString = @"Server=localhost\\SQLEXPRESS;Data Source=maxim;Initial Catalog=Test;Integrated Security=True;Persist Security Info=False;Pooling=False;MultipleActiveResultSets=False;Encrypt=False;TrustServerCertificate=False";
 
@@ -19,16 +20,22 @@ public sealed class BankAccountRepository : ApplicationContext, IRepository<Bank
         _bankContext = _bankRepository.BankContext;
         SetBankServicesOptions();
         _bankRepository = new BankRepository(ConnectionString);
+        _applicationContext = BankServicesOptions.ApplicationContext ??
+                              new ApplicationContext(BankServicesOptions.Connection);
     }
     public BankAccountRepository(BankRepository bankRepository)
     {
         _bankRepository = bankRepository;
+        _applicationContext = BankServicesOptions.ApplicationContext ??
+                              new ApplicationContext(BankServicesOptions.Connection);
     }
-    public BankAccountRepository(string connection) : base(connection)
+    public BankAccountRepository(string connection)
     {
         _bankContext = BankServicesOptions.BankContext ?? new BankContext(connection);
         SetBankServicesOptions();
         _bankRepository = BankServicesOptions.ServiceConfiguration?.BankRepository ?? new BankRepository(connection);
+        _applicationContext = BankServicesOptions.ApplicationContext ??
+                              new ApplicationContext(connection);
     }
 
     [Obsolete("This constructor has bad implementation. We don't recommend to use it.")]
@@ -37,6 +44,8 @@ public sealed class BankAccountRepository : ApplicationContext, IRepository<Bank
         _bankContext = BankServicesOptions.BankContext ?? new BankContext(connection);
         SetBankServicesOptions();
         _bankRepository = BankServicesOptions.ServiceConfiguration?.BankRepository ?? new BankRepository(connection);
+        _applicationContext = BankServicesOptions.ApplicationContext ??
+                              new ApplicationContext(connection);
     }
 
     // Public implementation of Dispose pattern callable by consumers.
@@ -49,15 +58,18 @@ public sealed class BankAccountRepository : ApplicationContext, IRepository<Bank
     // Protected implementation of Dispose pattern.
     private void Dispose(bool disposing)
     {
-        if (_disposedValue) return;
+        if (_disposedValue) 
+            return;
         if (disposing)
         {
             _bankContext.Dispose();
             _bankRepository.Dispose();
+            _applicationContext.Dispose();
         }
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
         _bankContext = null;
         _bankRepository = null;
+        _applicationContext = null;
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
         _disposedValue = true;
     }
@@ -228,9 +240,9 @@ public sealed class BankAccountRepository : ApplicationContext, IRepository<Bank
         return ExceptionModel.Successfully;
     }
 
-    public IEnumerable<BankAccount> All => BankAccounts.AsNoTracking();
+    public IEnumerable<BankAccount> All => _applicationContext.BankAccounts.AsNoTracking();
 
-    public BankAccount? Get(Expression<Func<BankAccount, bool>> predicate) => BankAccounts.AsNoTracking().FirstOrDefault(predicate);
+    public BankAccount? Get(Expression<Func<BankAccount, bool>> predicate) => _applicationContext.BankAccounts.AsNoTracking().FirstOrDefault(predicate);
 
     /// <summary>
     /// updates only BankAccount. Referenced user won't be changed
@@ -241,8 +253,8 @@ public sealed class BankAccountRepository : ApplicationContext, IRepository<Bank
     {
         if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;
-        ChangeTracker.Clear();
-        BankAccounts.Update(item);
+        _applicationContext.ChangeTracker.Clear();
+        _applicationContext.BankAccounts.Update(item);
         _bankContext.SaveChanges();
         return ExceptionModel.Successfully;
     }
@@ -256,14 +268,14 @@ public sealed class BankAccountRepository : ApplicationContext, IRepository<Bank
     {
         if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;
-        ChangeTracker.Clear();
-        BankAccounts.Remove(item);
-        SaveChanges();
+        _applicationContext.ChangeTracker.Clear();
+        _applicationContext.BankAccounts.Remove(item);
+        _applicationContext.SaveChanges();
         return ExceptionModel.Successfully;
     }
 
     public bool Exist(Expression<Func<BankAccount, bool>> predicate)
-        => BankAccounts.AsNoTracking().Any(predicate);
+        => _applicationContext.BankAccounts.AsNoTracking().Any(predicate);
 
     public bool FitsConditions(BankAccount item)
     {
@@ -281,11 +293,11 @@ public sealed class BankAccountRepository : ApplicationContext, IRepository<Bank
         if (card is null || !_bankContext.Cards.AsNoTracking().Any(x => x.ID == card.ID))
             return ExceptionModel.VariableIsNull;
 
-        ChangeTracker.Clear();
-        using var transaction = Database.BeginTransaction();
-        BankAccounts.Update(item);
-        Users.Update(user);
-        SaveChanges(); 
+        _applicationContext.ChangeTracker.Clear();
+        using var transaction = _applicationContext.Database.BeginTransaction();
+        _applicationContext.BankAccounts.Update(item);
+        _applicationContext.Users.Update(user);
+        _applicationContext.SaveChanges(); 
         transaction.Commit();
 
         return ExceptionModel.Successfully;
@@ -296,7 +308,7 @@ public sealed class BankAccountRepository : ApplicationContext, IRepository<Bank
         if (item is null)
             throw new Exception("Passed instance of BankAccount is null.");
             
-        if (!Users.AsNoTracking().Any(x => x.ID == item.UserID))
+        if (!_applicationContext.Users.AsNoTracking().Any(x => x.ID == item.UserID))
             throw new Exception("Doesn't exist user with specified ID in the database.");
 
         if (!Exist(x => x.ID == item.ID)) 
@@ -311,6 +323,7 @@ public sealed class BankAccountRepository : ApplicationContext, IRepository<Bank
     private void SetBankServicesOptions()
     {
         BankServicesOptions.BankContext = _bankContext;
+        BankServicesOptions.ApplicationContext = _applicationContext;
     }
 
     ~BankAccountRepository()

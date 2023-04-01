@@ -1,7 +1,7 @@
 ﻿using BankSystem7.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace BankSystem7.Services;
+namespace BankSystem7.Services.Configuration;
 
 public class ModelConfiguration
 {

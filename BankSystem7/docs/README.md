@@ -5,9 +5,13 @@ It also let everybody to use bank system in its projects and change logic for yo
 
 **It's a beta version of library. Some exceptions can be weren't found.**
 
-Version 0.2.8-beta is the last maximum stable version without critical bugs but can contain some invisible for us bugs and it can cause to exceptions.
-For avoid that You can write to cloudyfg@gmail.com with title "**BANKSYSTEM REPORT BUG**" and in the body write about vulnerability or bug as detailed as possible. 
-It can help us to fix bug or remove vulnerability.
+### Updates
+- Added new repository CreditRepository that implements behavior of credit handling.
+- Fixed bugs with CRUD operations in UserRepository. Now all tests are passed.
+- Updated checking conditions. Added new method FitsConditions to interface IRepository that implements behavior of checking conditions.
+- Added new implementation of method Transfer in BankAccountRepository that lets avoid integrity violations in table Banks in the database.
+- Changed namespace of ConfigurationOptions, ModelConfiguration, ServiceConfiguration and ServiceConfigurationMiddleware from BankSystem7.Services to BankSystem7.Services.Configuration
+- Implemented architecture with one context class for handling all of operations in the database. This class is ApplicationContext. Remark: not everywhere used this context class because some operations makes deadlocks in requests to the database.
 ****
 # Documentation
 

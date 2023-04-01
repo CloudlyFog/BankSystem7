@@ -6,10 +6,11 @@ using BankSystem7.Services.Interfaces;
 
 namespace BankSystem7.Services.Repositories;
 
-public sealed class CardRepository : ApplicationContext, IRepository<Card>
+public sealed class CardRepository : IRepository<Card>
 {
     private CardContext _cardContext;
     private BankAccountRepository _bankAccountRepository;
+    private ApplicationContext _applicationContext;
     private bool _disposedValue;
     private readonly string _connection = @"Server=localhost\\SQLEXPRESS;Data Source=maxim;Initial Catalog=Test;Integrated Security=True;
             Persist Security Info=False;Pooling=False;MultipleActiveResultSets=False;
@@ -19,23 +20,31 @@ public sealed class CardRepository : ApplicationContext, IRepository<Card>
     {
         _cardContext = new CardContext(BankServicesOptions.Connection);
         _bankAccountRepository = new BankAccountRepository(BankServicesOptions.Connection);
+        _applicationContext = BankServicesOptions.ApplicationContext ??
+                              new ApplicationContext(BankServicesOptions.Connection);
     }
     public CardRepository(BankAccountRepository bankAccountRepository)
     {
         _bankAccountRepository = bankAccountRepository;
         _cardContext = new CardContext(BankServicesOptions.Connection);
+        _applicationContext = BankServicesOptions.ApplicationContext ??
+                              new ApplicationContext(bankAccountRepository);
     }
     public CardRepository(BankAccountRepository bankAccountRepository, string connection)
     {
         _connection = connection;
         _bankAccountRepository = bankAccountRepository;
         _cardContext = new CardContext(connection);
+        _applicationContext = BankServicesOptions.ApplicationContext ??
+                              new ApplicationContext(bankAccountRepository);
     }
     public CardRepository(string connection)
     {
         _connection = connection;
         _cardContext = new CardContext(connection);
         _bankAccountRepository = new BankAccountRepository(connection);
+        _applicationContext = BankServicesOptions.ApplicationContext ??
+                              new ApplicationContext(connection);
     }
 
     // Public implementation of Dispose pattern callable by consumers.
@@ -53,9 +62,11 @@ public sealed class CardRepository : ApplicationContext, IRepository<Card>
         {
             _cardContext.Dispose();
             _bankAccountRepository.Dispose();
+            _applicationContext.Dispose();
         }
         _cardContext = null;
         _bankAccountRepository = null;
+        _applicationContext = null;
         _disposedValue = true;
     }
 
@@ -66,8 +77,8 @@ public sealed class CardRepository : ApplicationContext, IRepository<Card>
     {
         if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;
-        Cards.Update(item);
-        _cardContext.SaveChanges();
+        _applicationContext.Cards.Update(item);
+        _applicationContext.SaveChanges();
         return ExceptionModel.Successfully;
     }
 
@@ -83,8 +94,8 @@ public sealed class CardRepository : ApplicationContext, IRepository<Card>
             return ExceptionModel.OperationRestricted;
         if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;
-        Cards.Add(item);
-        _cardContext.SaveChanges();
+        _applicationContext.Cards.Add(item);
+        _applicationContext.SaveChanges();
         return ExceptionModel.Successfully;
     }
 
@@ -92,21 +103,21 @@ public sealed class CardRepository : ApplicationContext, IRepository<Card>
     {
         if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;
-        Cards.Remove(item);
-        SaveChanges();
+        _applicationContext.Cards.Remove(item);
+        _applicationContext.SaveChanges();
         return ExceptionModel.Successfully;
     }
 
-    public bool Exist(Expression<Func<Card, bool>> predicate) => Cards.AsNoTracking().Any(predicate);
+    public bool Exist(Expression<Func<Card, bool>> predicate) => _applicationContext.Cards.AsNoTracking().Any(predicate);
     public bool FitsConditions(Card item)
     {
         return item is not null && Exist(x => x.ID == item.ID);
     }
 
-    public Card? Get(Expression<Func<Card, bool>> predicate) => Cards.AsNoTracking().FirstOrDefault(predicate);
+    public Card? Get(Expression<Func<Card, bool>> predicate) => _applicationContext.Cards.AsNoTracking().FirstOrDefault(predicate);
 
-    public IEnumerable<Card> All => Cards.AsNoTracking();
-    public void ChangeTrackerCardContext() => ChangeTracker.Clear();
+    public IEnumerable<Card> All => _applicationContext.Cards.AsNoTracking();
+    public void ChangeTrackerCardContext() => _applicationContext.ChangeTracker.Clear();
 
     ~CardRepository()
     {

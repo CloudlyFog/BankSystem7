@@ -13,9 +13,10 @@ using Microsoft.EntityFrameworkCore;
 namespace BankSystem7.Services.Repositories;
 
 
-public sealed class UserRepository : ApplicationContext, IRepository<User>
+public sealed class UserRepository : IRepository<User>
 {
     private BankAccountRepository _bankAccountRepository;
+    private ApplicationContext _applicationContext;
     private BankRepository _bankRepository;
     private CardRepository _cardRepository;
     private bool _disposed;
@@ -24,18 +25,23 @@ public sealed class UserRepository : ApplicationContext, IRepository<User>
         _bankAccountRepository = new BankAccountRepository(BankServicesOptions.Connection);
         _bankRepository = new BankRepository(BankServicesOptions.Connection);
         _cardRepository = new CardRepository(_bankAccountRepository);
+        _applicationContext = BankServicesOptions.ApplicationContext ??
+                              new ApplicationContext(_bankAccountRepository);
     }
-    public UserRepository(string connection) : base(connection)
+    public UserRepository(string connection)
     {
         _bankAccountRepository = new BankAccountRepository(connection);
         _bankRepository = new BankRepository(connection);
         _cardRepository = new CardRepository(_bankAccountRepository);
+        _applicationContext = BankServicesOptions.ApplicationContext ??
+                              new ApplicationContext(_bankAccountRepository);
     }
-    public UserRepository(BankAccountRepository repository) : base(repository)
+    public UserRepository(BankAccountRepository repository)
     {
         _bankAccountRepository = repository;
         _bankRepository = BankServicesOptions.ServiceConfiguration?.BankRepository ?? new BankRepository(BankServicesOptions.Connection);
         _cardRepository = BankServicesOptions.ServiceConfiguration?.CardRepository ?? new CardRepository(_bankAccountRepository);
+        _applicationContext = new ApplicationContext(_bankAccountRepository);
     }
     public ExceptionModel Create(User item)
     {
@@ -46,22 +52,22 @@ public sealed class UserRepository : ApplicationContext, IRepository<User>
         if (Exist(x => x.ID == item.ID))
             return ExceptionModel.OperationFailed;
 
-        using var userCreationTransaction = Database.BeginTransaction(IsolationLevel
+        using var userCreationTransaction = _applicationContext.Database.BeginTransaction(IsolationLevel
                                                 .RepeatableRead);
             
         
-        var avoidDuplication = _bankRepository.AvoidDuplication(item.Card.BankAccount.Bank);
+        var avoidDuplication = _applicationContext.AvoidDuplication(item.Card.BankAccount.Bank);
         if (avoidDuplication != ExceptionModel.Successfully)
         {
             userCreationTransaction.Rollback();
             return avoidDuplication;
         }
         
-        ChangeTracker.Clear();
-        Users.Add(item);
+        _applicationContext.ChangeTracker.Clear();
+        _applicationContext.Users.Add(item);
         try
         {
-            SaveChanges();
+            _applicationContext.SaveChanges();
         }
         catch (Exception ex)
         {
@@ -88,10 +94,12 @@ public sealed class UserRepository : ApplicationContext, IRepository<User>
             _bankAccountRepository.Dispose();
             _bankRepository.Dispose();
             _cardRepository.Dispose();
+            _applicationContext.Dispose();
         }
         _bankAccountRepository = null;
         _bankRepository = null;
         _cardRepository = null;
+        _applicationContext = null;
         _disposed = true;
     }
 
@@ -100,10 +108,10 @@ public sealed class UserRepository : ApplicationContext, IRepository<User>
         if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;
         
-        Users.Remove(item);
+        _applicationContext.Users.Remove(item);
         try
         {
-            SaveChanges();
+            _applicationContext.SaveChanges();
         }
         catch (Exception ex)
         {
@@ -114,17 +122,17 @@ public sealed class UserRepository : ApplicationContext, IRepository<User>
         return _bankAccountRepository.Delete(item.Card.BankAccount);
     }
 
-    public bool Exist(Expression<Func<User, bool>> predicate) => Users.AsNoTracking().Any(predicate);
+    public bool Exist(Expression<Func<User, bool>> predicate) => _applicationContext.Users.AsNoTracking().Any(predicate);
     public bool FitsConditions(User item)
     {
         return item?.Card?.BankAccount?.Bank is not null && Exist(x => x.ID == item.ID);
     }
 
-    public IEnumerable<User> All => Users.AsNoTracking();
+    public IEnumerable<User> All => _applicationContext.Users.AsNoTracking();
 
     public User? Get(Expression<Func<User, bool>> predicate)
     {
-        var user = Users.AsNoTracking().FirstOrDefault(predicate);
+        var user = _applicationContext.Users.AsNoTracking().FirstOrDefault(predicate);
         if (user is null)
             return user;
         user.Card = _cardRepository.Get(x => x.UserID == user.ID);
@@ -143,7 +151,7 @@ public sealed class UserRepository : ApplicationContext, IRepository<User>
     {
         if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;
-        using var userUpdateTransaction = Database.BeginTransaction(IsolationLevel.RepeatableRead);
+        using var userUpdateTransaction = _applicationContext.Database.BeginTransaction(IsolationLevel.RepeatableRead);
             
         var bankAccountDeletionOperation = _bankAccountRepository.Update(item.Card.BankAccount);
         if (bankAccountDeletionOperation != ExceptionModel.Successfully)
@@ -152,11 +160,11 @@ public sealed class UserRepository : ApplicationContext, IRepository<User>
             return bankAccountDeletionOperation;
         }
             
-        ChangeTracker.Clear();
-        Users.Update(item);
+        _applicationContext.ChangeTracker.Clear();
+        _applicationContext.Users.Update(item);
         try
         {
-            SaveChanges();
+            _applicationContext.SaveChanges();
         }
         catch (Exception ex)
         {

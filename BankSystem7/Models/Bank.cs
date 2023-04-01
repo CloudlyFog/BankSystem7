@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore.Query.Internal;
 
 namespace BankSystem7.Models;
 
@@ -26,14 +27,24 @@ public class Operation
 
 public class Credit
 {
+    public Credit()
+    {
+        
+    }
+    public Credit(User user = null, Bank bank = null)
+    {
+        if (bank is null || user is null)
+            return;
+
+        Bank = bank;
+        BankID = bank.ID;
+        User = user;
+        UserID = user.ID;
+    }
     [Key]
     public Guid ID { get; set; } = Guid.NewGuid();
     public Guid? BankID { get; set; }
     public Guid? UserID { get; set; }
-    
-    [Obsolete($"This property isn't used in main logic. Instead use {nameof(UserID)}")]
-    public Guid UserBankAccountID { get; set; } // id of user
-    
     public decimal CreditAmount { get; set; }
     public Bank? Bank { get; set; }
     public User? User { get; set; }

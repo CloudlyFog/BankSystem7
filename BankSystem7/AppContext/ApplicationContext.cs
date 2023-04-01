@@ -6,11 +6,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BankSystem7.AppContext;
 
-public abstract class ApplicationContext : DbContext
+public class ApplicationContext : DbContext
 {
     public static bool EnsureDeleted { get; set; }
     public static bool EnsureCreated { get; set; } = true;
-    protected DbSet<User> Users { get; set; } = null!;
+    protected internal DbSet<User> Users { get; set; } = null!;
     protected internal DbSet<BankAccount> BankAccounts { get; set; } = null!;
     protected internal DbSet<Bank> Banks { get; set; } = null!;
     protected internal DbSet<Card> Cards { get; set; } = null!;
@@ -113,5 +113,16 @@ public abstract class ApplicationContext : DbContext
             Database.EnsureDeleted();
         if (EnsureCreated)
             Database.EnsureCreated();
+    }
+    
+    internal ExceptionModel AvoidDuplication(Bank item)
+    {
+        foreach (var bankAccount in item.BankAccounts)
+            Entry(bankAccount).State = EntityState.Unchanged;
+
+        foreach (var credit in item.Credits)
+            Entry(credit).State = EntityState.Unchanged;
+
+        return ExceptionModel.Successfully;
     }
 }
