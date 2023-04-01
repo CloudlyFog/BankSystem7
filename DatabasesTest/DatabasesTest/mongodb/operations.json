@@ -1,0 +1,1892 @@
+[{
+  "_id": {
+    "$oid": "6425bf545dcfcbb62c94a026"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "iNDwOMQ84kyTyW+GsdFE8A==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "E5RTxDbmAUyuO766UC/dfQ==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "1000",
+  "OperationStatus": 200,
+  "OperationKind": 2
+},{
+  "_id": {
+    "$oid": "6425bf565dcfcbb62c94a02d"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "UyLCNeGZ1USPqgsOoJpiZw==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "njpxVqc2/UebglHBC4KgUQ==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "1000",
+  "OperationStatus": 200,
+  "OperationKind": 1
+},{
+  "_id": {
+    "$oid": "6425bf955dcfcbb62c94a04d"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "A9UKPqqpRkmrH9m2q6gBPw==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "E5RTxDbmAUyuO766UC/dfQ==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "1000",
+  "OperationStatus": 200,
+  "OperationKind": 2
+},{
+  "_id": {
+    "$oid": "6425c0035dcfcbb62c94a08e"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "fw9Vi3EyVk+V6/FT6LHb3w==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "E5RTxDbmAUyuO766UC/dfQ==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "1000",
+  "OperationStatus": 200,
+  "OperationKind": 2
+},{
+  "_id": {
+    "$oid": "6425c0045dcfcbb62c94a091"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "JnkBLnhAQ0Or3IVIWq9/5w==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "njpxVqc2/UebglHBC4KgUQ==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "1000",
+  "OperationStatus": 200,
+  "OperationKind": 1
+},{
+  "_id": {
+    "$oid": "6425c08d5dcfcbb62c94a0d1"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "wOYzWsYxIUC/1+tk3uocBg==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "E5RTxDbmAUyuO766UC/dfQ==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "1000",
+  "OperationStatus": 200,
+  "OperationKind": 2
+},{
+  "_id": {
+    "$oid": "6425c0915dcfcbb62c94a0d4"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "pM/Wd8mDR0ubSwABG9jHQQ==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "njpxVqc2/UebglHBC4KgUQ==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "1000",
+  "OperationStatus": 200,
+  "OperationKind": 1
+},{
+  "_id": {
+    "$oid": "6425c93d5dcfcbb62c94a479"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "5sf2HwiwykCEFkV8prBeEg==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "E5RTxDbmAUyuO766UC/dfQ==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "1000",
+  "OperationStatus": 200,
+  "OperationKind": 2
+},{
+  "_id": {
+    "$oid": "6425c93d5dcfcbb62c94a47c"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "Zp+CXY2ncU+OzjtOFSu8Kw==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "njpxVqc2/UebglHBC4KgUQ==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "1000",
+  "OperationStatus": 200,
+  "OperationKind": 1
+},{
+  "_id": {
+    "$oid": "6425e84d5dcfcbb62c94a563"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "mHw+G39Bp0mCk69ej82YEQ==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "E5RTxDbmAUyuO766UC/dfQ==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "1000",
+  "OperationStatus": 200,
+  "OperationKind": 2
+},{
+  "_id": {
+    "$oid": "6425e8555dcfcbb62c94a56a"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "Gaguuu8tSUeOvPL3fpH3kw==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "njpxVqc2/UebglHBC4KgUQ==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "1000",
+  "OperationStatus": 200,
+  "OperationKind": 1
+},{
+  "_id": {
+    "$oid": "6425e87e5dcfcbb62c94a589"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "j0Uql7h+oEymXJ85CRFEvw==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "E5RTxDbmAUyuO766UC/dfQ==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "1000",
+  "OperationStatus": 200,
+  "OperationKind": 2
+},{
+  "_id": {
+    "$oid": "6425e8815dcfcbb62c94a58c"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "+9P0HQMuokGr1YwB9AWN2g==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "njpxVqc2/UebglHBC4KgUQ==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "1000",
+  "OperationStatus": 200,
+  "OperationKind": 1
+},{
+  "_id": {
+    "$oid": "6425e89c5dcfcbb62c94a5a1"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "yIYEIbnxT0Styf3qAJXvYw==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "E5RTxDbmAUyuO766UC/dfQ==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "1000",
+  "OperationStatus": 200,
+  "OperationKind": 2
+},{
+  "_id": {
+    "$oid": "6425e89c5dcfcbb62c94a5a4"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "Z1DdKS/f4UWH2ol3S4VBeQ==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "njpxVqc2/UebglHBC4KgUQ==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "1000",
+  "OperationStatus": 200,
+  "OperationKind": 1
+},{
+  "_id": {
+    "$oid": "6425e8b75dcfcbb62c94a5b8"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "XREO78akukGdbv95JkZy7A==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "E5RTxDbmAUyuO766UC/dfQ==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "1000",
+  "OperationStatus": 200,
+  "OperationKind": 2
+},{
+  "_id": {
+    "$oid": "6425e8c85dcfcbb62c94a5c5"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "fvn+f4Vjq0aEVqpSZOHuEQ==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "njpxVqc2/UebglHBC4KgUQ==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "1000",
+  "OperationStatus": 200,
+  "OperationKind": 1
+},{
+  "_id": {
+    "$oid": "6425e8ef5dcfcbb62c94a5dd"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "W+HD59U1pUOVbe/sypwhDA==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "E5RTxDbmAUyuO766UC/dfQ==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "1000",
+  "OperationStatus": 200,
+  "OperationKind": 2
+},{
+  "_id": {
+    "$oid": "6425e8f45dcfcbb62c94a5e4"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "bbyEziXL3EakhWtjQUvqjw==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "njpxVqc2/UebglHBC4KgUQ==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "1000",
+  "OperationStatus": 200,
+  "OperationKind": 1
+},{
+  "_id": {
+    "$oid": "6425e93d5dcfcbb62c94a610"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "t47Fx1HqGkGLB6nMYo43uA==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "E5RTxDbmAUyuO766UC/dfQ==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "1000",
+  "OperationStatus": 200,
+  "OperationKind": 2
+},{
+  "_id": {
+    "$oid": "6425e93d5dcfcbb62c94a613"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "NtXly/C/FkqjyWYkcrzP+g==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "njpxVqc2/UebglHBC4KgUQ==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "1000",
+  "OperationStatus": 200,
+  "OperationKind": 1
+},{
+  "_id": {
+    "$oid": "6425e96a5dcfcbb62c94a633"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "rnDj6TdqgUGRknDQNc1R/g==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "E5RTxDbmAUyuO766UC/dfQ==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "1000",
+  "OperationStatus": 200,
+  "OperationKind": 2
+},{
+  "_id": {
+    "$oid": "6425e96b5dcfcbb62c94a636"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "/Vu0pyZMQEab0wwfh1Mz9g==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "njpxVqc2/UebglHBC4KgUQ==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "1000",
+  "OperationStatus": 200,
+  "OperationKind": 1
+},{
+  "_id": {
+    "$oid": "6425eb755dcfcbb62c94a714"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "8SOo6Y+wvE6Nq9VX6lEYLQ==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "E5RTxDbmAUyuO766UC/dfQ==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "1000",
+  "OperationStatus": 200,
+  "OperationKind": 2
+},{
+  "_id": {
+    "$oid": "6425eb765dcfcbb62c94a717"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "g9qTKjU8XE2tXlkn7n+b2w==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "njpxVqc2/UebglHBC4KgUQ==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "1000",
+  "OperationStatus": 200,
+  "OperationKind": 1
+},{
+  "_id": {
+    "$oid": "6425eba55dcfcbb62c94a762"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "OrOaZzlUHEaQN59T8L9Z8w==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "E5RTxDbmAUyuO766UC/dfQ==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "100",
+  "OperationStatus": 200,
+  "OperationKind": 2
+},{
+  "_id": {
+    "$oid": "6425eba55dcfcbb62c94a765"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "53mKFd1w5UeobN9smGQ4kA==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "njpxVqc2/UebglHBC4KgUQ==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "100",
+  "OperationStatus": 200,
+  "OperationKind": 1
+},{
+  "_id": {
+    "$oid": "642603605dcfcbb62c94b165"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "CTL5AjCtDUaqChfOHlWccg==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "90A7PkOO5USwlra6WjY7ng==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "100",
+  "OperationStatus": 200,
+  "OperationKind": 2
+},{
+  "_id": {
+    "$oid": "642603605dcfcbb62c94b168"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "PNlJMYNhOka8IcchucueRA==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "bHoiF4CjXkmH+ji10CKJhA==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "100",
+  "OperationStatus": 200,
+  "OperationKind": 1
+},{
+  "_id": {
+    "$oid": "642603b25dcfcbb62c94b195"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "ImvOCcMmXEeQSrVAqmL09w==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "pkvjagrXqkqo+aVjoYrfow==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "100",
+  "OperationStatus": 200,
+  "OperationKind": 2
+},{
+  "_id": {
+    "$oid": "642603b25dcfcbb62c94b198"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "h5JQQGzN6UmlEkfxV5YfXQ==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "E0ANV9DcbEyD5CldGLJzmw==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "wunng80Ff0SeoVffG1qwmA==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "E0ANV9DcbEyD5CldGLJzmw==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "100",
+  "OperationStatus": 200,
+  "OperationKind": 1
+},{
+  "_id": {
+    "$oid": "642604a65dcfcbb62c94b21a"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "Zjl7gdKXI0yhMG/A6eh6Og==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "uiLipsO0xkSzosndOBymNQ==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "100",
+  "OperationStatus": 200,
+  "OperationKind": 2
+},{
+  "_id": {
+    "$oid": "642604a65dcfcbb62c94b21d"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "mQjbq82PXE6nH+ajkO8yvg==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "E0ANV9DcbEyD5CldGLJzmw==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "5OjDecV2SEG6nlfWxkUb8w==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "E0ANV9DcbEyD5CldGLJzmw==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "100",
+  "OperationStatus": 200,
+  "OperationKind": 1
+},{
+  "_id": {
+    "$oid": "6427e2b55dcfcbb62c94dac5"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "WfJKGe+y5kG4IMx6WtLcjg==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "0oR4K229cEu+8VAxcTAW0Q==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "100",
+  "OperationStatus": 200,
+  "OperationKind": 2
+},{
+  "_id": {
+    "$oid": "6427e2b55dcfcbb62c94dac8"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "C0pK9hRqe0WDEgfG0+HSuA==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "E0ANV9DcbEyD5CldGLJzmw==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "dPOzsyeyUEapp3+rmablkQ==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "E0ANV9DcbEyD5CldGLJzmw==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "100",
+  "OperationStatus": 200,
+  "OperationKind": 1
+},{
+  "_id": {
+    "$oid": "6427e6e65dcfcbb62c94dcac"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "q0uXxbMScU6zTbSy2HEPvA==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "m/GXKD7lt0+cZmirDHvvTw==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "1000",
+  "OperationStatus": 200,
+  "OperationKind": 0
+},{
+  "_id": {
+    "$oid": "6427e74d5dcfcbb62c94dce1"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "eEpFgl6LrECQjP2RCxnO0Q==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "H9hHuVniRk+/gnG+XNFniw==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "1000",
+  "OperationStatus": 200,
+  "OperationKind": 0
+},{
+  "_id": {
+    "$oid": "6427e95b5dcfcbb62c94ddc4"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "orv7W7to5EmAMtWsaSy5uw==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "cnVGoah3JEGGr+Ab1aHkwg==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "1000",
+  "OperationStatus": 200,
+  "OperationKind": 0
+},{
+  "_id": {
+    "$oid": "64283ffb5dcfcbb62c94e06e"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "qA+TMS7QmUO6Z8AIhVU2gQ==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "7qe3AMFauUe/FFNalVQPTQ==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "1000",
+  "OperationStatus": 200,
+  "OperationKind": 0
+},{
+  "_id": {
+    "$oid": "642841525dcfcbb62c94e102"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "8vsg37pRhEa2cBBZZSS3BA==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "u50PEUy4vEqCrHQmEiJCXA==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "1000",
+  "OperationStatus": 200,
+  "OperationKind": 0
+},{
+  "_id": {
+    "$oid": "6428436a5dcfcbb62c94e1e6"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "CF1TTomXPE+EGxKXFHRiAQ==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "/JRh/57H90qeypPlWgoV3Q==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "1000",
+  "OperationStatus": 200,
+  "OperationKind": 0
+},{
+  "_id": {
+    "$oid": "642843b05dcfcbb62c94e210"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "7FroyXx11U+TTr7QZjR7VQ==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "uLUPnwbDi0KDDVES6iJW4Q==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "1000",
+  "OperationStatus": 200,
+  "OperationKind": 0
+},{
+  "_id": {
+    "$oid": "642844305dcfcbb62c94e24d"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "aL0acvnRhEadRwqMxq14qw==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "MH8ID0z0xki3gtSkVBO0kA==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "1000",
+  "OperationStatus": 200,
+  "OperationKind": 0
+},{
+  "_id": {
+    "$oid": "642845345dcfcbb62c94e2c6"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "Bp79SHGNx0Szjh3nQ16CTA==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "JYHgijy5vkSYwoR+K5ADRw==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "1000",
+  "OperationStatus": 200,
+  "OperationKind": 0
+},{
+  "_id": {
+    "$oid": "642846705dcfcbb62c94e35d"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "lfXb0x9IKUWo0fZHrQ6tjA==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "IkjA7O83NEeb9k6G6jsLyA==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "1000",
+  "OperationStatus": 200,
+  "OperationKind": 0
+},{
+  "_id": {
+    "$oid": "642846ba5dcfcbb62c94e387"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "0gKtZPxIMEiP9+gPHIv+YA==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "Znez24qTiE6qE3lh5cJnVg==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "1000",
+  "OperationStatus": 200,
+  "OperationKind": 0
+},{
+  "_id": {
+    "$oid": "642846e85dcfcbb62c94e3a6"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "3qSDk6uLVEyjBekPL9LfVg==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "gIiZM5XGyUid8RTlDBLrUg==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "1000",
+  "OperationStatus": 200,
+  "OperationKind": 0
+},{
+  "_id": {
+    "$oid": "642847075dcfcbb62c94e3b9"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "mEBY9NPTRkGL7jo3uNB/5w==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "yRrNllHzdk+ovBgCdwdZAg==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "1000",
+  "OperationStatus": 200,
+  "OperationKind": 0
+},{
+  "_id": {
+    "$oid": "642847775dcfcbb62c94e3ec"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "QkkDXuHySk6mrFnVMJ/IIA==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "8ZIlHKCC9UOJItWOq5RL/w==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "1000",
+  "OperationStatus": 200,
+  "OperationKind": 0
+},{
+  "_id": {
+    "$oid": "642847775dcfcbb62c94e3ef"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "CSo3UkYOU0qTEkPsR0/fcw==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "8ZIlHKCC9UOJItWOq5RL/w==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "500",
+  "OperationStatus": 200,
+  "OperationKind": 0
+},{
+  "_id": {
+    "$oid": "642847f05dcfcbb62c94e42a"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "tGvinMCA70SVFN/peD/j+Q==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "fQJc+WtFckOKpClbEMEPyA==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "1000",
+  "OperationStatus": 200,
+  "OperationKind": 0
+},{
+  "_id": {
+    "$oid": "642847f05dcfcbb62c94e42d"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "Ya+kqTh9iUiRL7KkF/cvlQ==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "fQJc+WtFckOKpClbEMEPyA==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "500",
+  "OperationStatus": 200,
+  "OperationKind": 0
+},{
+  "_id": {
+    "$oid": "642848655dcfcbb62c94e464"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "Fav3G2d+A0O6NWTnBWkZoA==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "Umeg7V1fYkewsalLw9+TJA==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "1000",
+  "OperationStatus": 200,
+  "OperationKind": 0
+},{
+  "_id": {
+    "$oid": "642848a25dcfcbb62c94e484"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "iRwBEeybXEWdSGytXVj6Rw==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "+1vIh64NCEiGn1xkXn2vkQ==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "1000",
+  "OperationStatus": 200,
+  "OperationKind": 0
+},{
+  "_id": {
+    "$oid": "642848a25dcfcbb62c94e487"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "kuwXUirPB0yojrb7kT3tkg==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "+1vIh64NCEiGn1xkXn2vkQ==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "500",
+  "OperationStatus": 200,
+  "OperationKind": 0
+},{
+  "_id": {
+    "$oid": "642848cb5dcfcbb62c94e49e"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "7qBTgqbL9EeYtnGBNnvLaA==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "G7qv/iZ8iEO6/SXoS9pTRw==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "1000",
+  "OperationStatus": 200,
+  "OperationKind": 0
+},{
+  "_id": {
+    "$oid": "642848cb5dcfcbb62c94e4a1"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "L/IAQriBKEOVGWvyM5j+yA==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "G7qv/iZ8iEO6/SXoS9pTRw==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "5100",
+  "OperationStatus": 200,
+  "OperationKind": 0
+},{
+  "_id": {
+    "$oid": "642849095dcfcbb62c94e4c4"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "vYEuwSqr9E6LWoA19YjQOQ==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "0XHwnk6bsk+orseKLioSTA==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "1000",
+  "OperationStatus": 200,
+  "OperationKind": 0
+},{
+  "_id": {
+    "$oid": "642849095dcfcbb62c94e4c7"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "CTiyj/q+t0GrbNJj+CUwEg==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "0XHwnk6bsk+orseKLioSTA==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "5100",
+  "OperationStatus": 200,
+  "OperationKind": 0
+},{
+  "_id": {
+    "$oid": "642851005dcfcbb62c94e811"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "PAp8rA9aCEOmdQSVmTvxIA==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "ifepwev58UqYCiNtklBJMA==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "1000",
+  "OperationStatus": 200,
+  "OperationKind": 0
+},{
+  "_id": {
+    "$oid": "642851005dcfcbb62c94e814"
+  },
+  "ID": {
+    "$binary": {
+      "base64": "RYDXPQxsgEqp8SvukZfnXQ==",
+      "subType": "03"
+    }
+  },
+  "BankID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "ReceiverID": {
+    "$binary": {
+      "base64": "ifepwev58UqYCiNtklBJMA==",
+      "subType": "03"
+    }
+  },
+  "SenderID": {
+    "$binary": {
+      "base64": "56MICt2A7UihWNvPbfUx+Q==",
+      "subType": "03"
+    }
+  },
+  "TransferAmount": "1000",
+  "OperationStatus": 200,
+  "OperationKind": 0
+}]

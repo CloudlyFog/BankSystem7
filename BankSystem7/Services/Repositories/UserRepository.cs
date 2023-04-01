@@ -3,129 +3,182 @@
 // Project-level suppressions either have no target or are given
 // a specific target and scoped to a namespace, type, member, etc.
 
-using Standart7.Models;
+using System.Data;
 using System.Linq.Expressions;
 using BankSystem7.AppContext;
+using BankSystem7.Models;
 using BankSystem7.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace BankSystem7.Services.Repositories
+namespace BankSystem7.Services.Repositories;
+
+
+public sealed class UserRepository : IRepository<User>
 {
-    public class UserRepository : ApplicationContext, IRepository<User>
+    private BankAccountRepository _bankAccountRepository;
+    private ApplicationContext _applicationContext;
+    private BankRepository _bankRepository;
+    private CardRepository _cardRepository;
+    private bool _disposed;
+    public UserRepository()
     {
-        private BankAccountRepository _bankAccountRepository;
-        private bool _disposed = false;
-        public UserRepository()
-        {
-            _bankAccountRepository = new BankAccountRepository();
-        }
-        public UserRepository(string connection)
-        {
-            _bankAccountRepository = new BankAccountRepository(connection);
-        }
-        public UserRepository(BankAccountRepository repository)
-        {
-            _bankAccountRepository = repository;
-        }
-        public ExceptionModel Create(User item)
-        {
-            if (Exist(item.ID))//if user isn`t exist method will send false
-                return ExceptionModel.OperationFailed;
-            item.Password = HashPassword(item.Password);
-            item.Authenticated = true;
-            item.ID = Guid.NewGuid();
-            var bankAccountModel = new BankAccount()
-            {
-                ID = item.BankAccountID,
-                UserID = item.ID
-            };
-            var operation = _bankAccountRepository.Create(bankAccountModel);
-            if (operation != ExceptionModel.Successfull)
-                return operation;
-            Users.Add(item);
-            try
-            {
-                SaveChanges();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                throw;
-            }
-            return ExceptionModel.Successfull;
-        }
+        _bankAccountRepository = new BankAccountRepository(BankServicesOptions.Connection);
+        _bankRepository = new BankRepository(BankServicesOptions.Connection);
+        _cardRepository = new CardRepository(_bankAccountRepository);
+        _applicationContext = BankServicesOptions.ApplicationContext ??
+                              new ApplicationContext(_bankAccountRepository);
+    }
+    public UserRepository(string connection)
+    {
+        _bankAccountRepository = new BankAccountRepository(connection);
+        _bankRepository = new BankRepository(connection);
+        _cardRepository = new CardRepository(_bankAccountRepository);
+        _applicationContext = BankServicesOptions.ApplicationContext ??
+                              new ApplicationContext(_bankAccountRepository);
+    }
+    public UserRepository(BankAccountRepository repository)
+    {
+        _bankAccountRepository = repository;
+        _bankRepository = BankServicesOptions.ServiceConfiguration?.BankRepository ?? new BankRepository(BankServicesOptions.Connection);
+        _cardRepository = BankServicesOptions.ServiceConfiguration?.CardRepository ?? new CardRepository(_bankAccountRepository);
+        _applicationContext = new ApplicationContext(_bankAccountRepository);
+    }
+    public ExceptionModel Create(User item)
+    {
+        if (item?.Card?.BankAccount?.Bank is null)
+            return ExceptionModel.OperationFailed;
+            
+        //if user exists method will send false
+        if (Exist(x => x.ID == item.ID))
+            return ExceptionModel.OperationFailed;
 
-        public void Dispose()
+        using var userCreationTransaction = _applicationContext.Database.BeginTransaction(IsolationLevel
+                                                .RepeatableRead);
+            
+        
+        var avoidDuplication = _applicationContext.AvoidDuplication(item.Card.BankAccount.Bank);
+        if (avoidDuplication != ExceptionModel.Successfully)
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
+            userCreationTransaction.Rollback();
+            return avoidDuplication;
         }
-        private void Dispose(bool disposing)
+        
+        _applicationContext.ChangeTracker.Clear();
+        _applicationContext.Users.Add(item);
+        try
         {
-            if (_disposed) return;
-            if (disposing)
-            {
-                _bankAccountRepository.Dispose();
-            }
-            _bankAccountRepository = null;
-            _disposed = true;
+            _applicationContext.SaveChanges();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            Console.WriteLine(ex.InnerException.Message);
+            userCreationTransaction.Rollback();
+            throw;
         }
 
-        public ExceptionModel Delete(User item)
+        userCreationTransaction.Commit();
+        return ExceptionModel.Successfully;
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+    private void Dispose(bool disposing)
+    {
+        if (_disposed) return;
+        if (disposing)
         {
-            if (item is null)
-                return ExceptionModel.OperationFailed;
-            if (Get(item.ID) is null)
-                return ExceptionModel.OperationFailed;
-            var bankAccountModel = _bankAccountRepository.Get(x => x.UserID == item.ID);
-            var operation = _bankAccountRepository.Delete(bankAccountModel);
-            if (operation != ExceptionModel.Successfull)
-                return operation;
-            Users.Remove(item);
-            try
-            {
-                SaveChanges();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                throw;
-            }
-            return ExceptionModel.Successfull;
+            _bankAccountRepository.Dispose();
+            _bankRepository.Dispose();
+            _cardRepository.Dispose();
+            _applicationContext.Dispose();
+        }
+        _bankAccountRepository = null;
+        _bankRepository = null;
+        _cardRepository = null;
+        _applicationContext = null;
+        _disposed = true;
+    }
+
+    public ExceptionModel Delete(User item)
+    {
+        if (!FitsConditions(item))
+            return ExceptionModel.OperationFailed;
+        
+        _applicationContext.Users.Remove(item);
+        try
+        {
+            _applicationContext.SaveChanges();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            throw;
+        }
+        
+        return _bankAccountRepository.Delete(item.Card.BankAccount);
+    }
+
+    public bool Exist(Expression<Func<User, bool>> predicate) => _applicationContext.Users.AsNoTracking().Any(predicate);
+    public bool FitsConditions(User item)
+    {
+        return item?.Card?.BankAccount?.Bank is not null && Exist(x => x.ID == item.ID);
+    }
+
+    public IEnumerable<User> All => _applicationContext.Users.AsNoTracking();
+
+    public User? Get(Expression<Func<User, bool>> predicate)
+    {
+        var user = _applicationContext.Users.AsNoTracking().FirstOrDefault(predicate);
+        if (user is null)
+            return user;
+        user.Card = _cardRepository.Get(x => x.UserID == user.ID);
+        if (user.Card is null)
+            return user;
+        user.Card.BankAccount = _bankAccountRepository.Get(x => x.UserID == user.ID);
+        if (user.Card.BankAccount is null)
+            return user;
+        user.Card.BankAccount.Bank = _bankRepository.Get(x => x.BankAccounts.Contains(user.Card.BankAccount));
+        if (user.Card.BankAccount.Bank is null)
+            return user;
+        return user;
+    }
+
+    public ExceptionModel Update(User item)
+    {
+        if (!FitsConditions(item))
+            return ExceptionModel.OperationFailed;
+        using var userUpdateTransaction = _applicationContext.Database.BeginTransaction(IsolationLevel.RepeatableRead);
+            
+        var bankAccountDeletionOperation = _bankAccountRepository.Update(item.Card.BankAccount);
+        if (bankAccountDeletionOperation != ExceptionModel.Successfully)
+        {
+            userUpdateTransaction.Rollback();
+            return bankAccountDeletionOperation;
+        }
+            
+        _applicationContext.ChangeTracker.Clear();
+        _applicationContext.Users.Update(item);
+        try
+        {
+            _applicationContext.SaveChanges();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            userUpdateTransaction.Rollback();
+            throw;
         }
 
-        public bool Exist(Guid id) => Users.AsNoTracking().Any(user => user.ID == id && user.Authenticated);
+        userUpdateTransaction.Commit();
+        return ExceptionModel.Successfully;
+    }
 
-        public bool Exist(Expression<Func<User, bool>> predicate) => Users.AsNoTracking().Any(predicate);
-
-        public IEnumerable<User> All => Users.AsNoTracking().AsEnumerable();
-
-        public User? Get(Guid id) => Users.AsNoTracking().FirstOrDefault(x => x.ID == id);
-
-        public User? Get(Expression<Func<User, bool>> predicate) => Users.AsNoTracking().FirstOrDefault(predicate);
-
-        public ExceptionModel Update(User item)
-        {
-            if (item is null)
-                return ExceptionModel.OperationFailed;
-            if (Get(item.ID) is null)
-                return ExceptionModel.OperationFailed;
-            Users.Update(item);
-            try
-            {
-                SaveChanges();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                throw;
-            }
-            return ExceptionModel.Successfull;
-        }
-
-        ~UserRepository()
-        {
-            Dispose(false);
-        }
+    ~UserRepository()
+    {
+        Dispose(false);
     }
 }
