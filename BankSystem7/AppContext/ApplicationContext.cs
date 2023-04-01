@@ -8,8 +8,8 @@ namespace BankSystem7.AppContext;
 
 public class ApplicationContext : DbContext
 {
-    public static bool EnsureDeleted { get; set; }
     public static bool EnsureCreated { get; set; } = true;
+    public static bool EnsureDeleted { get; set; }
     protected internal DbSet<User> Users { get; set; } = null!;
     protected internal DbSet<BankAccount> BankAccounts { get; set; } = null!;
     protected internal DbSet<Bank> Banks { get; set; } = null!;
@@ -107,6 +107,9 @@ public class ApplicationContext : DbContext
         modelBuilder.Entity<Bank>().HasData(banks);
     }
 
+    /// <summary>
+    /// handle creating and deleting database
+    /// </summary>
     private void DatabaseHandle()
     {
         if (EnsureDeleted)

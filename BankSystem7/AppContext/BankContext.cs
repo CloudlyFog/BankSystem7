@@ -34,6 +34,9 @@ namespace BankSystem7.AppContext
             optionsBuilder.UseSqlServer(ServiceConfiguration.Connection);
         }
         
+        /// <summary>
+        /// handle creating and deleting database
+        /// </summary>
         private void DatabaseHandle()
         {
             if (BankServicesOptions.EnsureDeleted)
