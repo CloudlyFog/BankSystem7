@@ -5,7 +5,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <PackageVersion>0.2.9-beta</PackageVersion>
+        <PackageVersion>0.3.0-beta</PackageVersion>
         <Authors>CloudlyFog</Authors>
         <Copyright>Copyright (c) CloudlyFog 2023</Copyright>
         <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -13,7 +13,7 @@
         <PackageLicenseUrl>https://mit-license.org/</PackageLicenseUrl>
         <PackageTags>bank;account;banksystem;credit;transfer;money;bankaccount</PackageTags>
         <PackageReleaseNotes>Added some documentation to code.</PackageReleaseNotes>
-        <PackageProjectUrl>https://github.com/CloudlyFog/BankSystem7</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/CloudlyFog/BankSystem7</RepositoryUrl>
     </PropertyGroup>
 
     <ItemGroup>
