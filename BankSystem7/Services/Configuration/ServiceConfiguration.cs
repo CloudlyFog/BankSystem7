@@ -90,11 +90,15 @@ public class ServiceConfiguration
             BankAccountRepository?.Dispose();
             BankRepository?.Dispose();
             CardRepository?.Dispose();
+            UserRepository?.Dispose();
+            CreditRepository?.Dispose();
         }
 
         BankAccountRepository = null;
         BankRepository = null;
         CardRepository = null;
+        UserRepository = null;
+        CreditRepository = null;
         _disposed = true;
     }
 
