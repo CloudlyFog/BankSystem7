@@ -1,6 +1,7 @@
 ﻿using BankSystem7.Models;
 using BankSystem7.Services.Interfaces;
 using MongoDB.Driver;
+using SharpCompress.Readers;
 
 namespace BankSystem7.Services;
 
@@ -11,25 +12,36 @@ public class Logger<T> : ILogger<T> where T : Report
 
     public Logger()
     {
-        _operationService = new OperationService<T>(new OperationServiceOptions
+        LoggerOptions = new LoggerOptions
         {
-            CollectionName = "Reports",
-        });
+            IsEnabled = true,
+            OperationServiceOptions = new OperationServiceOptions
+            {
+                CollectionName = "Reports",
+            },
+        };
+        _operationService = new OperationService<T>(LoggerOptions.OperationServiceOptions);
     }
     public Logger(ILogger<T> logger)
     {
         _logger = logger;
     }
 
-    public Logger(OperationServiceOptions options)
+    public Logger(LoggerOptions options)
     {
-        _operationService = new OperationService<T>(options);
+        _operationService = new OperationService<T>(options.OperationServiceOptions);
+        LoggerOptions = options;
     }
+    
+    public LoggerOptions LoggerOptions { get; }
 
     public bool IsReused { get; set; }
     
     public async Task<ExceptionModel> Log(Report report)
     {
+        if (!LoggerOptions.IsEnabled)
+            return ExceptionModel.OperationRestricted;
+        
         if (IsReused)
             return await _logger.Log(report);
 
@@ -51,4 +63,14 @@ public class Logger<T> : ILogger<T> where T : Report
     {
         return Get(report) is not null;
     }
+}
+
+public sealed class LoggerOptions
+{
+    public OperationServiceOptions? OperationServiceOptions { get; set; }
+    public bool IsEnabled { get; set; }
+}
+public class Logger
+{
+    public static bool IsEnabled { get; set; }
 }
