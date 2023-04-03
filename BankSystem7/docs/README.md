@@ -5,7 +5,7 @@ It also let everybody to use bank system in its projects and change logic for yo
 
 **It's a beta version of library. Some exceptions can be weren't found.**
 
-### Updates in version 0.3.3-betas 
+### Updates in version 0.3.3-beta
 - Updated logic in calculating loan balance. Removed property LoanBalance from model of credit for its needlessness. Rewrote logic in methods TakeCredit&PayCredit.
 ****
 # Documentation
