@@ -8,13 +8,13 @@ public class ModelConfiguration
     public virtual void Invoke(ModelBuilder modelBuilder)
     {
         ConfigureCardRelationships(modelBuilder);
-        ConfigureCreditRelationShips(modelBuilder);
+        ConfigureCreditRelationships(modelBuilder);
         ConfigureBankAccountRelationships(modelBuilder);
         
         modelBuilder.Entity<User>().Ignore(user => user.Exception);
     }
 
-    private static void ConfigureCreditRelationShips(ModelBuilder modelBuilder)
+    private static void ConfigureCreditRelationships(ModelBuilder modelBuilder)
     {
         // bank
         modelBuilder.Entity<Credit>()

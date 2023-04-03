@@ -5,15 +5,10 @@ It also let everybody to use bank system in its projects and change logic for yo
 
 **It's a beta version of library. Some exceptions can be weren't found.**
 
-### Updates
-- Added new repository CreditRepository that implements behavior of credit handling.
-- Fixed bugs with CRUD operations in UserRepository. Now all tests are passed.
-- Updated checking conditions. Added new method FitsConditions to interface IRepository that implements behavior of checking conditions.
-- Added new implementation of method Transfer in BankAccountRepository that lets avoid integrity violations in table Banks in the database.
-- Changed namespace of ConfigurationOptions, ModelConfiguration, ServiceConfiguration and ServiceConfigurationMiddleware from BankSystem7.Services to BankSystem7.Services.Configuration
-- Implemented architecture with one context class for handling all of operations in the database. This class is ApplicationContext. Remark: not everywhere used this context class because some operations makes deadlocks in requests to the database. That's why in the some places of code we are using another context classes.
-- Removed context classes BankAccountContext and CardContext for their needlessness.
-- Updated documentation.
+### Updates in version 0.3.2-beta
+- Added interest rate of credit. Now there is an interest rate of credit for closer similarity with real bank operations.
+- Changed class Credit to factory method for calculating repayment amount. 
+- Updated logic of CreditRepository.cs for interest rate of credit. For this has been added some properties, for instance, LoanBalance handles remaining amount of loan that borrower have to repay.
 ****
 # Documentation
 

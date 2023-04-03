@@ -102,9 +102,8 @@ public sealed class BankRepository : IRepository<Bank>
     /// <summary>
     /// asynchronously accrual money to user bank account from bank's account
     /// </summary>
-    /// <param name="user"></param>
-    /// <param name="bank"></param>
-    /// <param name="operation"></param>
+    /// <param name="user">where will accrued money</param>
+    /// <param name="operation">data of ongoing operation</param>
     /// <exception cref="Exception"></exception>
     public ExceptionModel BankAccountAccrual(User user, Operation operation)
     {
@@ -180,9 +179,8 @@ public sealed class BankRepository : IRepository<Bank>
     /// <summary>
     /// asynchronously withdraw money from user bank account and accrual to bank's account
     /// </summary>
-    /// <param name="user"></param>
-    /// <param name="bank"></param>
-    /// <param name="operation"></param>
+    /// <param name="user">where will accrued money</param>
+    /// <param name="operation">data of ongoing operation</param>
     /// <exception cref="Exception"></exception>
     public ExceptionModel BankAccountWithdraw(User user, Operation operation)
     {

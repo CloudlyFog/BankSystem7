@@ -86,7 +86,7 @@ public class CreditRepository : IRepository<Credit>
     /// <returns></returns>
     public ExceptionModel TakeCredit(User? user, Credit? credit)
     {
-        if (user is null || credit is null)
+        if (user.Card?.BankAccount?.Bank is null || credit is null || Exist(x => x.ID == credit.ID || x.UserID == user.ID))
             return ExceptionModel.VariableIsNull;
 
         var operationAccrualOnUserAccount = new Operation()
@@ -124,7 +124,7 @@ public class CreditRepository : IRepository<Credit>
     /// <returns></returns>
     public ExceptionModel PayCredit(User? user, Credit credit, decimal payAmount)
     {
-        if (user is null || credit is null)
+        if (user.Card?.BankAccount?.Bank is null || credit is null || !Exist(x => x.ID == credit.ID || x.UserID == user.ID))
             return ExceptionModel.VariableIsNull;
 
         var operationAccrualOnUserAccount = new Operation()
@@ -135,8 +135,8 @@ public class CreditRepository : IRepository<Credit>
             TransferAmount = payAmount
         };
 
-        if (payAmount > credit.CreditAmount)
-            operationAccrualOnUserAccount.TransferAmount = credit.CreditAmount;
+        if (payAmount > credit.LoanBalance)
+            operationAccrualOnUserAccount.TransferAmount = credit.LoanBalance;
 
         using var transaction = _applicationContext.Database.BeginTransaction(IsolationLevel.Serializable);
 
@@ -148,7 +148,7 @@ public class CreditRepository : IRepository<Credit>
         if (_bankContext.BankAccountWithdraw(user, user.Card?.BankAccount?.Bank, operationAccrualOnUserAccount) != ExceptionModel.Successfully)
             return (ExceptionModel)operationAccrualOnUserAccount.OperationStatus.GetHashCode();
 
-        if (credit.CreditAmount == operationAccrualOnUserAccount.TransferAmount)
+        if (credit.LoanBalance == operationAccrualOnUserAccount.TransferAmount)
         {
             if (Delete(credit) != ExceptionModel.Successfully)
                 return (ExceptionModel)operationAccrualOnUserAccount.OperationStatus.GetHashCode();
@@ -156,7 +156,7 @@ public class CreditRepository : IRepository<Credit>
 
         else
         {
-            credit.CreditAmount = operationAccrualOnUserAccount.TransferAmount;
+            credit.LoanBalance = credit.CreditAmount - operationAccrualOnUserAccount.TransferAmount;
             if (Update(credit) != ExceptionModel.Successfully)
                 return (ExceptionModel)operationAccrualOnUserAccount.OperationStatus.GetHashCode();
         }

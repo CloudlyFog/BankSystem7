@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using BankSystem7.Services.Repositories;
 using Microsoft.EntityFrameworkCore.Query.Internal;
 
 namespace BankSystem7.Models;
@@ -27,11 +28,30 @@ public class Operation
 
 public class Credit
 {
-    public Credit()
+    public static Credit CreateInstance1()
+    {
+        return new Credit();
+    }
+
+    public static Credit CreateInstance(decimal creditAmount, decimal interestRate, DateTime repaymentDate,
+        DateTime issueCreditDate, User user = null, Bank bank = null)
+    {
+        var credit = new Credit(creditAmount, user, bank)
+        {
+            CreditAmount = creditAmount,
+            InterestRate = interestRate,
+            IssueCreditDate = issueCreditDate,
+            RepaymentDate = repaymentDate,
+        };
+        credit.RepaymentAmount = credit.CalculateRepaymentAmount();
+        return credit;
+    }
+
+    private Credit()
     {
         
     }
-    public Credit(User user = null, Bank bank = null)
+    private Credit(decimal creditAmount, User user = null, Bank bank = null)
     {
         if (bank is null || user is null)
             return;
@@ -40,17 +60,35 @@ public class Credit
         BankID = bank.ID;
         User = user;
         UserID = user.ID;
+        LoanBalance = CreditAmount = creditAmount;
     }
     [Key]
     public Guid ID { get; set; } = Guid.NewGuid();
     public Guid? BankID { get; set; }
     public Guid? UserID { get; set; }
     public decimal CreditAmount { get; set; }
+    public decimal InterestRate { get; set; }
+    public decimal LoanBalance { get; set; }
+
+    public decimal RepaymentAmount { get; set; }
+    public DateTime RepaymentDate { get; set; }
+    public DateTime IssueCreditDate { get; set; }
     public Bank? Bank { get; set; }
     public User? User { get; set; }
 
     [NotMapped] 
     public StatusOperationCode OperationStatus { get; set; } = StatusOperationCode.Successfully;
+
+    public decimal CalculateRepaymentAmount()
+    {
+        var a = double.Parse((1 + InterestRate / 1200).ToString());
+        var repaymentDateMonth = (RepaymentDate.Year - IssueCreditDate.Year) * 12;
+        var x = Math.Pow(a, repaymentDateMonth);
+        x = 1 / x;
+        x = 1 - x;
+        var monthlyPayment = CreditAmount * (InterestRate / 1200) / decimal.Parse(x.ToString());
+        return monthlyPayment * repaymentDateMonth;
+    }
 }
 
 public class BankAccount
