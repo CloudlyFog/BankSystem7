@@ -5,10 +5,8 @@ It also let everybody to use bank system in its projects and change logic for yo
 
 **It's a beta version of library. Some exceptions can be weren't found.**
 
-### Updates in version 0.3.2-beta
-- Added interest rate of credit. Now there is an interest rate of credit for closer similarity with real bank operations.
-- Changed class Credit to factory method for calculating repayment amount.
-- Updated logic of CreditRepository.cs for interest rate of credit. For this has been added some properties, for instance, LoanBalance handles remaining amount of loan that borrower have to repay.
+### Updates in version 0.3.3-betas
+- Updated logic in calculating loan balance. Removed property LoanBalance from model of credit for its needlessness. Rewrote logic in methods TakeCredit&PayCredit.
 ****
 # Documentation
 

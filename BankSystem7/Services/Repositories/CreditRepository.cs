@@ -52,6 +52,7 @@ public class CreditRepository : IRepository<Credit>
         if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;
 
+        _applicationContext.ChangeTracker.Clear();
         _applicationContext.Credits.Update(item);
         _applicationContext.SaveChanges();
         return ExceptionModel.Successfully;
@@ -62,6 +63,7 @@ public class CreditRepository : IRepository<Credit>
         if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;
 
+        _applicationContext.ChangeTracker.Clear();
         _applicationContext.Credits.Remove(item);
         _applicationContext.SaveChanges();
         return ExceptionModel.Successfully;
@@ -135,8 +137,8 @@ public class CreditRepository : IRepository<Credit>
             TransferAmount = payAmount
         };
 
-        if (payAmount > credit.LoanBalance)
-            operationAccrualOnUserAccount.TransferAmount = credit.LoanBalance;
+        if (payAmount > credit.RepaymentAmount)
+            operationAccrualOnUserAccount.TransferAmount = credit.RepaymentAmount;
 
         using var transaction = _applicationContext.Database.BeginTransaction(IsolationLevel.Serializable);
 
@@ -148,7 +150,7 @@ public class CreditRepository : IRepository<Credit>
         if (_bankContext.BankAccountWithdraw(user, user.Card?.BankAccount?.Bank, operationAccrualOnUserAccount) != ExceptionModel.Successfully)
             return (ExceptionModel)operationAccrualOnUserAccount.OperationStatus.GetHashCode();
 
-        if (credit.LoanBalance == operationAccrualOnUserAccount.TransferAmount)
+        if (credit.RepaymentAmount == operationAccrualOnUserAccount.TransferAmount)
         {
             if (Delete(credit) != ExceptionModel.Successfully)
                 return (ExceptionModel)operationAccrualOnUserAccount.OperationStatus.GetHashCode();
@@ -156,7 +158,7 @@ public class CreditRepository : IRepository<Credit>
 
         else
         {
-            credit.LoanBalance = credit.CreditAmount - operationAccrualOnUserAccount.TransferAmount;
+            credit.RepaymentAmount -= operationAccrualOnUserAccount.TransferAmount;
             if (Update(credit) != ExceptionModel.Successfully)
                 return (ExceptionModel)operationAccrualOnUserAccount.OperationStatus.GetHashCode();
         }

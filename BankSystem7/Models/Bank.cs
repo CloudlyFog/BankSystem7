@@ -60,7 +60,6 @@ public class Credit
         BankID = bank.ID;
         User = user;
         UserID = user.ID;
-        LoanBalance = CreditAmount = creditAmount;
     }
     [Key]
     public Guid ID { get; set; } = Guid.NewGuid();
@@ -68,8 +67,6 @@ public class Credit
     public Guid? UserID { get; set; }
     public decimal CreditAmount { get; set; }
     public decimal InterestRate { get; set; }
-    public decimal LoanBalance { get; set; }
-
     public decimal RepaymentAmount { get; set; }
     public DateTime RepaymentDate { get; set; }
     public DateTime IssueCreditDate { get; set; }
