@@ -18,24 +18,26 @@ public sealed class BankAccountRepository : IRepository<BankAccount>
     public BankAccountRepository()
     {
         _bankContext = _bankRepository.BankContext;
-        SetBankServicesOptions();
-        _bankRepository = new BankRepository(ConnectionString);
         _applicationContext = BankServicesOptions.ApplicationContext ??
                               new ApplicationContext(BankServicesOptions.Connection);
+        SetBankServicesOptions();
+        _bankRepository = new BankRepository(ConnectionString);
     }
     public BankAccountRepository(BankRepository bankRepository)
     {
         _bankRepository = bankRepository;
+        _bankContext = _bankRepository.BankContext;
         _applicationContext = BankServicesOptions.ApplicationContext ??
                               new ApplicationContext(BankServicesOptions.Connection);
+        SetBankServicesOptions();
     }
     public BankAccountRepository(string connection)
     {
         _bankContext = BankServicesOptions.BankContext ?? new BankContext(connection);
-        SetBankServicesOptions();
-        _bankRepository = BankServicesOptions.ServiceConfiguration?.BankRepository ?? new BankRepository(connection);
         _applicationContext = BankServicesOptions.ApplicationContext ??
                               new ApplicationContext(connection);
+        SetBankServicesOptions();
+        _bankRepository = BankServicesOptions.ServiceConfiguration?.BankRepository ?? new BankRepository(connection);
     }
 
     // Public implementation of Dispose pattern callable by consumers.
