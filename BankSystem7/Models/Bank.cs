@@ -69,7 +69,7 @@ public class Credit
     public decimal InterestRate { get; set; }
     public decimal RepaymentAmount { get; set; }
     public DateTime RepaymentDate { get; set; }
-    public DateTime IssueCreditDate { get; set; }
+    public DateTime IssueCreditDate { get; set; } = DateTime.Now;
     public Bank? Bank { get; set; }
     public User? User { get; set; }
 
@@ -145,6 +145,8 @@ public class Card
         BankAccountID = bankAccount.ID;
         BankID = bankAccount.BankID;
         Amount = bankAccount.BankAccountAmount;
+
+        BankAccount.Bank = bankAccount.Bank;
     }
 
     private Card()

@@ -74,7 +74,7 @@ public class CreditRepository : IRepository<Credit>
 
     public bool Exist(Expression<Func<Credit, bool>> predicate) => _applicationContext.Credits.AsNoTracking().Any(predicate);
 
-    public bool FitsConditions(Credit item)
+    public bool FitsConditions(Credit? item)
     {
         return item is not null && Exist(x => x.ID == item.ID);
     }

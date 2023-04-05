@@ -2,8 +2,9 @@
 
 namespace BankSystem7.Services.Interfaces;
 
-public interface ILogger<T> where T : Report
+public interface ILogger
 {
     public bool IsReused { get; set; }
-    Task<ExceptionModel> Log(Report report);
+    public LoggerOptions LoggerOptions { get; set; }
+    ExceptionModel Log(Report report);
 }

@@ -5,8 +5,14 @@ It also let everybody to use bank system in its projects and change logic for yo
 
 **It's a beta version of library. Some exceptions can be weren't found.**
 
-### Updates in version 0.3.3-beta
-- Updated logic in calculating loan balance. Removed property LoanBalance from model of credit for its needlessness. Rewrote logic in methods TakeCredit&PayCredit.
+### Updates in version 0.3.4-beta
+- Added clearing tracker in method Create in BankRepository.cs for avoid exceptions with tracking the same entities.
+- Added class LoggerOptions. Added property of LoggerOptions to ConfigurationOptions.cs.
+- Added Logging. Implemented interface ILogger.cs in class Logger.cs.
+- Added repository LoggerRepository.cs for handling logs.
+- Added new model for logging - Report.cs.
+- Added interaction with logger services via properties in ServiceConfiguration.cs.
+- Updated logic of user creation. 
 ****
 # Documentation
 

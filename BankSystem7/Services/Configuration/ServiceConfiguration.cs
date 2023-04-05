@@ -1,4 +1,6 @@
 ﻿using BankSystem7.AppContext;
+using BankSystem7.Models;
+using BankSystem7.Services.Interfaces;
 using BankSystem7.Services.Repositories;
 using Microsoft.AspNetCore.Http;
 
@@ -16,12 +18,14 @@ public class ServiceConfiguration
 
     
     private bool _disposed;
-    public BankAccountRepository? BankAccountRepository { get; set; }
-    public BankRepository? BankRepository { get; set; }
-    public CardRepository? CardRepository { get; set; }
-    public UserRepository? UserRepository { get; set; }
-    public CreditRepository? CreditRepository { get; set; }
-    public static ConfigurationOptions Options { get; set; }
+    public BankAccountRepository? BankAccountRepository { get; protected internal  set; }
+    public BankRepository? BankRepository { get; protected internal set; }
+    public CardRepository? CardRepository { get; protected internal set; }
+    public UserRepository? UserRepository { get; protected internal set; }
+    public CreditRepository? CreditRepository { get; protected internal set; }
+    public LoggerRepository? LoggerRepository { get; protected internal set; }
+    public ILogger? Logger { get; protected internal set; }
+    public static ConfigurationOptions Options { get; protected internal set; }
 
     private ServiceConfiguration()
     {
@@ -30,6 +34,8 @@ public class ServiceConfiguration
         CardRepository = new CardRepository(BankAccountRepository);
         BankRepository = new BankRepository(Connection);
         CreditRepository = new CreditRepository(Connection);
+        LoggerRepository = new LoggerRepository(Options.LoggerOptions);
+        Logger = new Logger(LoggerRepository, Options.LoggerOptions);
     }
 
     public ServiceConfiguration(RequestDelegate next, ConfigurationOptions options)
@@ -92,6 +98,7 @@ public class ServiceConfiguration
             CardRepository?.Dispose();
             UserRepository?.Dispose();
             CreditRepository?.Dispose();
+            LoggerRepository.Dispose();
         }
 
         BankAccountRepository = null;
@@ -99,6 +106,8 @@ public class ServiceConfiguration
         CardRepository = null;
         UserRepository = null;
         CreditRepository = null;
+        LoggerRepository = null;
+        Logger = null;
         _disposed = true;
     }
 

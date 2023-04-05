@@ -267,7 +267,7 @@ public sealed class BankAccountRepository : IRepository<BankAccount>
     public bool Exist(Expression<Func<BankAccount, bool>> predicate)
         => _applicationContext.BankAccounts.AsNoTracking().Any(predicate);
 
-    public bool FitsConditions(BankAccount item)
+    public bool FitsConditions(BankAccount? item)
     {
         return item is not null && Exist(x => x.ID == item.ID) && item.Bank is not null;
     }

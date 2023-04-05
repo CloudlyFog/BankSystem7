@@ -91,7 +91,7 @@ public sealed class CardRepository : IRepository<Card>
     }
 
     public bool Exist(Expression<Func<Card, bool>> predicate) => _applicationContext.Cards.AsNoTracking().Any(predicate);
-    public bool FitsConditions(Card item)
+    public bool FitsConditions(Card? item)
     {
         return item is not null && Exist(x => x.ID == item.ID);
     }

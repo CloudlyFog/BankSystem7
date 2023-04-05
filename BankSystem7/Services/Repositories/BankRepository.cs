@@ -212,6 +212,7 @@ public sealed class BankRepository : IRepository<Bank>
         if (item is null)
             return ExceptionModel.VariableIsNull;
 
+        _applicationContext.ChangeTracker.Clear();
         if (Exist(x => x.ID == item.ID))
             Update(item);
         else
@@ -232,7 +233,7 @@ public sealed class BankRepository : IRepository<Bank>
     }
 
     public bool Exist(Expression<Func<Bank, bool>> predicate) => _applicationContext.Banks.AsNoTracking().Any(predicate);
-    public bool FitsConditions(Bank item)
+    public bool FitsConditions(Bank? item)
     {
         return item is not null && Exist(x => x.ID == item.ID);
     }

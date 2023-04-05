@@ -5,14 +5,37 @@ namespace BankSystem7.Models;
 public class Report
 {
     public Guid Id { get; set; } = Guid.NewGuid();
-    public DateTime ReportDate { get; set; } = DateTime.Now;
+    public DateTime ReportDate { get; set; } = DateTime.UtcNow;
     public ExceptionModel ExceptionModel { get; set; } = ExceptionModel.Successfully;
 }
 
 public class GeneralReport<T> : UserReport<T> where T : Enum
 {
+    public GeneralReport()
+    {
+        
+    }
+
+    public GeneralReport(Report report)
+    {
+        SetReport(report);
+    }
+
+    public GeneralReport(GeneralReport<T> report)
+    {
+        SetReport(report);
+        MethodName = report.MethodName;
+        Assembly = report.Assembly;
+    }
     public string MethodName { get; set; }
-    public Assembly? Assembly { get; set; }
+    public object? Assembly { get; set; }
+
+    private void SetReport(Report report)
+    {
+        Id = report.Id;
+        ReportDate = report.ReportDate;
+        ExceptionModel = report.ExceptionModel;
+    }
 }
 
 public class UserReport<T> : Report where T : Enum

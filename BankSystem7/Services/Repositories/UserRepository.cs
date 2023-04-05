@@ -62,6 +62,13 @@ public sealed class UserRepository : IRepository<User>
             userCreationTransaction.Rollback();
             return avoidDuplication;
         }
+
+        var bank = item.Card.BankAccount.Bank;
+
+        if (_bankRepository.Exist(x => x.ID == item.Card.BankAccount.Bank.ID))
+        {
+            item.Card.BankAccount.Bank = null;
+        }
         
         _applicationContext.ChangeTracker.Clear();
         _applicationContext.Users.Add(item);
@@ -75,6 +82,15 @@ public sealed class UserRepository : IRepository<User>
             Console.WriteLine(ex.InnerException.Message);
             userCreationTransaction.Rollback();
             throw;
+        }
+
+        item.Card.BankAccount.Bank = bank;
+        _applicationContext.ChangeTracker.Clear();
+        var updateBank = _bankRepository.Update(item.Card.BankAccount.Bank);
+        if (updateBank != ExceptionModel.Successfully)
+        {
+            userCreationTransaction.Rollback();
+            return updateBank;
         }
 
         userCreationTransaction.Commit();
@@ -123,7 +139,7 @@ public sealed class UserRepository : IRepository<User>
     }
 
     public bool Exist(Expression<Func<User, bool>> predicate) => _applicationContext.Users.AsNoTracking().Any(predicate);
-    public bool FitsConditions(User item)
+    public bool FitsConditions(User? item)
     {
         return item?.Card?.BankAccount?.Bank is not null && Exist(x => x.ID == item.ID);
     }

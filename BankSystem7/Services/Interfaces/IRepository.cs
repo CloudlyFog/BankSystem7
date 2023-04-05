@@ -45,5 +45,5 @@ public interface IRepository<T> : IDisposable
     /// <returns></returns>
     bool Exist(Expression<Func<T, bool>> predicate);
 
-    bool FitsConditions(T item);
+    bool FitsConditions(T? item);
 }
