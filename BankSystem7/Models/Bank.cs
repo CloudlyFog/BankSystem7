@@ -35,14 +35,12 @@ public class Credit
         return new Credit();
     }
 
-    public static Credit CreateInstance(decimal creditAmount, decimal interestRate, DateTime repaymentDate,
-        DateTime issueCreditDate, User user = null, Bank bank = null)
+    public static Credit CreateInstance(decimal creditAmount, decimal interestRate, DateTime repaymentDate, User user = null, Bank bank = null)
     {
         var credit = new Credit(creditAmount, user, bank)
         {
             CreditAmount = creditAmount,
             InterestRate = interestRate,
-            IssueCreditDate = issueCreditDate,
             RepaymentDate = repaymentDate,
         };
         credit.RepaymentAmount = credit.CalculateRepaymentAmount();
