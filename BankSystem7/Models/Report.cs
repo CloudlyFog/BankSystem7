@@ -47,7 +47,7 @@ public enum OperationType
     Read,
     Update,
     Delete,
-    Exists,
+    Exist,
     All,
     FitsConditions,
     Constructor,
