@@ -24,6 +24,7 @@ public class ServiceConfiguration
     public UserRepository? UserRepository { get; protected internal set; }
     public CreditRepository? CreditRepository { get; protected internal set; }
     public LoggerRepository? LoggerRepository { get; protected internal set; }
+    public OperationRepository? OperationRepository { get; protected internal set; }
     public ILogger? Logger { get; protected internal set; }
     public static ConfigurationOptions Options { get; protected internal set; }
 
@@ -36,6 +37,7 @@ public class ServiceConfiguration
         CreditRepository = new CreditRepository(Connection);
         LoggerRepository = new LoggerRepository(Options.LoggerOptions);
         Logger = new Logger(LoggerRepository, Options.LoggerOptions);
+        OperationRepository = new OperationRepository(Logger, Options.OperationOptions);
     }
 
     public ServiceConfiguration(RequestDelegate next, ConfigurationOptions options)
