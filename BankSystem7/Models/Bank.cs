@@ -30,7 +30,7 @@ public class Operation
 
 public class Credit
 {
-    public static Credit CreateInstance1()
+    public static Credit CreateInstance()
     {
         return new Credit();
     }
