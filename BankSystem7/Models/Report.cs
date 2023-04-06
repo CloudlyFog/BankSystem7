@@ -25,10 +25,8 @@ public class GeneralReport<T> : UserReport<T> where T : Enum
     {
         SetReport(report);
         MethodName = report.MethodName;
-        Assembly = report.Assembly;
     }
     public string MethodName { get; set; }
-    public object? Assembly { get; set; }
 
     private void SetReport(Report report)
     {
@@ -50,6 +48,10 @@ public enum OperationType
     Update,
     Delete,
     Exists,
+    All,
+    FitsConditions,
+    Constructor,
+    Destructor,
     Other,
 }
 

@@ -7,18 +7,23 @@ using System.Data;
 using System.Linq.Expressions;
 using BankSystem7.AppContext;
 using BankSystem7.Models;
+using BankSystem7.Services.Configuration;
 using BankSystem7.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using SharpCompress.Readers;
 
 namespace BankSystem7.Services.Repositories;
 
 
-public sealed class UserRepository : IRepository<User>
+public sealed class UserRepository : IRepository<User>, ILoggerDo<OperationType>
 {
     private BankAccountRepository _bankAccountRepository;
     private ApplicationContext _applicationContext;
     private BankRepository _bankRepository;
     private CardRepository _cardRepository;
+    private ILogger _logger;
+    private List<GeneralReport<OperationType>> _reports = new();
     private bool _disposed;
     public UserRepository()
     {
@@ -27,6 +32,7 @@ public sealed class UserRepository : IRepository<User>
         _cardRepository = new CardRepository(_bankAccountRepository);
         _applicationContext = BankServicesOptions.ApplicationContext ??
                               new ApplicationContext(_bankAccountRepository);
+        _logger = new Logger(ServiceConfiguration.Options.LoggerOptions);
     }
     public UserRepository(string connection)
     {
@@ -35,6 +41,8 @@ public sealed class UserRepository : IRepository<User>
         _cardRepository = new CardRepository(_bankAccountRepository);
         _applicationContext = BankServicesOptions.ApplicationContext ??
                               new ApplicationContext(_bankAccountRepository);
+        _logger = new Logger(ServiceConfiguration.Options.LoggerOptions);
+        
     }
     public UserRepository(BankAccountRepository repository)
     {
@@ -42,15 +50,22 @@ public sealed class UserRepository : IRepository<User>
         _bankRepository = BankServicesOptions.ServiceConfiguration?.BankRepository ?? new BankRepository(BankServicesOptions.Connection);
         _cardRepository = BankServicesOptions.ServiceConfiguration?.CardRepository ?? new CardRepository(_bankAccountRepository);
         _applicationContext = new ApplicationContext(_bankAccountRepository);
+        _logger = new Logger(ServiceConfiguration.Options.LoggerOptions);
     }
     public ExceptionModel Create(User item)
     {
         if (item?.Card?.BankAccount?.Bank is null)
+        {
+            Log(ExceptionModel.VariableIsNull, nameof(Create), OperationType.Create);
             return ExceptionModel.OperationFailed;
+        }
             
         //if user exists method will send false
         if (Exist(x => x.ID == item.ID))
+        {
+            Log(ExceptionModel.OperationNotExist, nameof(Create), OperationType.Create);
             return ExceptionModel.OperationFailed;
+        }
 
         using var userCreationTransaction = _applicationContext.Database.BeginTransaction(IsolationLevel
                                                 .RepeatableRead);
@@ -60,13 +75,15 @@ public sealed class UserRepository : IRepository<User>
         if (avoidDuplication != ExceptionModel.Successfully)
         {
             userCreationTransaction.Rollback();
+            Log(avoidDuplication, nameof(Create), OperationType.Create);
             return avoidDuplication;
         }
 
-        var bank = item.Card.BankAccount.Bank;
+        Bank bank = null;
 
         if (_bankRepository.Exist(x => x.ID == item.Card.BankAccount.Bank.ID))
         {
+            bank = item.Card.BankAccount.Bank;
             item.Card.BankAccount.Bank = null;
         }
         
@@ -84,21 +101,33 @@ public sealed class UserRepository : IRepository<User>
             throw;
         }
 
-        item.Card.BankAccount.Bank = bank;
+        if (bank is null)
+        {
+            userCreationTransaction.Commit();
+            Log(ExceptionModel.Successfully, nameof(Create), OperationType.Create);
+            return ExceptionModel.Successfully;
+        }
+        item.Card.BankAccount.Bank ??= bank;
         _applicationContext.ChangeTracker.Clear();
         var updateBank = _bankRepository.Update(item.Card.BankAccount.Bank);
         if (updateBank != ExceptionModel.Successfully)
         {
             userCreationTransaction.Rollback();
+            
+            Log(updateBank, nameof(Create), OperationType.Create);
             return updateBank;
         }
 
         userCreationTransaction.Commit();
+        
+        
+        Log(ExceptionModel.Successfully, nameof(Create), OperationType.Create);
         return ExceptionModel.Successfully;
     }
 
     public void Dispose()
     {
+        _logger.Log(_reports);
         Dispose(true);
         GC.SuppressFinalize(this);
     }
@@ -116,13 +145,17 @@ public sealed class UserRepository : IRepository<User>
         _bankRepository = null;
         _cardRepository = null;
         _applicationContext = null;
+        _reports = null;
         _disposed = true;
     }
 
     public ExceptionModel Delete(User item)
     {
         if (!FitsConditions(item))
-            return ExceptionModel.OperationFailed;
+        {
+            Log(ExceptionModel.OperationNotExist, nameof(Delete), OperationType.Delete);
+            return ExceptionModel.OperationNotExist;
+        }
         
         _applicationContext.Users.Remove(item);
         try
@@ -134,45 +167,85 @@ public sealed class UserRepository : IRepository<User>
             Console.WriteLine(ex.Message);
             throw;
         }
-        
-        return _bankAccountRepository.Delete(item.Card.BankAccount);
+        var deleteBankAccount = _bankAccountRepository.Delete(item.Card.BankAccount);
+
+        Log(deleteBankAccount, nameof(Delete), OperationType.Delete);
+        return deleteBankAccount;
     }
 
     public bool Exist(Expression<Func<User, bool>> predicate) => _applicationContext.Users.AsNoTracking().Any(predicate);
     public bool FitsConditions(User? item)
     {
-        return item?.Card?.BankAccount?.Bank is not null && Exist(x => x.ID == item.ID);
+        if (item?.Card?.BankAccount?.Bank is null)
+        {
+            Log(ExceptionModel.VariableIsNull, nameof(FitsConditions), OperationType.FitsConditions);
+            return false;
+        }
+
+        if (!Exist(x => x.ID == item.ID))
+        {
+            Log(ExceptionModel.OperationNotExist, nameof(FitsConditions), OperationType.FitsConditions);
+            return false;
+        }
+
+        return true;
     }
 
-    public IEnumerable<User> All => _applicationContext.Users.AsNoTracking();
+    public IEnumerable<User> All
+    {
+        get
+        {
+            Log(ExceptionModel.Successfully, nameof(All), OperationType.All);
+            return _applicationContext.Users.AsNoTracking();
+        }
+    }
 
     public User? Get(Expression<Func<User, bool>> predicate)
     {
         var user = _applicationContext.Users.AsNoTracking().FirstOrDefault(predicate);
         if (user is null)
+        {
+            Log(ExceptionModel.VariableIsNull, nameof(Get), OperationType.Read);
             return user;
+        }
         user.Card = _cardRepository.Get(x => x.UserID == user.ID);
         if (user.Card is null)
+        {
+            Log(ExceptionModel.VariableIsNull, nameof(Get), OperationType.Read);
             return user;
+        }
         user.Card.BankAccount = _bankAccountRepository.Get(x => x.UserID == user.ID);
         if (user.Card.BankAccount is null)
+        {
+            Log(ExceptionModel.VariableIsNull, nameof(Get), OperationType.Read);
             return user;
+        }
         user.Card.BankAccount.Bank = _bankRepository.Get(x => x.BankAccounts.Contains(user.Card.BankAccount));
         if (user.Card.BankAccount.Bank is null)
+        {
+            Log(ExceptionModel.VariableIsNull, nameof(Get), OperationType.Read);
             return user;
+        }
+        
+        Log(ExceptionModel.Successfully, nameof(Get), OperationType.Read);
         return user;
     }
+
 
     public ExceptionModel Update(User item)
     {
         if (!FitsConditions(item))
+        {
+            Log(ExceptionModel.OperationFailed, nameof(Update), OperationType.Update);
             return ExceptionModel.OperationFailed;
+        }
         using var userUpdateTransaction = _applicationContext.Database.BeginTransaction(IsolationLevel.RepeatableRead);
             
         var bankAccountDeletionOperation = _bankAccountRepository.Update(item.Card.BankAccount);
         if (bankAccountDeletionOperation != ExceptionModel.Successfully)
         {
             userUpdateTransaction.Rollback();
+            Log(bankAccountDeletionOperation, nameof(Update), OperationType.Update);
             return bankAccountDeletionOperation;
         }
             
@@ -190,11 +263,24 @@ public sealed class UserRepository : IRepository<User>
         }
 
         userUpdateTransaction.Commit();
+        Log(ExceptionModel.Successfully, nameof(Update), OperationType.Update);
         return ExceptionModel.Successfully;
+    }
+
+    public void Log(ExceptionModel exceptionModel, string methodName, OperationType operationType)
+    {
+        var report = new GeneralReport<OperationType>
+        {
+            MethodName = methodName,
+            OperationType = operationType,
+            ExceptionModel = exceptionModel,
+        };
+        _reports.Add(report);
     }
 
     ~UserRepository()
     {
+        _logger.Log(_reports);
         Dispose(false);
     }
 }
