@@ -24,9 +24,9 @@ public class OperationRepository : IRepository<Operation>, ILoggerDo<OperationTy
             OperationServiceOptions = options,
         });
     }
-    public OperationRepository(ILogger logger)
+    public OperationRepository(ILogger logger, OperationServiceOptions options)
     {
-        _operationService = new OperationService<Operation>(logger.LoggerOptions.OperationServiceOptions);
+        _operationService = new OperationService<Operation>(options);
         _logger = logger;
     }
 

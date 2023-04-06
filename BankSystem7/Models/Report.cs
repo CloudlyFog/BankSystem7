@@ -1,7 +1,9 @@
 ﻿using System.Reflection;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace BankSystem7.Models;
 
+[BsonIgnoreExtraElements]
 public class Report
 {
     public Guid Id { get; set; } = Guid.NewGuid();
@@ -9,6 +11,7 @@ public class Report
     public ExceptionModel ExceptionModel { get; set; } = ExceptionModel.Successfully;
 }
 
+[BsonIgnoreExtraElements]
 public class GeneralReport<T> : UserReport<T> where T : Enum
 {
     public GeneralReport()
@@ -36,6 +39,7 @@ public class GeneralReport<T> : UserReport<T> where T : Enum
     }
 }
 
+[BsonIgnoreExtraElements]
 public class UserReport<T> : Report where T : Enum
 {
     public T OperationType { get; set; }

@@ -8,4 +8,5 @@ public sealed class ConfigurationOptions
     public string? Connection { get; set; } = null;
     public string? DatabaseName { get; set; } = null;
     public LoggerOptions? LoggerOptions { get; set; }
+    public OperationServiceOptions? OperationOptions { get; set; }
 }

@@ -37,7 +37,7 @@ public class ServiceConfiguration
         CreditRepository = new CreditRepository(Connection);
         LoggerRepository = new LoggerRepository(Options.LoggerOptions);
         Logger = new Logger(LoggerRepository, Options.LoggerOptions);
-        OperationRepository = new OperationRepository(Logger);
+        OperationRepository = new OperationRepository(Logger, Options.OperationOptions);
     }
 
     public ServiceConfiguration(RequestDelegate next, ConfigurationOptions options)

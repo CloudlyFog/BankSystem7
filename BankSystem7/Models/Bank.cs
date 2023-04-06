@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using BankSystem7.Services.Repositories;
 using Microsoft.EntityFrameworkCore.Query.Internal;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace BankSystem7.Models;
 
@@ -15,6 +16,7 @@ public class Bank
     public decimal AccountAmount { get; set; }
 }
 
+[BsonIgnoreExtraElements]
 public class Operation
 {
     public Guid ID { get; set; } = Guid.NewGuid();
