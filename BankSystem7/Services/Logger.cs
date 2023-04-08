@@ -23,6 +23,7 @@ public sealed class Logger : ILogger
     public Logger(ILogger logger)
     {
         _logger = logger;
+        IsReused = true;
         _loggerRepository = BankServicesOptions.ServiceConfiguration?.LoggerRepository ?? new LoggerRepository(logger.LoggerOptions);
     }
 
@@ -39,18 +40,15 @@ public sealed class Logger : ILogger
     }
 
     public bool IsReused { get; set; }
-    public LoggerOptions LoggerOptions { get; set; }
+    public LoggerOptions? LoggerOptions { get; set; }
 
     public ExceptionModel Log(Report report)
     {
-        if (!LoggerOptions.IsEnabled)
+        if (LoggerOptions?.IsEnabled == false && _logger?.LoggerOptions?.IsEnabled == false)
             return ExceptionModel.OperationRestricted;
 
         if (IsReused)
-        {
-            IsReused = false;
             return _logger.Log(report);
-        }
 
         if (_loggerRepository.Exist(x => x.Id == report.Id))
             _loggerRepository.Update(report);

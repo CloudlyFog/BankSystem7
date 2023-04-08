@@ -103,6 +103,7 @@ namespace BankSystem7.AppContext
             user.Card.BankAccount.BankAccountAmount -= operation.TransferAmount;
             user.Card.Amount -= operation.TransferAmount;
             ChangeTracker.Clear();
+            Update(user.Card);
             Update(user.Card.BankAccount);
             Update(user.Card.BankAccount.Bank);
             SaveChanges();
@@ -127,6 +128,7 @@ namespace BankSystem7.AppContext
             user.Card.BankAccount.BankAccountAmount += operation.TransferAmount;
             user.Card.Amount += operation.TransferAmount;
             ChangeTracker.Clear();
+            Update(user.Card);
             Update(user.Card.BankAccount);
             Update(user.Card.BankAccount.Bank);
             SaveChanges();

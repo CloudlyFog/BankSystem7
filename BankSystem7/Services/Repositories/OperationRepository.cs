@@ -47,12 +47,12 @@ public class OperationRepository : IRepository<Operation>, ILoggerDo<OperationTy
     {
         if (item is null || Exist(x => x.ID == item.ID))
         {
-            Log(ExceptionModel.OperationFailed, nameof(Create), OperationType.Create);
+            Log(ExceptionModel.OperationFailed, nameof(Create), nameof(OperationRepository), OperationType.Create);
             return ExceptionModel.OperationFailed;
         }
         _operationService.Collection.InsertOne(item);
         
-        Log(ExceptionModel.Successfully, nameof(Create), OperationType.Create);
+        Log(ExceptionModel.Successfully, nameof(Create), nameof(OperationRepository), OperationType.Create);
         return ExceptionModel.Successfully;
     }
 
@@ -60,7 +60,7 @@ public class OperationRepository : IRepository<Operation>, ILoggerDo<OperationTy
     {
         if (!FitsConditions(item))
         {
-            Log(ExceptionModel.OperationFailed, nameof(Update), OperationType.Update);
+            Log(ExceptionModel.OperationFailed, nameof(Update), nameof(OperationRepository), OperationType.Update);
             return ExceptionModel.OperationFailed;
         }
 
@@ -70,7 +70,7 @@ public class OperationRepository : IRepository<Operation>, ILoggerDo<OperationTy
             .Set(x => x, item);
         _operationService.Collection.UpdateOne(filter, update);
         
-        Log(ExceptionModel.Successfully, nameof(Update), OperationType.Update);
+        Log(ExceptionModel.Successfully, nameof(Update), nameof(OperationRepository), OperationType.Update);
         return ExceptionModel.Successfully;
     }
 
@@ -78,13 +78,13 @@ public class OperationRepository : IRepository<Operation>, ILoggerDo<OperationTy
     {
         if (!FitsConditions(item))
         {
-            Log(ExceptionModel.OperationFailed, nameof(Delete), OperationType.Delete);
+            Log(ExceptionModel.OperationFailed, nameof(Delete), nameof(OperationRepository), OperationType.Delete);
             return ExceptionModel.OperationFailed;
         }
         var filter = Builders<Operation>.Filter
             .Eq(x => x.ID, item.ID);
         
-        Log(ExceptionModel.Successfully, nameof(Delete), OperationType.Delete);
+        Log(ExceptionModel.Successfully, nameof(Delete), nameof(OperationRepository), OperationType.Delete);
         _operationService.Collection.DeleteOne(filter);
         return ExceptionModel.Successfully;
     }
@@ -97,7 +97,7 @@ public class OperationRepository : IRepository<Operation>, ILoggerDo<OperationTy
 
     public bool Exist(Expression<Func<Operation, bool>> predicate)
     {
-        Log(ExceptionModel.Successfully, nameof(Exist), OperationType.Exist);
+        Log(ExceptionModel.Successfully, nameof(Exist), nameof(OperationRepository), OperationType.Exist);
         return _operationService.Collection.Find(predicate).Any();
     }
 
@@ -105,24 +105,25 @@ public class OperationRepository : IRepository<Operation>, ILoggerDo<OperationTy
     {
         if (item is null)
         {
-            Log(ExceptionModel.VariableIsNull, nameof(FitsConditions), OperationType.FitsConditions);
+            Log(ExceptionModel.VariableIsNull, nameof(FitsConditions), nameof(OperationRepository), OperationType.FitsConditions);
             return false;
         }
 
         if (!Exist(x => x.ID == item.ID))
         {
-            Log(ExceptionModel.OperationNotExist, nameof(FitsConditions), OperationType.FitsConditions);
+            Log(ExceptionModel.OperationNotExist, nameof(FitsConditions), nameof(OperationRepository), OperationType.FitsConditions);
             return false;
         }
 
         return true;
     }
 
-    public void Log(ExceptionModel exceptionModel, string methodName, OperationType operationType)
+    public void Log(ExceptionModel exceptionModel, string methodName, string className, OperationType operationType)
     {
         var report = new GeneralReport<OperationType>
         {
             MethodName = methodName,
+            ClassName = className,
             OperationType = operationType,
             ExceptionModel = exceptionModel,
         };

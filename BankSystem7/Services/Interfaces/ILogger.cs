@@ -14,7 +14,7 @@ public interface ILogger
 /// You have to implement this interface as part of repository, where logging doings is encapsulated.
 /// For instance, implementation of method <see cref="Log"/> can be creating new report and logging it by interface <see cref="ILogger"/>
 /// </summary>
-public interface ILoggerDo<TOperationType> where TOperationType : Enum 
+public interface ILoggerDo<in TOperationType> where TOperationType : Enum 
 {
-    void Log(ExceptionModel exceptionModel, string methodName, OperationType operationType);
+    void Log(ExceptionModel exceptionModel, string methodName, string className, TOperationType operationType);
 }

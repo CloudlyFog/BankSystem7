@@ -30,6 +30,7 @@ public class GeneralReport<T> : UserReport<T> where T : Enum
         MethodName = report.MethodName;
     }
     public string MethodName { get; set; }
+    public string ClassName { get; set; }
 
     private void SetReport(Report report)
     {
