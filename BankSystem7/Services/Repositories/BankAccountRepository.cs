@@ -7,7 +7,7 @@ using BankSystem7.Services.Interfaces;
 
 namespace BankSystem7.Services.Repositories;
 
-public sealed class BankAccountRepository : IRepository<BankAccount>
+public sealed class BankAccountRepository : LoggerExecutor<OperationType>, IRepository<BankAccount>
 {
     private BankRepository _bankRepository;
     private BankContext _bankContext;

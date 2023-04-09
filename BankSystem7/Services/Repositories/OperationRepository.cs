@@ -5,7 +5,7 @@ using MongoDB.Driver;
 
 namespace BankSystem7.Services.Repositories;
 
-public class OperationRepository : IRepository<Operation>, ILoggerDo<OperationType>
+public class OperationRepository : LoggerExecutor<OperationType>, IRepository<Operation>
 {
     private List<GeneralReport<OperationType>> _reports = new();
     private OperationService<Operation> _operationService;
@@ -46,12 +46,12 @@ public class OperationRepository : IRepository<Operation>, ILoggerDo<OperationTy
     {
         if (item is null || Exist(x => x.ID == item.ID))
         {
-            Log(ExceptionModel.OperationFailed, nameof(Create), nameof(OperationRepository), OperationType.Create);
+            Log(ExceptionModel.OperationFailed, nameof(Create), nameof(OperationRepository), OperationType.Create, _reports);
             return ExceptionModel.OperationFailed;
         }
         _operationService.Collection.InsertOne(item);
         
-        Log(ExceptionModel.Successfully, nameof(Create), nameof(OperationRepository), OperationType.Create);
+        Log(ExceptionModel.Successfully, nameof(Create), nameof(OperationRepository), OperationType.Create, _reports);
         return ExceptionModel.Successfully;
     }
 
@@ -59,7 +59,7 @@ public class OperationRepository : IRepository<Operation>, ILoggerDo<OperationTy
     {
         if (!FitsConditions(item))
         {
-            Log(ExceptionModel.OperationFailed, nameof(Update), nameof(OperationRepository), OperationType.Update);
+            Log(ExceptionModel.OperationFailed, nameof(Update), nameof(OperationRepository), OperationType.Update, _reports);
             return ExceptionModel.OperationFailed;
         }
 
@@ -69,7 +69,7 @@ public class OperationRepository : IRepository<Operation>, ILoggerDo<OperationTy
             .Set(x => x, item);
         _operationService.Collection.UpdateOne(filter, update);
         
-        Log(ExceptionModel.Successfully, nameof(Update), nameof(OperationRepository), OperationType.Update);
+        Log(ExceptionModel.Successfully, nameof(Update), nameof(OperationRepository), OperationType.Update, _reports);
         return ExceptionModel.Successfully;
     }
 
@@ -77,13 +77,13 @@ public class OperationRepository : IRepository<Operation>, ILoggerDo<OperationTy
     {
         if (!FitsConditions(item))
         {
-            Log(ExceptionModel.OperationFailed, nameof(Delete), nameof(OperationRepository), OperationType.Delete);
+            Log(ExceptionModel.OperationFailed, nameof(Delete), nameof(OperationRepository), OperationType.Delete, _reports);
             return ExceptionModel.OperationFailed;
         }
         var filter = Builders<Operation>.Filter
             .Eq(x => x.ID, item.ID);
         
-        Log(ExceptionModel.Successfully, nameof(Delete), nameof(OperationRepository), OperationType.Delete);
+        Log(ExceptionModel.Successfully, nameof(Delete), nameof(OperationRepository), OperationType.Delete, _reports);
         _operationService.Collection.DeleteOne(filter);
         return ExceptionModel.Successfully;
     }
@@ -96,7 +96,7 @@ public class OperationRepository : IRepository<Operation>, ILoggerDo<OperationTy
 
     public bool Exist(Expression<Func<Operation, bool>> predicate)
     {
-        Log(ExceptionModel.Successfully, nameof(Exist), nameof(OperationRepository), OperationType.Exist);
+        Log(ExceptionModel.Successfully, nameof(Exist), nameof(OperationRepository), OperationType.Exist, _reports);
         return _operationService.Collection.Find(predicate).Any();
     }
 
@@ -104,28 +104,16 @@ public class OperationRepository : IRepository<Operation>, ILoggerDo<OperationTy
     {
         if (item is null)
         {
-            Log(ExceptionModel.VariableIsNull, nameof(FitsConditions), nameof(OperationRepository), OperationType.FitsConditions);
+            Log(ExceptionModel.VariableIsNull, nameof(FitsConditions), nameof(OperationRepository), OperationType.FitsConditions, _reports);
             return false;
         }
 
         if (!Exist(x => x.ID == item.ID))
         {
-            Log(ExceptionModel.OperationNotExist, nameof(FitsConditions), nameof(OperationRepository), OperationType.FitsConditions);
+            Log(ExceptionModel.OperationNotExist, nameof(FitsConditions), nameof(OperationRepository), OperationType.FitsConditions, _reports);
             return false;
         }
 
         return true;
-    }
-
-    public void Log(ExceptionModel exceptionModel, string methodName, string className, OperationType operationType)
-    {
-        var report = new GeneralReport<OperationType>
-        {
-            MethodName = methodName,
-            ClassName = className,
-            OperationType = operationType,
-            ExceptionModel = exceptionModel,
-        };
-        _reports.Add(report);
     }
 }
