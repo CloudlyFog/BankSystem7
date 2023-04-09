@@ -11,12 +11,11 @@ public interface ILogger
 }
 
 /// <summary>
-/// You have to implement this interface as part of repository, where logging doings is encapsulated.
-/// For instance, implementation of method <see cref="Log"/> can be creating new report and logging it by interface <see cref="ILogger"/>
+/// Simple implementation of service for added reports to logger queue
 /// </summary>
-public abstract class LoggerExecutor<TOperationType> where TOperationType : Enum 
+public abstract class LoggerExecutor<TOperationType> where TOperationType : Enum
 {
-    public void Log(ExceptionModel exceptionModel, string methodName, string className, TOperationType operationType, ICollection<GeneralReport<TOperationType>> reports)
+    public virtual void Log(ExceptionModel exceptionModel, string methodName, string className, TOperationType operationType, ICollection<GeneralReport<TOperationType>> reports)
     {
         var report = new GeneralReport<TOperationType>
         {

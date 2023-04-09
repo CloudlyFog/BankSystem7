@@ -7,7 +7,7 @@ using BankSystem7.Services.Interfaces;
 
 namespace BankSystem7.Services.Repositories;
 
-public sealed class BankAccountRepository : LoggerExecutor<OperationType>, IRepository<BankAccount>
+public sealed class BankAccountRepository : IRepository<BankAccount>
 {
     private BankRepository _bankRepository;
     private BankContext _bankContext;
@@ -66,10 +66,10 @@ public sealed class BankAccountRepository : LoggerExecutor<OperationType>, IRepo
         _disposedValue = true;
     }
 
-    public async Task<ExceptionModel> Transfer(User? from, User? to, decimal transferAmount, decimal minimalTransferAmount = 0)
+    public async Task<ExceptionModel> Transfer(User? from, User? to, decimal transferAmount)
     {
         if (from is null || to is null || from.Card is null || to.Card is null || from.Card.BankAccount is null ||
-            to.Card.BankAccount is null || transferAmount <= minimalTransferAmount)
+            to.Card.BankAccount is null || transferAmount <= 0)
             return ExceptionModel.OperationFailed;
             
         if (!Exist(x => x.ID == from.Card.BankAccount.ID) || !Exist(x => x.ID == to.Card.BankAccount.ID))
@@ -88,21 +88,6 @@ public sealed class BankAccountRepository : LoggerExecutor<OperationType>, IRepo
             transaction.Rollback();
             throw;
         }
-        transaction.Commit();
-        return ExceptionModel.Successfully;
-    }
-        
-    public async Task<ExceptionModel> Transfer(BankAccount? from, BankAccount? to, decimal transferAmount)
-    {
-        if (from is null || to is null || transferAmount <= 0)
-            return ExceptionModel.OperationFailed;
-            
-        if (!Exist(x => x.ID == from.ID) || !Exist(x => x.ID == to.ID))
-            return ExceptionModel.OperationFailed;
-            
-        using var transaction = _bankContext.Database.BeginTransaction(IsolationLevel.RepeatableRead);
-        await WithdrawAsync(from, transferAmount);
-        await AccrualAsync(to, transferAmount);
         transaction.Commit();
         return ExceptionModel.Successfully;
     }

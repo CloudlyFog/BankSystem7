@@ -26,10 +26,6 @@ public sealed class LoggerRepository
         LoggerOptions = options;
     }
     public LoggerOptions LoggerOptions { get; }
-    
-    public void Dispose()
-    {
-    }
 
     public ExceptionModel Create(Report? item)
     {

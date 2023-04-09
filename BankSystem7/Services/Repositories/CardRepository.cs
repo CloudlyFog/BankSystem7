@@ -52,9 +52,6 @@ public sealed class CardRepository : IRepository<Card>
         _disposedValue = true;
     }
 
-    public async Task<ExceptionModel> Transfer(BankAccount? from, BankAccount? to, decimal transferAmount) 
-        => await _bankAccountRepository.Transfer(from, to, transferAmount);
-
     public ExceptionModel Update(Card item)
     {
         if (!FitsConditions(item))

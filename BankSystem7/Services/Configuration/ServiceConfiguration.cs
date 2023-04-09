@@ -100,7 +100,6 @@ public class ServiceConfiguration
             CardRepository?.Dispose();
             UserRepository?.Dispose();
             CreditRepository?.Dispose();
-            LoggerRepository.Dispose();
         }
 
         BankAccountRepository = null;

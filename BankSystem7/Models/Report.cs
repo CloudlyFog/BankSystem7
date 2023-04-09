@@ -12,7 +12,7 @@ public class Report
 }
 
 [BsonIgnoreExtraElements]
-public class GeneralReport<T> : UserReport<T> where T : Enum
+public class GeneralReport<TOperationType> : UserReport<TOperationType> where TOperationType : Enum
 {
     public GeneralReport()
     {
@@ -24,7 +24,7 @@ public class GeneralReport<T> : UserReport<T> where T : Enum
         SetReport(report);
     }
 
-    public GeneralReport(GeneralReport<T> report)
+    public GeneralReport(GeneralReport<TOperationType> report)
     {
         SetReport(report);
         MethodName = report.MethodName;
@@ -41,9 +41,9 @@ public class GeneralReport<T> : UserReport<T> where T : Enum
 }
 
 [BsonIgnoreExtraElements]
-public class UserReport<T> : Report where T : Enum
+public class UserReport<TOperationType> : Report where TOperationType : Enum
 {
-    public T OperationType { get; set; }
+    public TOperationType OperationType { get; set; }
 }
 
 public enum OperationType
