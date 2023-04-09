@@ -1,17 +1,10 @@
-﻿// This file is used by Code Analysis to maintain SuppressMessage
-// attributes that are applied to this project.
-// Project-level suppressions either have no target or are given
-// a specific target and scoped to a namespace, type, member, etc.
-
-using System.Data;
+﻿using System.Data;
 using System.Linq.Expressions;
 using BankSystem7.AppContext;
 using BankSystem7.Models;
 using BankSystem7.Services.Configuration;
 using BankSystem7.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
-using SharpCompress.Readers;
 
 namespace BankSystem7.Services.Repositories;
 

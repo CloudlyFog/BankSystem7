@@ -29,7 +29,6 @@ public class OperationRepository : IRepository<Operation>, ILoggerDo<OperationTy
         _operationService = new OperationService<Operation>(options);
         _logger = logger;
     }
-
     public OperationRepository(LoggerRepository loggerRepository, LoggerOptions options)
     {
         _operationService = new OperationService<Operation>(options.OperationServiceOptions);
