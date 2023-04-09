@@ -12,7 +12,7 @@ public class Report
 }
 
 [BsonIgnoreExtraElements]
-public class GeneralReport<TOperationType> : UserReport<TOperationType> where TOperationType : Enum
+public class GeneralReport<TOperationType> : Report
 {
     public GeneralReport()
     {
@@ -31,6 +31,7 @@ public class GeneralReport<TOperationType> : UserReport<TOperationType> where TO
     }
     public string MethodName { get; set; }
     public string ClassName { get; set; }
+    public TOperationType OperationType { get; set; }
 
     private void SetReport(Report report)
     {
@@ -39,13 +40,6 @@ public class GeneralReport<TOperationType> : UserReport<TOperationType> where TO
         ExceptionModel = report.ExceptionModel;
     }
 }
-
-[BsonIgnoreExtraElements]
-public class UserReport<TOperationType> : Report where TOperationType : Enum
-{
-    public TOperationType OperationType { get; set; }
-}
-
 public enum OperationType
 {
     Create = 1,
@@ -55,16 +49,5 @@ public enum OperationType
     Exist,
     All,
     FitsConditions,
-    Constructor,
-    Destructor,
-    Other,
-}
-
-public enum UserOperationType
-{
-    TransferMoney = 1,
-    TakeCredit,
-    PayCredit,
-    RepayCredit
 }
 
