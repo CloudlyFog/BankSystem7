@@ -52,9 +52,6 @@ public sealed class CardRepository : IRepository<Card>
         _disposedValue = true;
     }
 
-    public async Task<ExceptionModel> Transfer(BankAccount? from, BankAccount? to, decimal transferAmount) 
-        => await _bankAccountRepository.Transfer(from, to, transferAmount);
-
     public ExceptionModel Update(Card item)
     {
         if (!FitsConditions(item))
@@ -91,7 +88,7 @@ public sealed class CardRepository : IRepository<Card>
     }
 
     public bool Exist(Expression<Func<Card, bool>> predicate) => _applicationContext.Cards.AsNoTracking().Any(predicate);
-    public bool FitsConditions(Card item)
+    public bool FitsConditions(Card? item)
     {
         return item is not null && Exist(x => x.ID == item.ID);
     }

@@ -20,7 +20,7 @@ namespace BankSystem7.AppContext
         public BankContext(string connection)
         {
             ServiceConfiguration.SetConnection(connection);
-            _operationService = new OperationService<Operation>(ServiceConfiguration.Options.DatabaseName ?? "CabManagementSystemReborn");
+            _operationService = new OperationService<Operation>(ServiceConfiguration.Options.LoggerOptions?.OperationServiceOptions?.DatabaseName ?? "CabManagementSystemReborn");
             DatabaseHandle();
         }
         public DbSet<User> Users { get; set; } = null!;
@@ -103,6 +103,7 @@ namespace BankSystem7.AppContext
             user.Card.BankAccount.BankAccountAmount -= operation.TransferAmount;
             user.Card.Amount -= operation.TransferAmount;
             ChangeTracker.Clear();
+            Update(user.Card);
             Update(user.Card.BankAccount);
             Update(user.Card.BankAccount.Bank);
             SaveChanges();
@@ -127,6 +128,7 @@ namespace BankSystem7.AppContext
             user.Card.BankAccount.BankAccountAmount += operation.TransferAmount;
             user.Card.Amount += operation.TransferAmount;
             ChangeTracker.Clear();
+            Update(user.Card);
             Update(user.Card.BankAccount);
             Update(user.Card.BankAccount.Bank);
             SaveChanges();

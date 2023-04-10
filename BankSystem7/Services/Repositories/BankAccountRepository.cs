@@ -18,24 +18,26 @@ public sealed class BankAccountRepository : IRepository<BankAccount>
     public BankAccountRepository()
     {
         _bankContext = _bankRepository.BankContext;
-        SetBankServicesOptions();
-        _bankRepository = new BankRepository(ConnectionString);
         _applicationContext = BankServicesOptions.ApplicationContext ??
                               new ApplicationContext(BankServicesOptions.Connection);
+        SetBankServicesOptions();
+        _bankRepository = new BankRepository(ConnectionString);
     }
     public BankAccountRepository(BankRepository bankRepository)
     {
         _bankRepository = bankRepository;
+        _bankContext = _bankRepository.BankContext;
         _applicationContext = BankServicesOptions.ApplicationContext ??
                               new ApplicationContext(BankServicesOptions.Connection);
+        SetBankServicesOptions();
     }
     public BankAccountRepository(string connection)
     {
         _bankContext = BankServicesOptions.BankContext ?? new BankContext(connection);
-        SetBankServicesOptions();
-        _bankRepository = BankServicesOptions.ServiceConfiguration?.BankRepository ?? new BankRepository(connection);
         _applicationContext = BankServicesOptions.ApplicationContext ??
                               new ApplicationContext(connection);
+        SetBankServicesOptions();
+        _bankRepository = BankServicesOptions.ServiceConfiguration?.BankRepository ?? new BankRepository(connection);
     }
 
     // Public implementation of Dispose pattern callable by consumers.
@@ -64,10 +66,10 @@ public sealed class BankAccountRepository : IRepository<BankAccount>
         _disposedValue = true;
     }
 
-    public async Task<ExceptionModel> Transfer(User? from, User? to, decimal transferAmount, decimal minimalTransferAmount = 0)
+    public async Task<ExceptionModel> Transfer(User? from, User? to, decimal transferAmount)
     {
         if (from is null || to is null || from.Card is null || to.Card is null || from.Card.BankAccount is null ||
-            to.Card.BankAccount is null || transferAmount <= minimalTransferAmount)
+            to.Card.BankAccount is null || transferAmount <= 0)
             return ExceptionModel.OperationFailed;
             
         if (!Exist(x => x.ID == from.Card.BankAccount.ID) || !Exist(x => x.ID == to.Card.BankAccount.ID))
@@ -86,21 +88,6 @@ public sealed class BankAccountRepository : IRepository<BankAccount>
             transaction.Rollback();
             throw;
         }
-        transaction.Commit();
-        return ExceptionModel.Successfully;
-    }
-        
-    public async Task<ExceptionModel> Transfer(BankAccount? from, BankAccount? to, decimal transferAmount)
-    {
-        if (from is null || to is null || transferAmount <= 0)
-            return ExceptionModel.OperationFailed;
-            
-        if (!Exist(x => x.ID == from.ID) || !Exist(x => x.ID == to.ID))
-            return ExceptionModel.OperationFailed;
-            
-        using var transaction = _bankContext.Database.BeginTransaction(IsolationLevel.RepeatableRead);
-        await WithdrawAsync(from, transferAmount);
-        await AccrualAsync(to, transferAmount);
         transaction.Commit();
         return ExceptionModel.Successfully;
     }
@@ -267,7 +254,7 @@ public sealed class BankAccountRepository : IRepository<BankAccount>
     public bool Exist(Expression<Func<BankAccount, bool>> predicate)
         => _applicationContext.BankAccounts.AsNoTracking().Any(predicate);
 
-    public bool FitsConditions(BankAccount item)
+    public bool FitsConditions(BankAccount? item)
     {
         return item is not null && Exist(x => x.ID == item.ID) && item.Bank is not null;
     }

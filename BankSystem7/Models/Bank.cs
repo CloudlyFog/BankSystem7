@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using BankSystem7.Services.Repositories;
 using Microsoft.EntityFrameworkCore.Query.Internal;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace BankSystem7.Models;
 
@@ -15,6 +16,7 @@ public class Bank
     public decimal AccountAmount { get; set; }
 }
 
+[BsonIgnoreExtraElements]
 public class Operation
 {
     public Guid ID { get; set; } = Guid.NewGuid();
@@ -28,19 +30,17 @@ public class Operation
 
 public class Credit
 {
-    public static Credit CreateInstance1()
+    public static Credit CreateInstance()
     {
         return new Credit();
     }
 
-    public static Credit CreateInstance(decimal creditAmount, decimal interestRate, DateTime repaymentDate,
-        DateTime issueCreditDate, User user = null, Bank bank = null)
+    public static Credit CreateInstance(decimal creditAmount, decimal interestRate, DateTime repaymentDate, User user = null, Bank bank = null)
     {
         var credit = new Credit(creditAmount, user, bank)
         {
             CreditAmount = creditAmount,
             InterestRate = interestRate,
-            IssueCreditDate = issueCreditDate,
             RepaymentDate = repaymentDate,
         };
         credit.RepaymentAmount = credit.CalculateRepaymentAmount();
@@ -69,7 +69,7 @@ public class Credit
     public decimal InterestRate { get; set; }
     public decimal RepaymentAmount { get; set; }
     public DateTime RepaymentDate { get; set; }
-    public DateTime IssueCreditDate { get; set; }
+    public DateTime IssueCreditDate { get; set; } = DateTime.Now;
     public Bank? Bank { get; set; }
     public User? User { get; set; }
 
@@ -145,6 +145,8 @@ public class Card
         BankAccountID = bankAccount.ID;
         BankID = bankAccount.BankID;
         Amount = bankAccount.BankAccountAmount;
+
+        BankAccount.Bank = bankAccount.Bank;
     }
 
     private Card()
