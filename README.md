@@ -85,7 +85,7 @@ Services are dividing on 3 sub-folders:
 
 1. **Configuration**
 2. **Interfaces**
-3. **Repositories`**`
+3. **Repositories**
 
 And some classes that don't belong to any of folders:
 
