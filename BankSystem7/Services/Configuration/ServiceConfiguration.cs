@@ -18,16 +18,7 @@ public class ServiceConfiguration
 
     
     private bool _disposed;
-    public BankAccountRepository? BankAccountRepository { get; protected internal  set; }
-    public BankRepository? BankRepository { get; protected internal set; }
-    public CardRepository? CardRepository { get; protected internal set; }
-    public UserRepository? UserRepository { get; protected internal set; }
-    public CreditRepository? CreditRepository { get; protected internal set; }
-    public LoggerRepository? LoggerRepository { get; protected internal set; }
-    public OperationRepository? OperationRepository { get; protected internal set; }
-    public ILogger? Logger { get; protected internal set; }
-    public static ConfigurationOptions Options { get; protected internal set; }
-
+    
     private ServiceConfiguration()
     {
         BankAccountRepository = new BankAccountRepository(Connection);
@@ -42,6 +33,16 @@ public class ServiceConfiguration
         }
         OperationRepository = new OperationRepository(Logger, Options.OperationOptions);
     }
+    
+    public BankAccountRepository? BankAccountRepository { get; protected internal  set; }
+    public BankRepository? BankRepository { get; protected internal set; }
+    public CardRepository? CardRepository { get; protected internal set; }
+    public UserRepository? UserRepository { get; protected internal set; }
+    public CreditRepository? CreditRepository { get; protected internal set; }
+    public LoggerRepository? LoggerRepository { get; protected internal set; }
+    public OperationRepository? OperationRepository { get; protected internal set; }
+    public ILogger? Logger { get; protected internal set; }
+    public static ConfigurationOptions Options { get; protected internal set; }
 
     public ServiceConfiguration(RequestDelegate next, ConfigurationOptions options)
     {

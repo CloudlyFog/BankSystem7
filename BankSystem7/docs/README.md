@@ -24,13 +24,16 @@ It also let everybody to use bank system in its projects and change logic for yo
 
 ## Structure of project
 
- 1.  Folder **AppContext** is folder where contain context classes for interaction with database without business logic.
- 2.  Folder **Services** contains 2 sub folders: **Interfaces** and **Repositories**.
- 3.  Folder **Interfaces** contains interfaces which describes structure of inherited classes.
- 4.  Folder **Repositories** is folder with all business logic of project. Only there simple developer has access.
+ 1. Folder **AppContext** is folder where contains context classes for interaction with database without business logic.
+ 2. Folder **Middleware** is folder where contains middleware.
+ 3. Folder **Services** contains 2 sub folders: **Interfaces** and **Repositories**.
+ 4. Folder **Interfaces** contains interfaces which describes structure of inherited classes.
+ 5. Folder **Repositories** is folder with all business logic of project. Only there simple developer has access.
 
-## How to interact with database?
-Developer can interact with database using class BankServiceOptions that provides properties for a little configuration. Set connection string you can by set value to property Connection. Ensure create or delete database by setting value to properties EnsureCreated and EnsureDeleted.
+## How to interact with library?
+Developer can interact with library by following next steps:
+ 1. create instance of class `ServiceConfiguration` and pass as parameters class `ConfigurationOptions` with own settings. (or do the same steps but instead of create instance of `ServiceConfiguration`, use middleware `ServiceConfigurationMiddleware`)
+ 2. interact with repositories throughout public properties of instanced class `ServiceConfiguration`
 #### Remember!
 If you'll not change connection string to database in class BankServiceOptions or directly in repository classes program may don't work correctly.
 You can catch exception like "There isn't database which has been specified." because databases which was used in developing project may doesn't exist on your machine.
@@ -78,21 +81,43 @@ There are 2 classes context:
 
 
 ### Services
-Services are dividing on 2 sub-folders:
+Services are dividing on 3 sub-folders:
 
- 1. **Interfaces**
- 2. **Repositories**
+ 1. **Configuration**
+ 2. **Interfaces**
+ 3. **Repositories`**`
 
-### Interfaces
+And some classes that don't belong to any of folders:
+
+ 1. `BankServiceOptions` - defines options that used by internal services.
+ 2. `Logger` - service for logging some info about repositories operations.
+ 3. `OperationService` - provides connection to mongodb services.
+
+
+### Configuration
+Here located services for configuring library.
+ 1. `ConfigurationOptions` - service provides options for the most full configuring of library.
+ 2. `ModelConfiguration` - service ensures correct relationships between models.
+ 3. `ServiceConifiguration` - service that handles all services that there are in the library.
+
+### Interfaces (and abstract classes)
 Here located interfaces which describes behavior of inherited repo-classes.
  1. Interface `IRepository<T>` - parent interface from which will inherit other interfaces and repo-classes. Describes main logic and structure of the project.
- **Methods**:  
-- `ExceptionModel  Create(T item);` - implements creating item and adding it in database. 
+ **Methods**:
+- `ExceptionModel  Create(T item);` - implements creating item and adding it in database.
 - `ExceptionModel  Update(T item);` -implements updating item in database.
 - `ExceptionModel  Delete(T item);` - implements deleting item from database.
 - `IEnumerable<T> All {  get; }` - implements getting a sequence of the objects from database.
--  `T  Get(Expression<Func<T, bool>> predicate);` - implements getting an object from database with func-condition.
--  `bool  Exist(Expression<Func<T, bool>> predicate);` - implements checking exist object with in database func-condition.
+- `T  Get(Expression<Func<T, bool>> predicate);` - implements getting an object from database with func-condition.
+- `bool  Exist(Expression<Func<T, bool>> predicate);` - implements checking exist object with in database func-condition.
+ 2. Interface `ILogger` - interface that provides standard set for logging
+**Methods**:
+- `ExceptionModel Log(Report report);` - implements logging report in database.
+- `ExceptionModel Log(IEnumerable<Report> reports);` - implements logging collection of reports in database.
+**Properties**
+- `public bool IsReused { get; set; }` - defines possibility use already initialized logger.
+- `public LoggerOptions LoggerOptions { get; set; }` - defines options for logger configuration.
+
 
 ### Repositories
 Repositories are implementation of various interfaces and working with context classes for interact with database. 
@@ -102,9 +127,12 @@ Repositories are implementation of various interfaces and working with context c
  3. `CardRepository` - implements interface `IRepository<T>` for handling card model and Transfer money method.
  4. `UserRepository` - implements interface `IRepository<T>` for handling user model.
  5. `CreditRepository` - implements interface `IRepository<T>` for handling credit model and  operations with credit(loan). For example: take, pay credit.
+ 6. `LoggerRepository` - implements interface `IRepository<T>` for handling reports.
+ 7. `OperationRepository` - implements interface `IRepository<T>` for handling operations.
+
 
 ## When cause exception or error?
-There are some points when you can catch an exception or error while using api of project:
+There are a lot of points when you can catch an exception or error while using api of project but we describe some of them:
 
  1. You use default connection string instead of Your. Can happen so that on Your machine won't database with name which was specified in default connection string.
  2. You change content of repositories or context class. If You change some of these You can get an error. 
@@ -115,7 +143,7 @@ There are some points when you can catch an exception or error while using api o
         optionsBuilder.EnableSensitiveDataLogging();
         optionsBuilder.UseSqlServer(queryConnection);
     }
-````
+````****
  You'll write something like this
  ````
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
