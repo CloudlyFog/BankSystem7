@@ -36,7 +36,10 @@ public class ServiceConfiguration
         BankRepository = new BankRepository(Connection);
         CreditRepository = new CreditRepository(Connection);
         LoggerRepository = new LoggerRepository(Options.LoggerOptions);
-        Logger = new Logger(LoggerRepository, Options.LoggerOptions);
+        if (Options.LoggerOptions.IsEnabled)
+        {
+            Logger = new Logger(LoggerRepository, Options.LoggerOptions);
+        }
         OperationRepository = new OperationRepository(Logger, Options.OperationOptions);
     }
 
@@ -66,19 +69,6 @@ public class ServiceConfiguration
         BankServicesOptions.Connection = Connection;
     }
 
-    public static ServiceConfiguration CreateInstance()
-    {
-        BankServicesOptions.ServiceConfiguration = new ServiceConfiguration();
-        return BankServicesOptions.ServiceConfiguration;
-    }
-
-    public static ServiceConfiguration CreateInstance(string? connection = null, string? databaseName = DefaultDatabaseName)
-    {
-        SetConnection(connection, databaseName);
-        BankServicesOptions.ServiceConfiguration = new ServiceConfiguration();
-        return BankServicesOptions.ServiceConfiguration;
-    }
-
     public static ServiceConfiguration CreateInstance(ConfigurationOptions options)
     {
         Options = options;
@@ -100,6 +90,7 @@ public class ServiceConfiguration
             CardRepository?.Dispose();
             UserRepository?.Dispose();
             CreditRepository?.Dispose();
+            OperationRepository?.Dispose();
         }
 
         BankAccountRepository = null;
@@ -109,6 +100,7 @@ public class ServiceConfiguration
         CreditRepository = null;
         LoggerRepository = null;
         Logger = null;
+        OperationRepository = null;
         _disposed = true;
     }
 
