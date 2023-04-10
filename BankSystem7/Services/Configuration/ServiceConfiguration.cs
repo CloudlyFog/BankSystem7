@@ -35,9 +35,9 @@ public class ServiceConfiguration
         CardRepository = new CardRepository(BankAccountRepository);
         BankRepository = new BankRepository(Connection);
         CreditRepository = new CreditRepository(Connection);
-        LoggerRepository = new LoggerRepository(Options.LoggerOptions);
         if (Options.LoggerOptions.IsEnabled)
         {
+            LoggerRepository = new LoggerRepository(Options.LoggerOptions);
             Logger = new Logger(LoggerRepository, Options.LoggerOptions);
         }
         OperationRepository = new OperationRepository(Logger, Options.OperationOptions);
