@@ -10,9 +10,15 @@ It also let everybody to use bank system in its projects and change logic for yo
 - Added class LoggerOptions. Added property of LoggerOptions to ConfigurationOptions.cs.
 - Added Logging. Implemented interface ILogger.cs in class Logger.cs.
 - Added repository LoggerRepository.cs for handling logs.
+- Added repository OperationRepository for handling operation entities in the database.
+- Added logger in the UserRepository.
 - Added new model for logging - Report.cs.
 - Added interaction with logger services via properties in ServiceConfiguration.cs.
-- Updated logic of user creation.
+- Updated logic of user creation to avoid exceptions with needlessness creating of dependent entities.
+- Updated accrual and withdraw operations. Changes consists in updating card model of user during accrual/withdraw operation.
+- Removed field IssueCreditDate from parameters of instance maker of class Credit.
+- Added fields in ConfigurationOptions for setting options for logger and operation service.
+- Removed ability of set any repository value outside creation instance of ServiceConfiguration.
 ****
 # Documentation
 
