@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace BankSystem7.Services.Configuration;
 
-public class ServiceConfiguration
+public class ServiceConfiguration<TUser> where TUser : User
 {
     public static string Connection { get; private set; } =
         @"Server=localhost\\SQLEXPRESS;Data Source=maxim;Initial Catalog=Test;
@@ -21,26 +21,26 @@ public class ServiceConfiguration
     
     private ServiceConfiguration()
     {
-        BankAccountRepository = new BankAccountRepository(Connection);
-        UserRepository = new UserRepository(BankAccountRepository);
-        CardRepository = new CardRepository(BankAccountRepository);
-        BankRepository = new BankRepository(Connection);
-        CreditRepository = new CreditRepository(Connection);
+        BankAccountRepository = new BankAccountRepository<TUser>(Connection);
+        UserRepository = new UserRepository<TUser>(BankAccountRepository);
+        CardRepository = new CardRepository<TUser>(BankAccountRepository);
+        BankRepository = new BankRepository<TUser>(Connection);
+        CreditRepository = new CreditRepository<TUser>(Connection);
         if (Options.LoggerOptions.IsEnabled)
         {
             LoggerRepository = new LoggerRepository(Options.LoggerOptions);
-            Logger = new Logger(LoggerRepository, Options.LoggerOptions);
+            Logger = new Logger<TUser>(LoggerRepository, Options.LoggerOptions);
         }
-        OperationRepository = new OperationRepository(Logger, Options.OperationOptions);
+        OperationRepository = new OperationRepository<TUser>(Logger, Options.OperationOptions);
     }
     
-    public BankAccountRepository? BankAccountRepository { get; protected internal  set; }
-    public BankRepository? BankRepository { get; protected internal set; }
-    public CardRepository? CardRepository { get; protected internal set; }
-    public UserRepository? UserRepository { get; protected internal set; }
-    public CreditRepository? CreditRepository { get; protected internal set; }
+    public BankAccountRepository<TUser>? BankAccountRepository { get; protected internal  set; }
+    public BankRepository<TUser>? BankRepository { get; protected internal set; }
+    public CardRepository<TUser>? CardRepository { get; protected internal set; }
+    public UserRepository<TUser>? UserRepository { get; protected internal set; }
+    public CreditRepository<TUser>? CreditRepository { get; protected internal set; }
     public LoggerRepository? LoggerRepository { get; protected internal set; }
-    public OperationRepository? OperationRepository { get; protected internal set; }
+    public OperationRepository<TUser>? OperationRepository { get; protected internal set; }
     public ILogger? Logger { get; protected internal set; }
     public static ConfigurationOptions Options { get; protected internal set; }
 
@@ -54,31 +54,31 @@ public class ServiceConfiguration
         if (connection is not null && connection != string.Empty)
         {
             Connection = connection;
-            BankServicesOptions.Connection = Connection;
+            BankServicesOptions<TUser>.Connection = Connection;
             return;
         }
 
         if (databaseName is null || dataSource is null)
         {
-            BankServicesOptions.Connection = Connection;
+            BankServicesOptions<TUser>.Connection = Connection;
             return;
         }
         
         Connection = @$"Server=localhost\\SQLEXPRESS;Data Source={dataSource};Initial Catalog={databaseName};
             Integrated Security=True;Persist Security Info=False;Pooling=False;
             MultipleActiveResultSets=False; Encrypt=False;TrustServerCertificate=False";
-        BankServicesOptions.Connection = Connection;
+        BankServicesOptions<TUser>.Connection = Connection;
     }
 
-    public static ServiceConfiguration CreateInstance(ConfigurationOptions options)
+    public static ServiceConfiguration<TUser> CreateInstance(ConfigurationOptions options)
     {
         Options = options;
         SetConnection(options.Connection, options.DatabaseName);
-        ApplicationContext.EnsureDeleted = options.EnsureDeleted;
-        ApplicationContext.EnsureCreated = options.EnsureCreated;
+        ApplicationContext<TUser>.EnsureDeleted = BankServicesOptions<TUser>.EnsureDeleted = options.EnsureDeleted;
+        ApplicationContext<TUser>.EnsureCreated = BankServicesOptions<TUser>.EnsureCreated = options.EnsureCreated;
 
-        BankServicesOptions.ServiceConfiguration = new ServiceConfiguration();
-        return BankServicesOptions.ServiceConfiguration;
+        BankServicesOptions<TUser>.ServiceConfiguration = new ServiceConfiguration<TUser>();
+        return BankServicesOptions<TUser>.ServiceConfiguration;
     }
 
     private void Dispose(bool disposing)

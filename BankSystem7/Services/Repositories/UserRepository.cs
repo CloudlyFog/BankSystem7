@@ -9,54 +9,54 @@ using Microsoft.EntityFrameworkCore;
 namespace BankSystem7.Services.Repositories;
 
 
-public sealed class UserRepository : LoggerExecutor<OperationType>, IRepository<User>
+public sealed class UserRepository<TUser> : LoggerExecutor<OperationType>, IRepository<TUser> where TUser : User
 {
-    private BankAccountRepository _bankAccountRepository;
-    private ApplicationContext _applicationContext;
-    private BankRepository _bankRepository;
-    private CardRepository _cardRepository;
+    private BankAccountRepository<TUser> _bankAccountRepository;
+    private ApplicationContext<TUser> _applicationContext;
+    private BankRepository<TUser> _bankRepository;
+    private CardRepository<TUser> _cardRepository;
     private ILogger _logger;
     private List<GeneralReport<OperationType>> _reports = new();
     private bool _disposed;
     public UserRepository()
     {
-        _bankAccountRepository = new BankAccountRepository(BankServicesOptions.Connection);
-        _bankRepository = new BankRepository(BankServicesOptions.Connection);
-        _cardRepository = new CardRepository(_bankAccountRepository);
-        _applicationContext = BankServicesOptions.ApplicationContext ??
-                              new ApplicationContext(_bankAccountRepository);
-        _logger = new Logger(ServiceConfiguration.Options.LoggerOptions);
+        _bankAccountRepository = new BankAccountRepository<TUser>(BankServicesOptions<TUser>.Connection);
+        _bankRepository = new BankRepository<TUser>(BankServicesOptions<TUser>.Connection);
+        _cardRepository = new CardRepository<TUser>(_bankAccountRepository);
+        _applicationContext = BankServicesOptions<TUser>.ApplicationContext ??
+                              new ApplicationContext<TUser>(_bankAccountRepository);
+        _logger = new Logger<TUser>(ServiceConfiguration<TUser>.Options.LoggerOptions);
     }
     public UserRepository(string connection)
     {
-        _bankAccountRepository = new BankAccountRepository(connection);
-        _bankRepository = new BankRepository(connection);
-        _cardRepository = new CardRepository(_bankAccountRepository);
-        _applicationContext = BankServicesOptions.ApplicationContext ??
-                              new ApplicationContext(_bankAccountRepository);
-        _logger = new Logger(ServiceConfiguration.Options.LoggerOptions);
+        _bankAccountRepository = new BankAccountRepository<TUser>(connection);
+        _bankRepository = new BankRepository<TUser>(connection);
+        _cardRepository = new CardRepository<TUser>(_bankAccountRepository);
+        _applicationContext = BankServicesOptions<TUser>.ApplicationContext ??
+                              new ApplicationContext<TUser>(_bankAccountRepository);
+        _logger = new Logger<TUser>(ServiceConfiguration<TUser>.Options.LoggerOptions);
         
     }
-    public UserRepository(BankAccountRepository repository)
+    public UserRepository(BankAccountRepository<TUser> repository)
     {
         _bankAccountRepository = repository;
-        _bankRepository = BankServicesOptions.ServiceConfiguration?.BankRepository ?? new BankRepository(BankServicesOptions.Connection);
-        _cardRepository = BankServicesOptions.ServiceConfiguration?.CardRepository ?? new CardRepository(_bankAccountRepository);
-        _applicationContext = new ApplicationContext(_bankAccountRepository);
-        _logger = new Logger(ServiceConfiguration.Options.LoggerOptions);
+        _bankRepository = BankServicesOptions<TUser>.ServiceConfiguration?.BankRepository ?? new BankRepository<TUser>(BankServicesOptions<TUser>.Connection);
+        _cardRepository = BankServicesOptions<TUser>.ServiceConfiguration?.CardRepository ?? new CardRepository<TUser>(_bankAccountRepository);
+        _applicationContext = new ApplicationContext<TUser>(_bankAccountRepository);
+        _logger = new Logger<TUser>(ServiceConfiguration<TUser>.Options.LoggerOptions);
     }
-    public ExceptionModel Create(User item)
+    public ExceptionModel Create(TUser item)
     {
         if (item?.Card?.BankAccount?.Bank is null)
         {
-            Log(ExceptionModel.VariableIsNull, nameof(Create), nameof(UserRepository), OperationType.Create, _reports);
+            Log(ExceptionModel.VariableIsNull, nameof(Create), nameof(UserRepository<TUser>), OperationType.Create, _reports);
             return ExceptionModel.OperationFailed;
         }
             
         //if user exists method will send false
         if (Exist(x => x.ID == item.ID))
         {
-            Log(ExceptionModel.OperationNotExist, nameof(Create), nameof(UserRepository), OperationType.Create, _reports);
+            Log(ExceptionModel.OperationNotExist, nameof(Create), nameof(UserRepository<TUser>), OperationType.Create, _reports);
             return ExceptionModel.OperationFailed;
         }
 
@@ -68,7 +68,7 @@ public sealed class UserRepository : LoggerExecutor<OperationType>, IRepository<
         if (avoidDuplication != ExceptionModel.Successfully)
         {
             userCreationTransaction.Rollback();
-            Log(avoidDuplication, nameof(Create), nameof(UserRepository), OperationType.Create, _reports);
+            Log(avoidDuplication, nameof(Create), nameof(UserRepository<TUser>), OperationType.Create, _reports);
             return avoidDuplication;
         }
 
@@ -97,7 +97,7 @@ public sealed class UserRepository : LoggerExecutor<OperationType>, IRepository<
         if (bank is null)
         {
             userCreationTransaction.Commit();
-            Log(ExceptionModel.Successfully, nameof(Create), nameof(UserRepository), OperationType.Create, _reports);
+            Log(ExceptionModel.Successfully, nameof(Create), nameof(UserRepository<TUser>), OperationType.Create, _reports);
             return ExceptionModel.Successfully;
         }
         item.Card.BankAccount.Bank ??= bank;
@@ -107,14 +107,14 @@ public sealed class UserRepository : LoggerExecutor<OperationType>, IRepository<
         {
             userCreationTransaction.Rollback();
             
-            Log(updateBank, nameof(Create), nameof(UserRepository), OperationType.Create, _reports);
+            Log(updateBank, nameof(Create), nameof(UserRepository<TUser>), OperationType.Create, _reports);
             return updateBank;
         }
 
         userCreationTransaction.Commit();
         
         
-        Log(ExceptionModel.Successfully, nameof(Create), nameof(UserRepository), OperationType.Create, _reports);
+        Log(ExceptionModel.Successfully, nameof(Create), nameof(UserRepository<TUser>), OperationType.Create, _reports);
         return ExceptionModel.Successfully;
     }
 
@@ -143,11 +143,11 @@ public sealed class UserRepository : LoggerExecutor<OperationType>, IRepository<
         _disposed = true;
     }
 
-    public ExceptionModel Delete(User item)
+    public ExceptionModel Delete(TUser item)
     {
         if (!FitsConditions(item))
         {
-            Log(ExceptionModel.OperationNotExist, nameof(Delete), nameof(UserRepository), OperationType.Delete, _reports);
+            Log(ExceptionModel.OperationNotExist, nameof(Delete), nameof(UserRepository<TUser>), OperationType.Delete, _reports);
             return ExceptionModel.OperationNotExist;
         }
         
@@ -163,73 +163,73 @@ public sealed class UserRepository : LoggerExecutor<OperationType>, IRepository<
         }
         var deleteBankAccount = _bankAccountRepository.Delete(item.Card.BankAccount);
 
-        Log(deleteBankAccount, nameof(Delete), nameof(UserRepository), OperationType.Delete, _reports);
+        Log(deleteBankAccount, nameof(Delete), nameof(UserRepository<TUser>), OperationType.Delete, _reports);
         return deleteBankAccount;
     }
 
-    public bool Exist(Expression<Func<User, bool>> predicate) => _applicationContext.Users.AsNoTracking().Any(predicate);
-    public bool FitsConditions(User? item)
+    public bool Exist(Expression<Func<TUser, bool>> predicate) => _applicationContext.Users.AsNoTracking().Any(predicate);
+    public bool FitsConditions(TUser? item)
     {
         if (item?.Card?.BankAccount?.Bank is null)
         {
-            Log(ExceptionModel.VariableIsNull, nameof(FitsConditions), nameof(UserRepository), OperationType.FitsConditions, _reports);
+            Log(ExceptionModel.VariableIsNull, nameof(FitsConditions), nameof(UserRepository<TUser>), OperationType.FitsConditions, _reports);
             return false;
         }
 
         if (!Exist(x => x.ID == item.ID))
         {
-            Log(ExceptionModel.OperationNotExist, nameof(FitsConditions), nameof(UserRepository), OperationType.FitsConditions, _reports);
+            Log(ExceptionModel.OperationNotExist, nameof(FitsConditions), nameof(UserRepository<TUser>), OperationType.FitsConditions, _reports);
             return false;
         }
 
         return true;
     }
 
-    public IEnumerable<User> All
+    public IEnumerable<TUser> All
     {
         get
         {
-            Log(ExceptionModel.Successfully, nameof(All), nameof(UserRepository), OperationType.All, _reports);
+            Log(ExceptionModel.Successfully, nameof(All), nameof(UserRepository<TUser>), OperationType.All, _reports);
             return _applicationContext.Users.AsNoTracking();
         }
     }
 
-    public User? Get(Expression<Func<User, bool>> predicate)
+    public TUser? Get(Expression<Func<TUser, bool>> predicate)
     {
         var user = _applicationContext.Users.AsNoTracking().FirstOrDefault(predicate);
         if (user is null)
         {
-            Log(ExceptionModel.VariableIsNull, nameof(Get), nameof(UserRepository), OperationType.Read, _reports);
+            Log(ExceptionModel.VariableIsNull, nameof(Get), nameof(UserRepository<TUser>), OperationType.Read, _reports);
             return user;
         }
         user.Card = _cardRepository.Get(x => x.UserID == user.ID);
         if (user.Card is null)
         {
-            Log(ExceptionModel.VariableIsNull, nameof(Get), nameof(UserRepository), OperationType.Read, _reports);
+            Log(ExceptionModel.VariableIsNull, nameof(Get), nameof(UserRepository<TUser>), OperationType.Read, _reports);
             return user;
         }
         user.Card.BankAccount = _bankAccountRepository.Get(x => x.UserID == user.ID);
         if (user.Card.BankAccount is null)
         {
-            Log(ExceptionModel.VariableIsNull, nameof(Get), nameof(UserRepository), OperationType.Read, _reports);
+            Log(ExceptionModel.VariableIsNull, nameof(Get), nameof(UserRepository<TUser>), OperationType.Read, _reports);
             return user;
         }
         user.Card.BankAccount.Bank = _bankRepository.Get(x => x.BankAccounts.Contains(user.Card.BankAccount));
         if (user.Card.BankAccount.Bank is null)
         {
-            Log(ExceptionModel.VariableIsNull, nameof(Get), nameof(UserRepository), OperationType.Read, _reports);
+            Log(ExceptionModel.VariableIsNull, nameof(Get), nameof(UserRepository<TUser>), OperationType.Read, _reports);
             return user;
         }
         
-        Log(ExceptionModel.Successfully, nameof(Get), nameof(UserRepository), OperationType.Read, _reports);
+        Log(ExceptionModel.Successfully, nameof(Get), nameof(UserRepository<TUser>), OperationType.Read, _reports);
         return user;
     }
     
-    public ExceptionModel Update(User item)
+    public ExceptionModel Update(TUser item)
     {
         if (!FitsConditions(item))
         {
-            Log(ExceptionModel.OperationFailed, nameof(Update), nameof(UserRepository), OperationType.Update, _reports);
+            Log(ExceptionModel.OperationFailed, nameof(Update), nameof(UserRepository<TUser>), OperationType.Update, _reports);
             return ExceptionModel.OperationFailed;
         }
         using var userUpdateTransaction = _applicationContext.Database.BeginTransaction(IsolationLevel.RepeatableRead);
@@ -238,7 +238,7 @@ public sealed class UserRepository : LoggerExecutor<OperationType>, IRepository<
         if (bankAccountDeletionOperation != ExceptionModel.Successfully)
         {
             userUpdateTransaction.Rollback();
-            Log(bankAccountDeletionOperation, nameof(Update), nameof(UserRepository), OperationType.Update, _reports);
+            Log(bankAccountDeletionOperation, nameof(Update), nameof(UserRepository<TUser>), OperationType.Update, _reports);
             return bankAccountDeletionOperation;
         }
             
@@ -256,7 +256,7 @@ public sealed class UserRepository : LoggerExecutor<OperationType>, IRepository<
         }
 
         userUpdateTransaction.Commit();
-        Log(ExceptionModel.Successfully, nameof(Update), nameof(UserRepository), OperationType.Update, _reports);
+        Log(ExceptionModel.Successfully, nameof(Update), nameof(UserRepository<TUser>), OperationType.Update, _reports);
         return ExceptionModel.Successfully;
     }
 

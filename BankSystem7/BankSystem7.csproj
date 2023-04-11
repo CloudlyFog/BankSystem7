@@ -5,7 +5,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <PackageVersion>0.3.4-beta</PackageVersion>
+        <PackageVersion>0.3.5-beta</PackageVersion>
         <Authors>CloudlyFog</Authors>
         <Copyright>Copyright (c) CloudlyFog 2023</Copyright>
         <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -35,6 +35,10 @@
       <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0-preview.2" />
       <PackageReference Include="System.Data.HashFunction.Interfaces" Version="2.0.0" />
       <PackageReference Include="System.Data.HashFunction.Jenkins" Version="2.0.0" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <Folder Include="Migrations" />
     </ItemGroup>
 
 </Project>

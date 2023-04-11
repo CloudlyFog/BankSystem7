@@ -1,14 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
-using System.Data;
 using BankSystem7.Models;
 using BankSystem7.Services;
 using BankSystem7.Services.Configuration;
-using BankSystem7.Services.Repositories;
 
 namespace BankSystem7.AppContext
 {
-    internal sealed class BankContext : DbContext
+    internal sealed class BankContext<TUser> : DbContext where TUser : User
     {
         private readonly OperationService<Operation> _operationService;
 
@@ -19,11 +17,11 @@ namespace BankSystem7.AppContext
         }
         public BankContext(string connection)
         {
-            ServiceConfiguration.SetConnection(connection);
-            _operationService = new OperationService<Operation>(ServiceConfiguration.Options.LoggerOptions?.OperationServiceOptions?.DatabaseName ?? "CabManagementSystemReborn");
+            ServiceConfiguration<TUser>.SetConnection(connection);
+            _operationService = new OperationService<Operation>(ServiceConfiguration<TUser>.Options.LoggerOptions?.OperationServiceOptions?.DatabaseName ?? "CabManagementSystemReborn");
             DatabaseHandle();
         }
-        public DbSet<User> Users { get; set; } = null!;
+        public DbSet<TUser> Users { get; set; } = null!;
         public DbSet<Bank> Banks { get; set; } = null!;
         public DbSet<BankAccount> BankAccounts { get; set; } = null!;
         public DbSet<Card> Cards { get; set; } = null!;
@@ -31,7 +29,7 @@ namespace BankSystem7.AppContext
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.EnableSensitiveDataLogging();
-            optionsBuilder.UseSqlServer(ServiceConfiguration.Connection);
+            optionsBuilder.UseSqlServer(ServiceConfiguration<TUser>.Connection);
         }
         
         /// <summary>
@@ -39,10 +37,13 @@ namespace BankSystem7.AppContext
         /// </summary>
         private void DatabaseHandle()
         {
-            if (BankServicesOptions.EnsureDeleted)
+            if (BankServicesOptions<TUser>.Ensured)
+                return;
+            if (BankServicesOptions<TUser>.EnsureDeleted)
                 Database.EnsureDeleted();
-            if (BankServicesOptions.EnsureCreated)
+            if (BankServicesOptions<TUser>.EnsureCreated)
                 Database.EnsureCreated();
+            BankServicesOptions<TUser>.Ensured = true;
         }
 
         /// <summary>

@@ -1,4 +1,5 @@
-﻿using BankSystem7.Services;
+﻿using BankSystem7.Models;
+using BankSystem7.Services;
 using BankSystem7.Services.Configuration;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -10,7 +11,7 @@ namespace BankSystem7.Middleware;
 /// before using this class as middleware define <see cref="DbLoggerCategory.Database.Connection"/>
 /// default value for <see cref="DbLoggerCategory.Database.Connection"/> is connection to database
 /// </summary>
-public sealed class ServiceConfigurationMiddleware : ServiceConfiguration, IDisposable
+public sealed class ServiceConfigurationMiddleware<TUser> : ServiceConfiguration<TUser>, IDisposable where TUser : User
 {
     private readonly RequestDelegate _next;
 

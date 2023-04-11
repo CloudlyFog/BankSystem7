@@ -6,28 +6,28 @@ using BankSystem7.Models;
 
 namespace BankSystem7.Services.Repositories;
 
-public sealed class BankRepository : IRepository<Bank>
+public sealed class BankRepository<TUser> : IRepository<Bank> where TUser : User
 {
-    private BankContext _bankContext;
-    private ApplicationContext _applicationContext;
-    internal BankContext? BankContext { get; set; }
+    private BankContext<TUser> _bankContext;
+    private ApplicationContext<TUser> _applicationContext;
+    internal BankContext<TUser>? BankContext { get; set; }
     internal bool AnotherBankTransactionOperation { get; set; }
 
     private bool _disposedValue;
     public BankRepository()
     {
-        _bankContext = BankServicesOptions.BankContext ?? new BankContext();
+        _bankContext = BankServicesOptions<TUser>.BankContext ?? new BankContext<TUser>();
         BankContext = _bankContext;
-        _applicationContext = BankServicesOptions.ApplicationContext ??
-                              new ApplicationContext(BankServicesOptions.Connection);
+        _applicationContext = BankServicesOptions<TUser>.ApplicationContext ??
+                              new ApplicationContext<TUser>(BankServicesOptions<TUser>.Connection);
     }
 
     public BankRepository(string connection)
     {
-        _bankContext = BankServicesOptions.BankContext ?? new BankContext(connection);
+        _bankContext = BankServicesOptions<TUser>.BankContext ?? new BankContext<TUser>(connection);
         BankContext = _bankContext;
-        _applicationContext = BankServicesOptions.ApplicationContext ??
-                              new ApplicationContext(connection);
+        _applicationContext = BankServicesOptions<TUser>.ApplicationContext ??
+                              new ApplicationContext<TUser>(connection);
     }
     public void Dispose()
     {

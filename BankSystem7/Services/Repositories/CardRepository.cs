@@ -6,29 +6,29 @@ using BankSystem7.Services.Interfaces;
 
 namespace BankSystem7.Services.Repositories;
 
-public sealed class CardRepository : IRepository<Card>
+public sealed class CardRepository<TUser> : IRepository<Card> where TUser : User
 {
-    private BankAccountRepository _bankAccountRepository;
-    private ApplicationContext _applicationContext;
+    private BankAccountRepository<TUser> _bankAccountRepository;
+    private ApplicationContext<TUser> _applicationContext;
     private bool _disposedValue;
 
     public CardRepository()
     {
-        _bankAccountRepository = new BankAccountRepository(BankServicesOptions.Connection);
-        _applicationContext = BankServicesOptions.ApplicationContext ??
-                              new ApplicationContext(BankServicesOptions.Connection);
+        _bankAccountRepository = new BankAccountRepository<TUser>(BankServicesOptions<TUser>.Connection);
+        _applicationContext = BankServicesOptions<TUser>.ApplicationContext ??
+                              new ApplicationContext<TUser>(BankServicesOptions<TUser>.Connection);
     }
-    public CardRepository(BankAccountRepository bankAccountRepository)
+    public CardRepository(BankAccountRepository<TUser> bankAccountRepository)
     {
         _bankAccountRepository = bankAccountRepository;
-        _applicationContext = BankServicesOptions.ApplicationContext ??
-                              new ApplicationContext(bankAccountRepository);
+        _applicationContext = BankServicesOptions<TUser>.ApplicationContext ??
+                              new ApplicationContext<TUser>(bankAccountRepository);
     }
     public CardRepository(string connection)
     {
-        _bankAccountRepository = new BankAccountRepository(connection);
-        _applicationContext = BankServicesOptions.ApplicationContext ??
-                              new ApplicationContext(connection);
+        _bankAccountRepository = new BankAccountRepository<TUser>(connection);
+        _applicationContext = BankServicesOptions<TUser>.ApplicationContext ??
+                              new ApplicationContext<TUser>(connection);
     }
 
     // Public implementation of Dispose pattern callable by consumers.

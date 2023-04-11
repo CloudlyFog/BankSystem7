@@ -4,7 +4,7 @@ using BankSystem7.Services.Repositories;
 
 namespace BankSystem7.Services;
 
-public sealed class Logger : ILogger
+public sealed class Logger<TUser> : ILogger where TUser : User
 {
     private readonly LoggerRepository _loggerRepository;
     private readonly ILogger _logger;
@@ -24,13 +24,13 @@ public sealed class Logger : ILogger
     {
         _logger = logger;
         IsReused = true;
-        _loggerRepository = BankServicesOptions.ServiceConfiguration?.LoggerRepository ?? new LoggerRepository(logger.LoggerOptions);
+        _loggerRepository = BankServicesOptions<TUser>.ServiceConfiguration?.LoggerRepository ?? new LoggerRepository(logger.LoggerOptions);
     }
 
     public Logger(LoggerOptions options)
     {
         LoggerOptions = options;
-        _loggerRepository = BankServicesOptions.ServiceConfiguration?.LoggerRepository ?? new LoggerRepository(options);
+        _loggerRepository = BankServicesOptions<TUser>.ServiceConfiguration?.LoggerRepository ?? new LoggerRepository(options);
     }
 
     public Logger(LoggerRepository loggerRepository, LoggerOptions options)

@@ -7,37 +7,37 @@ using BankSystem7.Services.Interfaces;
 
 namespace BankSystem7.Services.Repositories;
 
-public sealed class BankAccountRepository : IRepository<BankAccount>
+public sealed class BankAccountRepository<TUser> : IRepository<BankAccount> where TUser : User
 {
-    private BankRepository _bankRepository;
-    private BankContext _bankContext;
-    private ApplicationContext _applicationContext;
+    private BankRepository<TUser> _bankRepository;
+    private BankContext<TUser> _bankContext;
+    private ApplicationContext<TUser> _applicationContext;
     private bool _disposedValue;
     private const string ConnectionString = @"Server=localhost\\SQLEXPRESS;Data Source=maxim;Initial Catalog=Test;Integrated Security=True;Persist Security Info=False;Pooling=False;MultipleActiveResultSets=False;Encrypt=False;TrustServerCertificate=False";
 
     public BankAccountRepository()
     {
+        _applicationContext = BankServicesOptions<TUser>.ApplicationContext ??
+                              new ApplicationContext<TUser>(BankServicesOptions<TUser>.Connection);
         _bankContext = _bankRepository.BankContext;
-        _applicationContext = BankServicesOptions.ApplicationContext ??
-                              new ApplicationContext(BankServicesOptions.Connection);
         SetBankServicesOptions();
-        _bankRepository = new BankRepository(ConnectionString);
+        _bankRepository = new BankRepository<TUser>(ConnectionString);
     }
-    public BankAccountRepository(BankRepository bankRepository)
+    public BankAccountRepository(BankRepository<TUser> bankRepository)
     {
         _bankRepository = bankRepository;
+        _applicationContext = BankServicesOptions<TUser>.ApplicationContext ??
+                              new ApplicationContext<TUser>(BankServicesOptions<TUser>.Connection);
         _bankContext = _bankRepository.BankContext;
-        _applicationContext = BankServicesOptions.ApplicationContext ??
-                              new ApplicationContext(BankServicesOptions.Connection);
         SetBankServicesOptions();
     }
     public BankAccountRepository(string connection)
     {
-        _bankContext = BankServicesOptions.BankContext ?? new BankContext(connection);
-        _applicationContext = BankServicesOptions.ApplicationContext ??
-                              new ApplicationContext(connection);
+        _applicationContext = BankServicesOptions<TUser>.ApplicationContext ??
+                              new ApplicationContext<TUser>(connection);
+        _bankContext = BankServicesOptions<TUser>.BankContext ?? new BankContext<TUser>(connection);
         SetBankServicesOptions();
-        _bankRepository = BankServicesOptions.ServiceConfiguration?.BankRepository ?? new BankRepository(connection);
+        _bankRepository = BankServicesOptions<TUser>.ServiceConfiguration?.BankRepository ?? new BankRepository<TUser>(connection);
     }
 
     // Public implementation of Dispose pattern callable by consumers.
@@ -259,7 +259,7 @@ public sealed class BankAccountRepository : IRepository<BankAccount>
         return item is not null && Exist(x => x.ID == item.ID) && item.Bank is not null;
     }
 
-    public ExceptionModel Update(BankAccount item, User user, Card card)
+    public ExceptionModel Update(BankAccount item, TUser user, Card card)
     {
         if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;
@@ -299,8 +299,8 @@ public sealed class BankAccountRepository : IRepository<BankAccount>
 
     private void SetBankServicesOptions()
     {
-        BankServicesOptions.BankContext = _bankContext;
-        BankServicesOptions.ApplicationContext = _applicationContext;
+        BankServicesOptions<TUser>.BankContext = _bankContext;
+        BankServicesOptions<TUser>.ApplicationContext = _applicationContext;
     }
 
     ~BankAccountRepository()
