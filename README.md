@@ -5,20 +5,8 @@ It also let everybody to use bank system in its projects and change logic for yo
 
 **It's a beta version of library. Some exceptions can be weren't found.**
 
-### Updates in version 0.3.4-beta
-- Added clearing tracker in method Create in BankRepository.cs for avoid exceptions with tracking the same entities.
-- Added class LoggerOptions. Added property of LoggerOptions to ConfigurationOptions.cs.
-- Added Logging. Implemented interface ILogger.cs in class Logger.cs.
-- Added repository LoggerRepository.cs for handling logs.
-- Added repository OperationRepository for handling operation entities in the database.
-- Added logger in the UserRepository.
-- Added new model for logging - Report.cs.
-- Added interaction with logger services via properties in ServiceConfiguration.cs.
-- Updated logic of user creation to avoid exceptions with needlessness creating of dependent entities.
-- Updated accrual and withdraw operations. Changes consists in updating card model of user during accrual/withdraw operation.
-- Removed field IssueCreditDate from parameters of instance maker of class Credit.
-- Added fields in ConfigurationOptions for setting options for logger and operation service.
-- Removed ability of set any repository value outside creation instance of ServiceConfiguration.
+### Updates in version 0.3.5-beta
+- Added possibility use own models in repositories.
 ****
 # Documentation
 
@@ -31,6 +19,8 @@ It also let everybody to use bank system in its projects and change logic for yo
 5. Folder **Repositories** is folder with all business logic of project. Only there simple developer has access.
 
 ## How to interact with library?
+The library provides ways to pass and use own models. For example, You can inherite Your class from base class User and pass it as type to initialized instance of `ServiceConfiguration` or `ServiceConfigurationMiddleware`
+and use own model.
 Developer can interact with library by following next steps:
 1. create instance of class `ServiceConfiguration` and pass as parameters class `ConfigurationOptions` with own settings. (or do the same steps but instead of create instance of `ServiceConfiguration`, use middleware `ServiceConfigurationMiddleware`)
 2. interact with repositories throughout public properties of instanced class `ServiceConfiguration`

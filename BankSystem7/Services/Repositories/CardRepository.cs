@@ -6,29 +6,34 @@ using BankSystem7.Services.Interfaces;
 
 namespace BankSystem7.Services.Repositories;
 
-public sealed class CardRepository<TUser> : IRepository<Card> where TUser : User
+public sealed class CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> : IRepository<TCard>
+    where TUser : User 
+    where TCard : Card 
+    where TBankAccount : BankAccount
+    where TBank : Bank
+    where TCredit : Credit
 {
-    private BankAccountRepository<TUser> _bankAccountRepository;
-    private ApplicationContext<TUser> _applicationContext;
+    private BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit> _bankAccountRepository;
+    private ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit> _applicationContext;
     private bool _disposedValue;
 
     public CardRepository()
     {
-        _bankAccountRepository = new BankAccountRepository<TUser>(BankServicesOptions<TUser>.Connection);
-        _applicationContext = BankServicesOptions<TUser>.ApplicationContext ??
-                              new ApplicationContext<TUser>(BankServicesOptions<TUser>.Connection);
+        _bankAccountRepository = new BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit>(BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.Connection);
+        _applicationContext = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ApplicationContext ??
+                              new ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>(BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.Connection);
     }
-    public CardRepository(BankAccountRepository<TUser> bankAccountRepository)
+    public CardRepository(BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit> bankAccountRepository)
     {
         _bankAccountRepository = bankAccountRepository;
-        _applicationContext = BankServicesOptions<TUser>.ApplicationContext ??
-                              new ApplicationContext<TUser>(bankAccountRepository);
+        _applicationContext = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ApplicationContext ??
+                              new ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>(bankAccountRepository);
     }
     public CardRepository(string connection)
     {
-        _bankAccountRepository = new BankAccountRepository<TUser>(connection);
-        _applicationContext = BankServicesOptions<TUser>.ApplicationContext ??
-                              new ApplicationContext<TUser>(connection);
+        _bankAccountRepository = new BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit>(connection);
+        _applicationContext = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ApplicationContext ??
+                              new ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>(connection);
     }
 
     // Public implementation of Dispose pattern callable by consumers.
@@ -52,7 +57,7 @@ public sealed class CardRepository<TUser> : IRepository<Card> where TUser : User
         _disposedValue = true;
     }
 
-    public ExceptionModel Update(Card item)
+    public ExceptionModel Update(TCard item)
     {
         if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;
@@ -67,7 +72,7 @@ public sealed class CardRepository<TUser> : IRepository<Card> where TUser : User
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public ExceptionModel Create(Card item)
+    public ExceptionModel Create(TCard item)
     {
         if (item.Exception == Warning.AgeRestricted)
             return ExceptionModel.OperationRestricted;
@@ -78,7 +83,7 @@ public sealed class CardRepository<TUser> : IRepository<Card> where TUser : User
         return ExceptionModel.Successfully;
     }
 
-    public ExceptionModel Delete(Card item)
+    public ExceptionModel Delete(TCard item)
     {
         if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;
@@ -87,15 +92,15 @@ public sealed class CardRepository<TUser> : IRepository<Card> where TUser : User
         return ExceptionModel.Successfully;
     }
 
-    public bool Exist(Expression<Func<Card, bool>> predicate) => _applicationContext.Cards.AsNoTracking().Any(predicate);
-    public bool FitsConditions(Card? item)
+    public bool Exist(Expression<Func<TCard, bool>> predicate) => _applicationContext.Cards.AsNoTracking().Any(predicate);
+    public bool FitsConditions(TCard? item)
     {
         return item is not null && Exist(x => x.ID == item.ID);
     }
 
-    public Card? Get(Expression<Func<Card, bool>> predicate) => _applicationContext.Cards.AsNoTracking().FirstOrDefault(predicate);
+    public TCard? Get(Expression<Func<TCard, bool>> predicate) => _applicationContext.Cards.AsNoTracking().FirstOrDefault(predicate);
 
-    public IEnumerable<Card> All => _applicationContext.Cards.AsNoTracking();
+    public IEnumerable<TCard> All => _applicationContext.Cards.AsNoTracking();
     public void ChangeTrackerCardContext() => _applicationContext.ChangeTracker.Clear();
 
     ~CardRepository()

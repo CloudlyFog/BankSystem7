@@ -6,15 +6,20 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BankSystem7.AppContext;
 
-public class ApplicationContext<TUser> : DbContext where TUser : User
+public class ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit> : DbContext 
+    where TUser : User 
+    where TCard : Card 
+    where TBankAccount : BankAccount
+    where TBank : Bank
+    where TCredit : Credit
 {
     public static bool EnsureCreated { get; set; } = true;
     public static bool EnsureDeleted { get; set; }
     protected internal DbSet<TUser> Users { get; set; } = null!;
-    protected internal DbSet<BankAccount> BankAccounts { get; set; } = null!;
-    protected internal DbSet<Bank> Banks { get; set; } = null!;
-    protected internal DbSet<Card> Cards { get; set; } = null!;
-    protected internal DbSet<Credit> Credits { get; set; } = null!;
+    protected internal DbSet<TCard> Cards { get; set; } = null!;
+    protected internal DbSet<TBankAccount> BankAccounts { get; set; } = null!;
+    protected internal DbSet<TBank> Banks { get; set; } = null!;
+    protected internal DbSet<TCredit> Credits { get; set; } = null!;
     
     public ApplicationContext()
     {
@@ -23,11 +28,11 @@ public class ApplicationContext<TUser> : DbContext where TUser : User
 
     public ApplicationContext(string connection)
     {
-        ServiceConfiguration<TUser>.SetConnection(connection);
+        ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>.SetConnection(connection);
         DatabaseHandle();
     }
 
-    public ApplicationContext(BankAccountRepository<TUser> bankAccountRepository)
+    public ApplicationContext(BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit> bankAccountRepository)
     {
         DatabaseHandle();
     }
@@ -35,7 +40,7 @@ public class ApplicationContext<TUser> : DbContext where TUser : User
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.EnableSensitiveDataLogging();
-        optionsBuilder.UseSqlServer(ServiceConfiguration<TUser>.Connection);
+        optionsBuilder.UseSqlServer(ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>.Connection);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -50,13 +55,13 @@ public class ApplicationContext<TUser> : DbContext where TUser : User
     /// </summary>
     private void DatabaseHandle()
     {
-        if (BankServicesOptions<TUser>.Ensured)
+        if (BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.Ensured)
             return;
         if (EnsureDeleted)
             Database.EnsureDeleted();
         if (EnsureCreated)
             Database.EnsureCreated();
-        BankServicesOptions<TUser>.Ensured = true;
+        BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.Ensured = true;
     }
     
     internal ExceptionModel AvoidDuplication(Bank item)

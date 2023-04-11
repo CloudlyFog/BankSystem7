@@ -6,7 +6,12 @@ using BankSystem7.Services.Configuration;
 
 namespace BankSystem7.AppContext
 {
-    internal sealed class BankContext<TUser> : DbContext where TUser : User
+    internal sealed class BankContext<TUser, TCard, TBankAccount, TBank, TCredit> : DbContext 
+        where TUser : User 
+        where TCard : Card 
+        where TBankAccount : BankAccount
+        where TBank : Bank
+        where TCredit : Credit
     {
         private readonly OperationService<Operation> _operationService;
 
@@ -17,8 +22,8 @@ namespace BankSystem7.AppContext
         }
         public BankContext(string connection)
         {
-            ServiceConfiguration<TUser>.SetConnection(connection);
-            _operationService = new OperationService<Operation>(ServiceConfiguration<TUser>.Options.LoggerOptions?.OperationServiceOptions?.DatabaseName ?? "CabManagementSystemReborn");
+            ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>.SetConnection(connection);
+            _operationService = new OperationService<Operation>(ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>.Options.LoggerOptions?.OperationServiceOptions?.DatabaseName ?? "CabManagementSystemReborn");
             DatabaseHandle();
         }
         public DbSet<TUser> Users { get; set; } = null!;
@@ -29,7 +34,7 @@ namespace BankSystem7.AppContext
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.EnableSensitiveDataLogging();
-            optionsBuilder.UseSqlServer(ServiceConfiguration<TUser>.Connection);
+            optionsBuilder.UseSqlServer(ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>.Connection);
         }
         
         /// <summary>
@@ -37,13 +42,13 @@ namespace BankSystem7.AppContext
         /// </summary>
         private void DatabaseHandle()
         {
-            if (BankServicesOptions<TUser>.Ensured)
+            if (BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.Ensured)
                 return;
-            if (BankServicesOptions<TUser>.EnsureDeleted)
+            if (BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.EnsureDeleted)
                 Database.EnsureDeleted();
-            if (BankServicesOptions<TUser>.EnsureCreated)
+            if (BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.EnsureCreated)
                 Database.EnsureCreated();
-            BankServicesOptions<TUser>.Ensured = true;
+            BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.Ensured = true;
         }
 
         /// <summary>

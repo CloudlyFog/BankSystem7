@@ -6,28 +6,34 @@ using BankSystem7.Models;
 
 namespace BankSystem7.Services.Repositories;
 
-public sealed class BankRepository<TUser> : IRepository<Bank> where TUser : User
+public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> : IRepository<TBank>
+    where TUser : User 
+    where TCard : Card 
+    where TBankAccount : BankAccount
+    where TBank : Bank
+    where TCredit : Credit
 {
-    private BankContext<TUser> _bankContext;
-    private ApplicationContext<TUser> _applicationContext;
-    internal BankContext<TUser>? BankContext { get; set; }
+    private BankContext<TUser, TCard, TBankAccount, TBank, TCredit> _bankContext;
+    private ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit> _applicationContext;
+    internal BankContext<TUser, TCard, TBankAccount, TBank, TCredit>? BankContext { get; set; }
     internal bool AnotherBankTransactionOperation { get; set; }
 
     private bool _disposedValue;
     public BankRepository()
     {
-        _bankContext = BankServicesOptions<TUser>.BankContext ?? new BankContext<TUser>();
+        _bankContext = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.BankContext ?? new BankContext<TUser, TCard, TBankAccount, TBank, TCredit>();
         BankContext = _bankContext;
-        _applicationContext = BankServicesOptions<TUser>.ApplicationContext ??
-                              new ApplicationContext<TUser>(BankServicesOptions<TUser>.Connection);
+        _applicationContext = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ApplicationContext ??
+                              new ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>
+                                  (BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.Connection);
     }
 
     public BankRepository(string connection)
     {
-        _bankContext = BankServicesOptions<TUser>.BankContext ?? new BankContext<TUser>(connection);
+        _bankContext = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.BankContext ?? new BankContext<TUser, TCard, TBankAccount, TBank, TCredit>(connection);
         BankContext = _bankContext;
-        _applicationContext = BankServicesOptions<TUser>.ApplicationContext ??
-                              new ApplicationContext<TUser>(connection);
+        _applicationContext = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ApplicationContext ??
+                              new ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>(connection);
     }
     public void Dispose()
     {
@@ -56,56 +62,14 @@ public sealed class BankRepository<TUser> : IRepository<Bank> where TUser : User
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
         _disposedValue = true;
     }
-
-    /// <summary>
-    /// asynchronously accrual money to user bank account from bank's account
-    /// </summary>
-    /// <param name="bankAccount"></param>
-    /// <param name="bank"></param>
-    /// <param name="operation"></param>
-    /// <exception cref="Exception"></exception>
-    
-    [Obsolete("Don't use this method. Instead use the same method but with another parameters: BankAccountAccrual(User user, Operation operation)")]
-    public ExceptionModel BankAccountAccrual(BankAccount bankAccount, Bank bank, Operation operation)
-    {
-        if (bankAccount is null || bank is null || !Exist(x => x.ID == bank.ID))
-            return ExceptionModel.VariableIsNull;
-        if (operation.OperationStatus != StatusOperationCode.Successfully)
-            return (ExceptionModel)operation.OperationStatus.GetHashCode();
-
-        var user = _applicationContext.Users.FirstOrDefault(x => x.ID == bankAccount.UserID);
-        user.Card = _applicationContext.Cards.FirstOrDefault(x => x.UserID == user.ID);
-            
-        if (user is null)
-            return ExceptionModel.VariableIsNull;
-
-        bank.AccountAmount -= operation.TransferAmount;
-        bankAccount.BankAccountAmount += operation.TransferAmount;
-        user.Card.Amount = bankAccount.BankAccountAmount;
-        _applicationContext.ChangeTracker.Clear();
-        _applicationContext.BankAccounts.Update(bankAccount);
-        _applicationContext.Banks.Update(bank);
-        _applicationContext.Users.Update(user);
-        _applicationContext.Cards.Update(user.Card);
-        try
-        {
-            _applicationContext.SaveChanges();
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
-        return ExceptionModel.Successfully;
-    }
         
     /// <summary>
-    /// asynchronously accrual money to user bank account from bank's account
+    /// accrual money to user bank account from bank's account
     /// </summary>
     /// <param name="user">where will accrued money</param>
     /// <param name="operation">data of ongoing operation</param>
     /// <exception cref="Exception"></exception>
-    public ExceptionModel BankAccountAccrual(User user, Operation operation)
+    public ExceptionModel BankAccountAccrual(TUser user, Operation operation)
     {
         if (user?.Card?.BankAccount?.Bank is null || !Exist(x => x.ID == user.Card.BankAccount.Bank.ID))
             return ExceptionModel.VariableIsNull;
@@ -135,54 +99,12 @@ public sealed class BankRepository<TUser> : IRepository<Bank> where TUser : User
     }
     
     /// <summary>
-    /// asynchronously withdraw money from user bank account and accrual to bank's account
-    /// </summary>
-    /// <param name="bankAccount"></param>
-    /// <param name="bank"></param>
-    /// <param name="operation"></param>
-    /// <exception cref="Exception"></exception>
-    [Obsolete("Don't use this method. Instead use the same method but with another parameters: BankAccountWithdraw(User user, Operation operation)")]
-    public ExceptionModel BankAccountWithdraw(BankAccount bankAccount, Bank bank, Operation operation)
-    {
-        if (bankAccount is null || bank is null)
-            return ExceptionModel.VariableIsNull;
-        if (operation.OperationStatus != StatusOperationCode.Successfully)
-            return (ExceptionModel)operation.OperationStatus.GetHashCode();
-
-            
-        var user = _applicationContext.Users.FirstOrDefault(x => x.ID == bankAccount.UserID);
-        user.Card = _applicationContext.Cards.FirstOrDefault(x => x.UserID == user.ID);
-            
-        if (user is null)
-            return ExceptionModel.VariableIsNull;
-
-        bank.AccountAmount += operation.TransferAmount;
-        bankAccount.BankAccountAmount -= operation.TransferAmount;
-        user.Card.Amount = bankAccount.BankAccountAmount;
-        _applicationContext.ChangeTracker.Clear();
-        _applicationContext.BankAccounts.Update(bankAccount); 
-        _applicationContext.Banks.Update(bank);
-        _applicationContext.Users.Update(user);
-        _applicationContext.Cards.Update(user.Card);
-        try
-        {
-            _applicationContext.SaveChanges();
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
-        return ExceptionModel.Successfully;
-    }
-    
-    /// <summary>
-    /// asynchronously withdraw money from user bank account and accrual to bank's account
+    /// withdraw money from user bank account and accrual to bank's account
     /// </summary>
     /// <param name="user">where will accrued money</param>
     /// <param name="operation">data of ongoing operation</param>
     /// <exception cref="Exception"></exception>
-    public ExceptionModel BankAccountWithdraw(User user, Operation operation)
+    public ExceptionModel BankAccountWithdraw(TUser user, Operation operation)
     {
         if (user?.Card?.BankAccount?.Bank is null || !Exist(x => x.ID == user.Card.BankAccount.Bank.ID))
             return ExceptionModel.VariableIsNull;
@@ -207,7 +129,7 @@ public sealed class BankRepository<TUser> : IRepository<Bank> where TUser : User
         }
         return ExceptionModel.Successfully;
     }
-    public ExceptionModel Create(Bank item)
+    public ExceptionModel Create(TBank item)
     {
         if (item is null)
             return ExceptionModel.VariableIsNull;
@@ -222,7 +144,7 @@ public sealed class BankRepository<TUser> : IRepository<Bank> where TUser : User
         return ExceptionModel.Successfully;
     }
 
-    public ExceptionModel Delete(Bank item)
+    public ExceptionModel Delete(TBank item)
     {
         if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;
@@ -232,17 +154,17 @@ public sealed class BankRepository<TUser> : IRepository<Bank> where TUser : User
         return ExceptionModel.Successfully;
     }
 
-    public bool Exist(Expression<Func<Bank, bool>> predicate) => _applicationContext.Banks.AsNoTracking().Any(predicate);
-    public bool FitsConditions(Bank? item)
+    public bool Exist(Expression<Func<TBank, bool>> predicate) => _applicationContext.Banks.AsNoTracking().Any(predicate);
+    public bool FitsConditions(TBank? item)
     {
         return item is not null && Exist(x => x.ID == item.ID);
     }
 
-    public IEnumerable<Bank> All => _applicationContext.Banks.AsNoTracking();
+    public IEnumerable<TBank> All => _applicationContext.Banks.AsNoTracking();
 
-    public Bank? Get(Expression<Func<Bank, bool>> predicate) => _applicationContext.Banks.AsNoTracking().FirstOrDefault(predicate);
+    public TBank? Get(Expression<Func<TBank, bool>> predicate) => _applicationContext.Banks.AsNoTracking().FirstOrDefault(predicate);
 
-    public ExceptionModel Update(Bank item)
+    public ExceptionModel Update(TBank item)
     {
         if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;

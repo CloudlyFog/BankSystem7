@@ -6,7 +6,12 @@ using Microsoft.AspNetCore.Http;
 
 namespace BankSystem7.Services.Configuration;
 
-public class ServiceConfiguration<TUser> where TUser : User
+public class ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>
+    where TUser : User 
+    where TCard : Card 
+    where TBankAccount : BankAccount
+    where TBank : Bank
+    where TCredit : Credit
 {
     public static string Connection { get; private set; } =
         @"Server=localhost\\SQLEXPRESS;Data Source=maxim;Initial Catalog=Test;
@@ -21,26 +26,26 @@ public class ServiceConfiguration<TUser> where TUser : User
     
     private ServiceConfiguration()
     {
-        BankAccountRepository = new BankAccountRepository<TUser>(Connection);
-        UserRepository = new UserRepository<TUser>(BankAccountRepository);
-        CardRepository = new CardRepository<TUser>(BankAccountRepository);
-        BankRepository = new BankRepository<TUser>(Connection);
-        CreditRepository = new CreditRepository<TUser>(Connection);
+        BankAccountRepository = new BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit>(Connection);
+        UserRepository = new UserRepository<TUser, TCard, TBankAccount, TBank, TCredit>(BankAccountRepository);
+        CardRepository = new CardRepository<TUser, TCard, TBankAccount, TBank, TCredit>(BankAccountRepository);
+        BankRepository = new BankRepository<TUser, TCard, TBankAccount, TBank, TCredit>(Connection);
+        CreditRepository = new CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>(Connection);
         if (Options.LoggerOptions.IsEnabled)
         {
             LoggerRepository = new LoggerRepository(Options.LoggerOptions);
-            Logger = new Logger<TUser>(LoggerRepository, Options.LoggerOptions);
+            Logger = new Logger<TUser, TCard, TBankAccount, TBank, TCredit>(LoggerRepository, Options.LoggerOptions);
         }
-        OperationRepository = new OperationRepository<TUser>(Logger, Options.OperationOptions);
+        OperationRepository = new OperationRepository<TUser, TCard, TBankAccount, TBank, TCredit>(Logger, Options.OperationOptions);
     }
     
-    public BankAccountRepository<TUser>? BankAccountRepository { get; protected internal  set; }
-    public BankRepository<TUser>? BankRepository { get; protected internal set; }
-    public CardRepository<TUser>? CardRepository { get; protected internal set; }
-    public UserRepository<TUser>? UserRepository { get; protected internal set; }
-    public CreditRepository<TUser>? CreditRepository { get; protected internal set; }
+    public BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit>? BankAccountRepository { get; protected internal  set; }
+    public BankRepository<TUser, TCard, TBankAccount, TBank, TCredit>? BankRepository { get; protected internal set; }
+    public CardRepository<TUser, TCard, TBankAccount, TBank, TCredit>? CardRepository { get; protected internal set; }
+    public UserRepository<TUser, TCard, TBankAccount, TBank, TCredit>? UserRepository { get; protected internal set; }
+    public CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>? CreditRepository { get; protected internal set; }
     public LoggerRepository? LoggerRepository { get; protected internal set; }
-    public OperationRepository<TUser>? OperationRepository { get; protected internal set; }
+    public OperationRepository<TUser, TCard, TBankAccount, TBank, TCredit>? OperationRepository { get; protected internal set; }
     public ILogger? Logger { get; protected internal set; }
     public static ConfigurationOptions Options { get; protected internal set; }
 
@@ -54,31 +59,31 @@ public class ServiceConfiguration<TUser> where TUser : User
         if (connection is not null && connection != string.Empty)
         {
             Connection = connection;
-            BankServicesOptions<TUser>.Connection = Connection;
+            BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.Connection = Connection;
             return;
         }
 
         if (databaseName is null || dataSource is null)
         {
-            BankServicesOptions<TUser>.Connection = Connection;
+            BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.Connection = Connection;
             return;
         }
         
         Connection = @$"Server=localhost\\SQLEXPRESS;Data Source={dataSource};Initial Catalog={databaseName};
             Integrated Security=True;Persist Security Info=False;Pooling=False;
             MultipleActiveResultSets=False; Encrypt=False;TrustServerCertificate=False";
-        BankServicesOptions<TUser>.Connection = Connection;
+        BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.Connection = Connection;
     }
 
-    public static ServiceConfiguration<TUser> CreateInstance(ConfigurationOptions options)
+    public static ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit> CreateInstance(ConfigurationOptions options)
     {
         Options = options;
         SetConnection(options.Connection, options.DatabaseName);
-        ApplicationContext<TUser>.EnsureDeleted = BankServicesOptions<TUser>.EnsureDeleted = options.EnsureDeleted;
-        ApplicationContext<TUser>.EnsureCreated = BankServicesOptions<TUser>.EnsureCreated = options.EnsureCreated;
+        ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>.EnsureDeleted = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.EnsureDeleted = options.EnsureDeleted;
+        ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>.EnsureCreated = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.EnsureCreated = options.EnsureCreated;
 
-        BankServicesOptions<TUser>.ServiceConfiguration = new ServiceConfiguration<TUser>();
-        return BankServicesOptions<TUser>.ServiceConfiguration;
+        BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ServiceConfiguration = new ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>();
+        return BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ServiceConfiguration;
     }
 
     private void Dispose(bool disposing)

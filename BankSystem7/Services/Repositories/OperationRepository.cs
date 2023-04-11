@@ -5,7 +5,12 @@ using MongoDB.Driver;
 
 namespace BankSystem7.Services.Repositories;
 
-public class OperationRepository<TUser> : LoggerExecutor<OperationType>, IRepository<Operation> where TUser : User
+public class OperationRepository<TUser, TCard, TBankAccount, TBank, TCredit> : LoggerExecutor<OperationType>, IRepository<Operation>
+    where TUser : User 
+    where TCard : Card 
+    where TBankAccount : BankAccount
+    where TBank : Bank
+    where TCredit : Credit
 {
     private List<GeneralReport<OperationType>> _reports = new();
     private OperationService<Operation> _operationService;
@@ -14,12 +19,12 @@ public class OperationRepository<TUser> : LoggerExecutor<OperationType>, IReposi
     public OperationRepository()
     {
         _operationService = new OperationService<Operation>();
-        _logger = new Logger<TUser>();
+        _logger = new Logger<TUser, TCard, TBankAccount, TBank, TCredit>();
     }
     public OperationRepository(OperationServiceOptions options)
     {
         _operationService = new OperationService<Operation>(options);
-        _logger = new Logger<TUser>(new LoggerOptions
+        _logger = new Logger<TUser, TCard, TBankAccount, TBank, TCredit>(new LoggerOptions
         {
             OperationServiceOptions = options,
         });
@@ -32,7 +37,7 @@ public class OperationRepository<TUser> : LoggerExecutor<OperationType>, IReposi
     public OperationRepository(LoggerRepository loggerRepository, LoggerOptions options)
     {
         _operationService = new OperationService<Operation>(options.OperationServiceOptions);
-        _logger = new Logger<TUser>(loggerRepository, options);
+        _logger = new Logger<TUser, TCard, TBankAccount, TBank, TCredit>(loggerRepository, options);
     }
     public void Dispose()
     {
@@ -45,23 +50,16 @@ public class OperationRepository<TUser> : LoggerExecutor<OperationType>, IReposi
     public ExceptionModel Create(Operation item)
     {
         if (item is null || Exist(x => x.ID == item.ID))
-        {
-            Log(ExceptionModel.OperationFailed, nameof(Create), nameof(OperationRepository<TUser>), OperationType.Create, _reports);
             return ExceptionModel.OperationFailed;
-        }
         _operationService.Collection.InsertOne(item);
         
-        Log(ExceptionModel.Successfully, nameof(Create), nameof(OperationRepository<TUser>), OperationType.Create, _reports);
         return ExceptionModel.Successfully;
     }
 
     public ExceptionModel Update(Operation item)
     {
         if (!FitsConditions(item))
-        {
-            Log(ExceptionModel.OperationFailed, nameof(Update), nameof(OperationRepository<TUser>), OperationType.Update, _reports);
             return ExceptionModel.OperationFailed;
-        }
 
         var filter = Builders<Operation>.Filter
             .Eq(x => x.ID, item.ID);
@@ -69,21 +67,16 @@ public class OperationRepository<TUser> : LoggerExecutor<OperationType>, IReposi
             .Set(x => x, item);
         _operationService.Collection.UpdateOne(filter, update);
         
-        Log(ExceptionModel.Successfully, nameof(Update), nameof(OperationRepository<TUser>), OperationType.Update, _reports);
         return ExceptionModel.Successfully;
     }
 
     public ExceptionModel Delete(Operation item)
     {
         if (!FitsConditions(item))
-        {
-            Log(ExceptionModel.OperationFailed, nameof(Delete), nameof(OperationRepository<TUser>), OperationType.Delete, _reports);
             return ExceptionModel.OperationFailed;
-        }
         var filter = Builders<Operation>.Filter
             .Eq(x => x.ID, item.ID);
         
-        Log(ExceptionModel.Successfully, nameof(Delete), nameof(OperationRepository<TUser>), OperationType.Delete, _reports);
         _operationService.Collection.DeleteOne(filter);
         return ExceptionModel.Successfully;
     }
@@ -96,23 +89,16 @@ public class OperationRepository<TUser> : LoggerExecutor<OperationType>, IReposi
 
     public bool Exist(Expression<Func<Operation, bool>> predicate)
     {
-        Log(ExceptionModel.Successfully, nameof(Exist), nameof(OperationRepository<TUser>), OperationType.Exist, _reports);
         return _operationService.Collection.Find(predicate).Any();
     }
 
     public bool FitsConditions(Operation? item)
     {
         if (item is null)
-        {
-            Log(ExceptionModel.VariableIsNull, nameof(FitsConditions), nameof(OperationRepository<TUser>), OperationType.FitsConditions, _reports);
             return false;
-        }
 
         if (!Exist(x => x.ID == item.ID))
-        {
-            Log(ExceptionModel.OperationNotExist, nameof(FitsConditions), nameof(OperationRepository<TUser>), OperationType.FitsConditions, _reports);
             return false;
-        }
 
         return true;
     }
