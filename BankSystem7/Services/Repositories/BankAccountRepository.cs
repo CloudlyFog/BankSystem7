@@ -82,16 +82,19 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
             
         using var transaction = _bankContext.Database.BeginTransaction(IsolationLevel.RepeatableRead);
         _bankRepository.AnotherBankTransactionOperation = AnotherBankTransactionOperation(from, to);
-        try
+
+        var withdraw = Withdraw(from, transferAmount);
+        if (withdraw != ExceptionModel.Successfully)
         {
-            await Withdraw(from, transferAmount);
-            await Accrual(to, transferAmount);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
             transaction.Rollback();
-            throw;
+            return withdraw;
+        }
+
+        var accrual = Accrual(to, transferAmount);
+        if (accrual != ExceptionModel.Successfully)
+        {
+            transaction.Rollback();
+            return accrual;
         }
         transaction.Commit();
         return ExceptionModel.Successfully;
@@ -103,7 +106,7 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
     /// <param name="item"></param>
     /// <param name="amountAccrual"></param>
     /// <returns>object of <see cref="ExceptionModel"/></returns>
-    private Task Accrual(TUser? item, decimal amountAccrual)
+    private ExceptionModel Accrual(TUser? item, decimal amountAccrual)
     {
         CheckBankAccount(item.Card.BankAccount);
 
@@ -116,13 +119,14 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
             OperationKind = OperationKind.Accrual
         };
         var createOperation = _bankContext.CreateOperation(operation, OperationKind.Accrual);
-            
         if (createOperation != ExceptionModel.Successfully)
-            throw new Exception($"Operation can't create due to exception: {createOperation}");
-            
-        if (_bankRepository.BankAccountAccrual(item, operation) != ExceptionModel.Successfully)
-            throw new Exception($"Failed withdraw money from {item.Card.BankAccount.Bank.BankName}");
-        return Task.CompletedTask;
+            return createOperation;
+
+        var accrualOperation = _bankRepository.BankAccountAccrual(item, operation);
+        if (accrualOperation != ExceptionModel.Successfully)
+            return accrualOperation;
+
+        return ExceptionModel.Successfully;
     }
         
     /// <summary>
@@ -131,10 +135,10 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
     /// <param name="item"></param>
     /// <param name="amountAccrual"></param>
     /// <returns>object of <see cref="ExceptionModel"/></returns>
-    private Task Withdraw(TUser? item, decimal amountAccrual)
+    private ExceptionModel Withdraw(TUser? item, decimal amountAccrual)
     {
         if (item.Card is null)
-            throw new Exception("Passed instance of Card is null.");
+            return ExceptionModel.VariableIsNull;
             
         CheckBankAccount(item.Card.BankAccount);
 
@@ -149,12 +153,12 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
             
         var createOperation = _bankContext.CreateOperation(operation, OperationKind.Withdraw);
         if (createOperation != ExceptionModel.Successfully)
-            throw new Exception($"Operation can't create due to exception: {createOperation}");
+            return createOperation;
             
         var withdraw = _bankRepository.BankAccountWithdraw(item, operation);
         if (withdraw != ExceptionModel.Successfully)
-            throw new Exception($"Failed withdraw money from {item.Card.BankAccount.Bank.BankName}\nException: {withdraw}");
-        return Task.CompletedTask;
+            return withdraw;
+        return ExceptionModel.Successfully;
     }
 
     public ExceptionModel Create(TBankAccount item)
