@@ -7,37 +7,42 @@ using BankSystem7.Services.Interfaces;
 
 namespace BankSystem7.Services.Repositories;
 
-public sealed class BankAccountRepository : IRepository<BankAccount>
+public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit> : IRepository<TBankAccount>
+    where TUser : User 
+    where TCard : Card 
+    where TBankAccount : BankAccount
+    where TBank : Bank
+    where TCredit : Credit
 {
-    private BankRepository _bankRepository;
-    private BankContext _bankContext;
-    private ApplicationContext _applicationContext;
+    private BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> _bankRepository;
+    private BankContext<TUser, TCard, TBankAccount, TBank, TCredit> _bankContext;
+    private ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit> _applicationContext;
     private bool _disposedValue;
     private const string ConnectionString = @"Server=localhost\\SQLEXPRESS;Data Source=maxim;Initial Catalog=Test;Integrated Security=True;Persist Security Info=False;Pooling=False;MultipleActiveResultSets=False;Encrypt=False;TrustServerCertificate=False";
 
     public BankAccountRepository()
     {
+        _applicationContext = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ApplicationContext ??
+                              new ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>(BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.Connection);
         _bankContext = _bankRepository.BankContext;
-        _applicationContext = BankServicesOptions.ApplicationContext ??
-                              new ApplicationContext(BankServicesOptions.Connection);
         SetBankServicesOptions();
-        _bankRepository = new BankRepository(ConnectionString);
+        _bankRepository = new BankRepository<TUser, TCard, TBankAccount, TBank, TCredit>(ConnectionString);
     }
-    public BankAccountRepository(BankRepository bankRepository)
+    public BankAccountRepository(BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> bankRepository)
     {
         _bankRepository = bankRepository;
+        _applicationContext = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ApplicationContext ??
+                              new ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>(BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.Connection);
         _bankContext = _bankRepository.BankContext;
-        _applicationContext = BankServicesOptions.ApplicationContext ??
-                              new ApplicationContext(BankServicesOptions.Connection);
         SetBankServicesOptions();
     }
     public BankAccountRepository(string connection)
     {
-        _bankContext = BankServicesOptions.BankContext ?? new BankContext(connection);
-        _applicationContext = BankServicesOptions.ApplicationContext ??
-                              new ApplicationContext(connection);
+        _applicationContext = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ApplicationContext ??
+                              new ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>(connection);
+        _bankContext = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.BankContext ?? new BankContext<TUser, TCard, TBankAccount, TBank, TCredit>(connection);
         SetBankServicesOptions();
-        _bankRepository = BankServicesOptions.ServiceConfiguration?.BankRepository ?? new BankRepository(connection);
+        _bankRepository = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ServiceConfiguration?.BankRepository ?? new BankRepository<TUser, TCard, TBankAccount, TBank, TCredit>(connection);
     }
 
     // Public implementation of Dispose pattern callable by consumers.
@@ -66,7 +71,7 @@ public sealed class BankAccountRepository : IRepository<BankAccount>
         _disposedValue = true;
     }
 
-    public async Task<ExceptionModel> Transfer(User? from, User? to, decimal transferAmount)
+    public async Task<ExceptionModel> Transfer(TUser? from, TUser? to, decimal transferAmount)
     {
         if (from is null || to is null || from.Card is null || to.Card is null || from.Card.BankAccount is null ||
             to.Card.BankAccount is null || transferAmount <= 0)
@@ -79,8 +84,8 @@ public sealed class BankAccountRepository : IRepository<BankAccount>
         _bankRepository.AnotherBankTransactionOperation = AnotherBankTransactionOperation(from, to);
         try
         {
-            await WithdrawAsync(from, transferAmount);
-            await AccrualAsync(to, transferAmount);
+            await Withdraw(from, transferAmount);
+            await Accrual(to, transferAmount);
         }
         catch (Exception e)
         {
@@ -91,34 +96,6 @@ public sealed class BankAccountRepository : IRepository<BankAccount>
         transaction.Commit();
         return ExceptionModel.Successfully;
     }
-
-    /// <summary>
-    /// asynchronously accrual money on account with the same user id
-    /// </summary>
-    /// <param name="item"></param>
-    /// <param name="amountAccrual"></param>
-    /// <returns>object of <see cref="ExceptionModel"/></returns>
-    private async Task AccrualAsync(BankAccount? item, decimal amountAccrual)
-    {
-        CheckBankAccount(item);
-
-        var operation = new Operation
-        {
-            BankID = item.BankID,
-            SenderID = item.BankID,
-            ReceiverID = item.UserID,
-            TransferAmount = amountAccrual,
-            OperationKind = OperationKind.Accrual
-        };
-        var createOperation = _bankContext.CreateOperation(operation, OperationKind.Accrual);
-            
-        if (createOperation != ExceptionModel.Successfully)
-            throw new Exception($"Operation can't create due to exception: {createOperation}");
-            
-        var bank = _bankRepository.Get(x => x.ID == operation.BankID);
-        if (_bankRepository.BankAccountAccrual(item, bank, operation) != ExceptionModel.Successfully)
-            throw new Exception($"Failed withdraw money from {bank}");
-    }
         
     /// <summary>
     /// asynchronously accrual money on account with the same user id
@@ -126,7 +103,7 @@ public sealed class BankAccountRepository : IRepository<BankAccount>
     /// <param name="item"></param>
     /// <param name="amountAccrual"></param>
     /// <returns>object of <see cref="ExceptionModel"/></returns>
-    private async Task AccrualAsync(User? item, decimal amountAccrual)
+    private Task Accrual(TUser? item, decimal amountAccrual)
     {
         CheckBankAccount(item.Card.BankAccount);
 
@@ -145,35 +122,7 @@ public sealed class BankAccountRepository : IRepository<BankAccount>
             
         if (_bankRepository.BankAccountAccrual(item, operation) != ExceptionModel.Successfully)
             throw new Exception($"Failed withdraw money from {item.Card.BankAccount.Bank.BankName}");
-    }
-
-    /// <summary>
-    /// withdraw money from account with the same user id
-    /// </summary>
-    /// <param name="item"></param>
-    /// <param name="amountAccrual"></param>
-    /// <returns>object of <see cref="ExceptionModel"/></returns>
-    private async Task WithdrawAsync(BankAccount? item, decimal amountAccrual)
-    {
-        CheckBankAccount(item);
-
-        var operation = new Operation
-        {
-            BankID = item.BankID,
-            SenderID = item.UserID,
-            ReceiverID = item.BankID,
-            TransferAmount = amountAccrual,
-            OperationKind = OperationKind.Withdraw
-        };
-            
-        var createOperation = _bankContext.CreateOperation(operation, OperationKind.Withdraw);
-        if (createOperation != ExceptionModel.Successfully)
-            throw new Exception($"Operation can't create due to exception: {createOperation}");
-            
-        var bank = _bankRepository.Get(x => x.ID == operation.BankID);
-        var withdraw = _bankRepository.BankAccountWithdraw(item, bank, operation);
-        if (withdraw != ExceptionModel.Successfully)
-            throw new Exception($"Failed withdraw money from {bank}\nException: {withdraw}");
+        return Task.CompletedTask;
     }
         
     /// <summary>
@@ -182,7 +131,7 @@ public sealed class BankAccountRepository : IRepository<BankAccount>
     /// <param name="item"></param>
     /// <param name="amountAccrual"></param>
     /// <returns>object of <see cref="ExceptionModel"/></returns>
-    private async Task WithdrawAsync(User? item, decimal amountAccrual)
+    private Task Withdraw(TUser? item, decimal amountAccrual)
     {
         if (item.Card is null)
             throw new Exception("Passed instance of Card is null.");
@@ -205,28 +154,28 @@ public sealed class BankAccountRepository : IRepository<BankAccount>
         var withdraw = _bankRepository.BankAccountWithdraw(item, operation);
         if (withdraw != ExceptionModel.Successfully)
             throw new Exception($"Failed withdraw money from {item.Card.BankAccount.Bank.BankName}\nException: {withdraw}");
+        return Task.CompletedTask;
     }
 
-    public ExceptionModel Create(BankAccount item)
+    public ExceptionModel Create(TBankAccount item)
     {
         if (item is null || Exist(x => x.ID == item.ID) || item.Bank is null)
             return ExceptionModel.VariableIsNull;
-        _bankRepository.Update(item.Bank);
         _bankContext.BankAccounts.Add(item);
         _bankContext.SaveChanges();
         return ExceptionModel.Successfully;
     }
 
-    public IEnumerable<BankAccount> All => _applicationContext.BankAccounts.AsNoTracking();
+    public IEnumerable<TBankAccount> All => _applicationContext.BankAccounts.AsNoTracking();
 
-    public BankAccount? Get(Expression<Func<BankAccount, bool>> predicate) => _applicationContext.BankAccounts.AsNoTracking().FirstOrDefault(predicate);
+    public TBankAccount? Get(Expression<Func<TBankAccount, bool>> predicate) => _applicationContext.BankAccounts.AsNoTracking().FirstOrDefault(predicate);
 
     /// <summary>
     /// updates only BankAccount. Referenced user won't be changed
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public ExceptionModel Update(BankAccount item)
+    public ExceptionModel Update(TBankAccount item)
     {
         if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;
@@ -241,7 +190,7 @@ public sealed class BankAccountRepository : IRepository<BankAccount>
     /// </summary>
     /// <param name="item"></param>
     /// <returns>object of <see cref="ExceptionModel"/></returns>
-    public ExceptionModel Delete(BankAccount item)
+    public ExceptionModel Delete(TBankAccount item)
     {
         if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;
@@ -251,15 +200,15 @@ public sealed class BankAccountRepository : IRepository<BankAccount>
         return ExceptionModel.Successfully;
     }
 
-    public bool Exist(Expression<Func<BankAccount, bool>> predicate)
+    public bool Exist(Expression<Func<TBankAccount, bool>> predicate)
         => _applicationContext.BankAccounts.AsNoTracking().Any(predicate);
 
-    public bool FitsConditions(BankAccount? item)
+    public bool FitsConditions(TBankAccount? item)
     {
         return item is not null && Exist(x => x.ID == item.ID) && item.Bank is not null;
     }
 
-    public ExceptionModel Update(BankAccount item, User user, Card card)
+    public ExceptionModel Update(TBankAccount item, TUser user, TCard card)
     {
         if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;
@@ -292,15 +241,15 @@ public sealed class BankAccountRepository : IRepository<BankAccount>
             throw new Exception($"Doesn't exist bank with id {{{item.ID}}}");
     }
     
-    private bool AnotherBankTransactionOperation(User from, User to)
+    private bool AnotherBankTransactionOperation(TUser from, TUser to)
     {
         return from.Card.BankAccount.Bank != to.Card.BankAccount.Bank;
     }
 
     private void SetBankServicesOptions()
     {
-        BankServicesOptions.BankContext = _bankContext;
-        BankServicesOptions.ApplicationContext = _applicationContext;
+        BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.BankContext = _bankContext;
+        BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ApplicationContext = _applicationContext;
     }
 
     ~BankAccountRepository()

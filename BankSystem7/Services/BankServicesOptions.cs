@@ -1,15 +1,22 @@
 ﻿using BankSystem7.AppContext;
+using BankSystem7.Models;
 using BankSystem7.Services.Configuration;
 
 namespace BankSystem7.Services;
 
-public sealed class BankServicesOptions
+public sealed class BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>
+    where TUser : User 
+    where TCard : Card 
+    where TBankAccount : BankAccount
+    where TBank : Bank
+    where TCredit : Credit
 {
     public static bool EnsureCreated { get; set; }
     public static bool EnsureDeleted { get; set; }
     public static string? Connection { get; set; }
-    public static ServiceConfiguration? ServiceConfiguration { get; set; }
+    public static bool Ensured { get; set; }
+    public static ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>? ServiceConfiguration { get; set; }
 
-    internal static BankContext? BankContext { get; set; } 
-    internal static ApplicationContext? ApplicationContext { get; set; }
+    internal static BankContext<TUser, TCard, TBankAccount, TBank, TCredit>? BankContext { get; set; } 
+    internal static ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>? ApplicationContext { get; set; }
 }

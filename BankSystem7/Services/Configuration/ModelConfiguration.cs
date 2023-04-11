@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BankSystem7.Services.Configuration;
 
-public class ModelConfiguration
+public class ModelConfiguration<TUser> where TUser : User
 {
     public virtual void Invoke(ModelBuilder modelBuilder)
     {
@@ -11,7 +11,23 @@ public class ModelConfiguration
         ConfigureCreditRelationships(modelBuilder);
         ConfigureBankAccountRelationships(modelBuilder);
         
-        modelBuilder.Entity<User>().Ignore(user => user.Exception);
+        //SetTableNames(modelBuilder);
+        
+        modelBuilder.Entity<TUser>().Ignore(user => user.Exception);
+    }
+
+    public virtual void SetTableNames(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<TUser>()
+            .ToTable($"{nameof(User)}s");
+        modelBuilder.Entity<Card>()
+            .ToTable($"{nameof(Card)}s");
+        modelBuilder.Entity<BankAccount>()
+            .ToTable($"{nameof(BankAccount)}s");
+        modelBuilder.Entity<Bank>()
+            .ToTable($"{nameof(Bank)}s");
+        modelBuilder.Entity<Credit>()
+            .ToTable($"{nameof(Credit)}s");
     }
 
     private static void ConfigureCreditRelationships(ModelBuilder modelBuilder)

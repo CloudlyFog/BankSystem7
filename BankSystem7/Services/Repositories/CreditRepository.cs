@@ -7,32 +7,37 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BankSystem7.Services.Repositories;
 
-public class CreditRepository : IRepository<Credit>
+public class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit> : IRepository<TCredit>
+    where TUser : User 
+    where TCard : Card 
+    where TBankAccount : BankAccount
+    where TBank : Bank
+    where TCredit : Credit
 {
-    private BankContext _bankContext;
-    private ApplicationContext _applicationContext;
-    private UserRepository _userRepository;
+    private BankContext<TUser, TCard, TBankAccount, TBank, TCredit> _bankContext;
+    private ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit> _applicationContext;
+    private UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> _userRepository;
     private bool _disposedValue;
 
     public CreditRepository()
     {
-        _bankContext = BankServicesOptions.BankContext ?? new BankContext(BankServicesOptions.Connection);
-        _applicationContext = BankServicesOptions.ApplicationContext ??
-                              new ApplicationContext(BankServicesOptions.Connection);
-        _userRepository = BankServicesOptions.ServiceConfiguration?.UserRepository ??
-                          new UserRepository(BankServicesOptions.Connection);
+        _bankContext = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.BankContext ?? new BankContext<TUser, TCard, TBankAccount, TBank, TCredit>(BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.Connection);
+        _applicationContext = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ApplicationContext ??
+                              new ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>(BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.Connection);
+        _userRepository = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ServiceConfiguration?.UserRepository ??
+                          new UserRepository<TUser, TCard, TBankAccount, TBank, TCredit>(BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.Connection);
     }
 
     public CreditRepository(string connection)
     {
-        _bankContext = BankServicesOptions.BankContext ?? new BankContext(connection);
-        _applicationContext = BankServicesOptions.ApplicationContext ??
-                              new ApplicationContext(connection);
-        _userRepository = BankServicesOptions.ServiceConfiguration?.UserRepository ??
-                          new UserRepository(connection);
+        _bankContext = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.BankContext ?? new BankContext<TUser, TCard, TBankAccount, TBank, TCredit>(connection);
+        _applicationContext = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ApplicationContext ??
+                              new ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>(connection);
+        _userRepository = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ServiceConfiguration?.UserRepository ??
+                          new UserRepository<TUser, TCard, TBankAccount, TBank, TCredit>(connection);
     }
 
-    public ExceptionModel Create(Credit item)
+    public ExceptionModel Create(TCredit item)
     {
         if (item is null)
             return ExceptionModel.VariableIsNull;
@@ -47,7 +52,7 @@ public class CreditRepository : IRepository<Credit>
         return ExceptionModel.Successfully;
     }
 
-    public ExceptionModel Update(Credit item)
+    public ExceptionModel Update(TCredit item)
     {
         if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;
@@ -58,7 +63,7 @@ public class CreditRepository : IRepository<Credit>
         return ExceptionModel.Successfully;
     }
 
-    public ExceptionModel Delete(Credit item)
+    public ExceptionModel Delete(TCredit item)
     {
         if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;
@@ -69,12 +74,12 @@ public class CreditRepository : IRepository<Credit>
         return ExceptionModel.Successfully;
     }
 
-    public IEnumerable<Credit> All => _applicationContext.Credits.AsNoTracking();
-    public Credit Get(Expression<Func<Credit, bool>> predicate) => _applicationContext.Credits.AsNoTracking().FirstOrDefault(predicate);
+    public IEnumerable<TCredit> All => _applicationContext.Credits.AsNoTracking();
+    public TCredit Get(Expression<Func<TCredit, bool>> predicate) => _applicationContext.Credits.AsNoTracking().FirstOrDefault(predicate);
 
-    public bool Exist(Expression<Func<Credit, bool>> predicate) => _applicationContext.Credits.AsNoTracking().Any(predicate);
+    public bool Exist(Expression<Func<TCredit, bool>> predicate) => _applicationContext.Credits.AsNoTracking().Any(predicate);
 
-    public bool FitsConditions(Credit? item)
+    public bool FitsConditions(TCredit? item)
     {
         return item is not null && Exist(x => x.ID == item.ID);
     }
@@ -86,12 +91,12 @@ public class CreditRepository : IRepository<Credit>
     /// <param name="user">from what account will withdraw money</param>
     /// <param name="credit">credit entity from database</param>
     /// <returns></returns>
-    public ExceptionModel TakeCredit(User? user, Credit? credit)
+    public ExceptionModel TakeCredit(User? user, TCredit? credit)
     {
         if (user.Card?.BankAccount?.Bank is null || credit is null || Exist(x => x.ID == credit.ID || x.UserID == user.ID))
             return ExceptionModel.VariableIsNull;
 
-        var operationAccrualOnUserAccount = new Operation()
+        var operationAccrualOnUserAccount = new Operation
         {
             BankID = credit.BankID,
             ReceiverID = credit.UserID,
@@ -124,7 +129,7 @@ public class CreditRepository : IRepository<Credit>
     /// <param name="credit">credit entity from database</param>
     /// <param name="payAmount">amount of money for paying</param>
     /// <returns></returns>
-    public ExceptionModel PayCredit(User? user, Credit credit, decimal payAmount)
+    public ExceptionModel PayCredit(TUser? user, TCredit credit, decimal payAmount)
     {
         if (user.Card?.BankAccount?.Bank is null || credit is null || !Exist(x => x.ID == credit.ID || x.UserID == user.ID))
             return ExceptionModel.VariableIsNull;
@@ -177,7 +182,7 @@ public class CreditRepository : IRepository<Credit>
     /// <returns></returns>
     [Obsolete("This method is using for repaying a credit. " +
               "Instead of it you can use new method PayCredit that takes as third arg a value on which credit will decrease.")]
-    public ExceptionModel RepayCredit(User? user, Credit? credit) =>
+    public ExceptionModel RepayCredit(TUser? user, TCredit? credit) =>
         PayCredit(user, credit, credit.CreditAmount);
 
     private void Dispose(bool disposing)
