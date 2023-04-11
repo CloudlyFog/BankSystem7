@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BankSystem7.Services.Repositories;
 
-public class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit> : IRepository<TCredit>
+public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit> : IRepository<TCredit>
     where TUser : User 
     where TCard : Card 
     where TBankAccount : BankAccount
@@ -16,7 +16,6 @@ public class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit> : IRep
 {
     private BankContext<TUser, TCard, TBankAccount, TBank, TCredit> _bankContext;
     private ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit> _applicationContext;
-    private UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> _userRepository;
     private bool _disposedValue;
 
     public CreditRepository()
@@ -24,8 +23,6 @@ public class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit> : IRep
         _bankContext = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.BankContext ?? new BankContext<TUser, TCard, TBankAccount, TBank, TCredit>(BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.Connection);
         _applicationContext = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ApplicationContext ??
                               new ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>(BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.Connection);
-        _userRepository = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ServiceConfiguration?.UserRepository ??
-                          new UserRepository<TUser, TCard, TBankAccount, TBank, TCredit>(BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.Connection);
     }
 
     public CreditRepository(string connection)
@@ -33,8 +30,6 @@ public class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit> : IRep
         _bankContext = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.BankContext ?? new BankContext<TUser, TCard, TBankAccount, TBank, TCredit>(connection);
         _applicationContext = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ApplicationContext ??
                               new ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>(connection);
-        _userRepository = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ServiceConfiguration?.UserRepository ??
-                          new UserRepository<TUser, TCard, TBankAccount, TBank, TCredit>(connection);
     }
 
     public ExceptionModel Create(TCredit item)

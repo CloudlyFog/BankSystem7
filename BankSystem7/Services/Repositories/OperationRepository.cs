@@ -5,7 +5,7 @@ using MongoDB.Driver;
 
 namespace BankSystem7.Services.Repositories;
 
-public class OperationRepository<TUser, TCard, TBankAccount, TBank, TCredit> : LoggerExecutor<OperationType>, IRepository<Operation>
+public sealed class OperationRepository<TUser, TCard, TBankAccount, TBank, TCredit> : LoggerExecutor<OperationType>, IRepository<Operation>
     where TUser : User 
     where TCard : Card 
     where TBankAccount : BankAccount
