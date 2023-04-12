@@ -37,7 +37,7 @@ public class Credit
 
     public static Credit CreateInstance(decimal creditAmount, decimal interestRate, DateTime repaymentDate, User user = null, Bank bank = null)
     {
-        var credit = new Credit(creditAmount, user, bank)
+        var credit = new Credit(user, bank)
         {
             CreditAmount = creditAmount,
             InterestRate = interestRate,
@@ -51,7 +51,7 @@ public class Credit
     {
         
     }
-    private Credit(decimal creditAmount, User user = null, Bank bank = null)
+    private Credit(User user = null, Bank bank = null)
     {
         if (bank is null || user is null)
             return;
