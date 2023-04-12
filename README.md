@@ -1,7 +1,6 @@
 
 # Bank system 7
-This package was developed for common using and learning definite technology.
-It also let everybody to use bank system in its projects and change logic for your needs.
+This library provides opportunities for using likeness of bank system. You can handle not only users but also other models like banks, cards and etc.
 
 **It's a beta version of library. Some exceptions can be weren't found.**
 
