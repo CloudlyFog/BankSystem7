@@ -50,65 +50,6 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         _applicationContext = new ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>(_bankAccountRepository);
         _logger = new Logger<TUser, TCard, TBankAccount, TBank, TCredit>(ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>.Options.LoggerOptions);
     }
-    public ExceptionModel Create(TUser item)
-    {
-        if (item?.Card?.BankAccount?.Bank is null)
-            return ExceptionModel.OperationFailed;
-            
-        //if user exists method will send false
-        if (Exist(x => x.ID == item.ID))
-            return ExceptionModel.OperationFailed;
-        using var userCreationTransaction = _applicationContext.Database.BeginTransaction(IsolationLevel
-                                                .RepeatableRead);
-            
-        
-        var avoidDuplication = _applicationContext.AvoidDuplication(item.Card.BankAccount.Bank);
-        if (avoidDuplication != ExceptionModel.Successfully)
-        {
-            userCreationTransaction.Rollback();
-            return avoidDuplication;
-        }
-
-        Bank bank = null;
-
-        if (_bankRepository.Exist(x => x.ID == item.Card.BankAccount.Bank.ID))
-        {
-            bank = item.Card.BankAccount.Bank;
-            item.Card.BankAccount.Bank = null;
-        }
-        
-        _applicationContext.ChangeTracker.Clear();
-        _applicationContext.Users.Add(item);
-        try
-        {
-            _applicationContext.SaveChanges();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-            Console.WriteLine(ex.InnerException.Message);
-            userCreationTransaction.Rollback();
-            throw;
-        }
-
-        if (bank is null)
-        {
-            userCreationTransaction.Commit();
-            return ExceptionModel.Successfully;
-        }
-        item.Card.BankAccount.Bank ??= bank;
-        _applicationContext.ChangeTracker.Clear();
-        var updateBank = _bankRepository.Update(_bankRepository.Get(x => x.ID == item.Card.BankID));
-        if (updateBank != ExceptionModel.Successfully)
-        {
-            userCreationTransaction.Rollback();
-            return updateBank;
-        }
-
-        userCreationTransaction.Commit();
-        
-        return ExceptionModel.Successfully;
-    }
 
     public void Dispose()
     {
@@ -135,11 +76,73 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         _disposed = true;
     }
 
+    public ExceptionModel Create(TUser item)
+    {
+        if (item?.Card?.BankAccount?.Bank is null)
+            return ExceptionModel.OperationFailed;
+
+        //if user exists method will send false
+        if (Exist(x => x.ID == item.ID))
+            return ExceptionModel.OperationFailed;
+        using var userCreationTransaction = _applicationContext.Database.BeginTransaction(IsolationLevel
+                                                .RepeatableRead);
+
+
+        var avoidDuplication = _applicationContext.AvoidDuplication(item.Card.BankAccount.Bank);
+        if (avoidDuplication != ExceptionModel.Successfully)
+        {
+            userCreationTransaction.Rollback();
+            return avoidDuplication;
+        }
+
+        Bank bank = null;
+
+        if (_bankRepository.Exist(x => x.ID == item.Card.BankAccount.Bank.ID))
+        {
+            bank = item.Card.BankAccount.Bank;
+            item.Card.BankAccount.Bank = null;
+        }
+
+        _applicationContext.ChangeTracker.Clear();
+        _applicationContext.Users.Add(item);
+
+        try
+        {
+            _applicationContext.SaveChanges();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            Console.WriteLine(ex.InnerException.Message);
+            userCreationTransaction.Rollback();
+            throw;
+        }
+
+        if (bank is null)
+        {
+            userCreationTransaction.Commit();
+            return ExceptionModel.Successfully;
+        }
+        item.Card.BankAccount.Bank ??= bank;
+
+        _applicationContext.ChangeTracker.Clear();
+        var updateBank = _bankRepository.Update(_bankRepository.Get(x => x.ID == item.Card.BankID));
+        if (updateBank != ExceptionModel.Successfully)
+        {
+            userCreationTransaction.Rollback();
+            return updateBank;
+        }
+
+        userCreationTransaction.Commit();
+
+        return ExceptionModel.Successfully;
+    }
     public ExceptionModel Delete(TUser item)
     {
         if (!FitsConditions(item))
             return ExceptionModel.OperationNotExist;
-        
+
+        _applicationContext.ChangeTracker.Clear();
         _applicationContext.Users.Remove(item);
         try
         {
@@ -150,7 +153,11 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
             Console.WriteLine(ex.Message);
             throw;
         }
-        var deleteBankAccount = _bankAccountRepository.Delete(_bankAccountRepository.Get(x => x.ID == item.Card.BankAccountID));
+
+        var bankAccount = _bankAccountRepository.Get(x => x.ID == item.Card.BankAccount.ID);
+        bankAccount.Bank = _bankRepository.Get(x => x.ID == item.BankID);
+
+        var deleteBankAccount = _bankAccountRepository.Delete(bankAccount);
         return deleteBankAccount;
     }
 
@@ -170,30 +177,20 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
 
     public TUser? Get(Expression<Func<TUser, bool>> predicate)
     {
-        var user = _applicationContext.Users.AsNoTracking().FirstOrDefault(predicate);
-        if (user is null)
-            return user;
-        user.Card = _cardRepository.Get(x => x.UserID == user.ID);
-        if (user.Card is null)
-            return user;
-        user.Card.BankAccount = _bankAccountRepository.Get(x => x.UserID == user.ID);
-        if (user.Card.BankAccount is null)
-            return user;
-        user.Card.BankAccount.Bank = _bankRepository.Get(x => x.BankAccounts.Contains(user.Card.BankAccount));
-        if (user.Card.BankAccount.Bank is null)
-            return user;
-        
-        return user;
+        return _applicationContext.Users.Include(x => x.Card.BankAccount).Include(x => x.Card.BankAccount.Bank)
+            .AsNoTracking().FirstOrDefault(predicate);
     }
-    
+
     public ExceptionModel Update(TUser item)
     {
         if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;
         
         using var userUpdateTransaction = _applicationContext.Database.BeginTransaction(IsolationLevel.RepeatableRead);
-            
-        var bankAccountUpdateOperation = _bankAccountRepository.Update(_bankAccountRepository.Get(x => x.ID == item.Card.BankAccountID));
+
+        var bankAccount = _bankAccountRepository.Get(x => x.ID == item.Card.BankAccount.ID);
+        bankAccount.Bank = _bankRepository.Get(x => x.ID == item.BankID);
+        var bankAccountUpdateOperation = _bankAccountRepository.Update(bankAccount);
         if (bankAccountUpdateOperation != ExceptionModel.Successfully)
         {
             userUpdateTransaction.Rollback();

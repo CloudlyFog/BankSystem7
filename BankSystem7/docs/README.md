@@ -4,8 +4,8 @@ This library provides opportunities for using likeness of bank system. You can h
 
 **It's a beta version of library. Some exceptions can be weren't found.**
 
-### Updates in version 0.3.5-beta
-- Added possibility use own models in repositories.
+### Updates in version 0.3.7-beta
+- 
 ****
 # Documentation
 

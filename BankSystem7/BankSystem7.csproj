@@ -5,11 +5,11 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <PackageVersion>0.3.6-beta</PackageVersion>
+        <PackageVersion>0.3.7-beta</PackageVersion>
         <Authors>CloudlyFog</Authors>
         <Copyright>Copyright (c) CloudlyFog 2023</Copyright>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <Description>This package was developed for common using and learning definite technology. It also let everybody to use bank system in its projects and change logic for your needs.</Description>
+        <Description>This library provides opportunities for using likeness of bank system. You can handle not only users but also other models like banks, cards and etc.</Description>
         <PackageLicenseUrl>https://mit-license.org/</PackageLicenseUrl>
         <PackageTags>bank;account;banksystem;credit;transfer;money;bankaccount</PackageTags>
         <RepositoryUrl>https://github.com/CloudlyFog/BankSystem7</RepositoryUrl>
