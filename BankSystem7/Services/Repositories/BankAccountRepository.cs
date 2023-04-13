@@ -170,9 +170,13 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
         return ExceptionModel.Successfully;
     }
 
-    public IEnumerable<TBankAccount> All => _applicationContext.BankAccounts.AsNoTracking();
+    public IEnumerable<TBankAccount> All => _applicationContext.BankAccounts.Include(x => x.Bank).AsNoTracking();
 
-    public TBankAccount? Get(Expression<Func<TBankAccount, bool>> predicate) => _applicationContext.BankAccounts.AsNoTracking().FirstOrDefault(predicate);
+    public TBankAccount? Get(Expression<Func<TBankAccount, bool>> predicate)
+    {
+        return _applicationContext.BankAccounts.Include(x => x.Bank)
+            .AsNoTracking().FirstOrDefault(predicate);
+    }
 
     /// <summary>
     /// updates only BankAccount. Referenced user won't be changed
@@ -210,27 +214,6 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
     public bool FitsConditions(TBankAccount? item)
     {
         return item is not null && Exist(x => x.ID == item.ID) && item.Bank is not null;
-    }
-
-    public ExceptionModel Update(TBankAccount item, TUser user, TCard card)
-    {
-        if (!FitsConditions(item))
-            return ExceptionModel.OperationFailed;
-
-        if (user is null || !_bankRepository.Exist(x => x.ID == user.ID))
-            return ExceptionModel.VariableIsNull;
-            
-        if (card is null || !_bankContext.Cards.AsNoTracking().Any(x => x.ID == card.ID))
-            return ExceptionModel.VariableIsNull;
-
-        _applicationContext.ChangeTracker.Clear();
-        using var transaction = _applicationContext.Database.BeginTransaction();
-        _applicationContext.BankAccounts.Update(item);
-        _applicationContext.Users.Update(user);
-        _applicationContext.SaveChanges(); 
-        transaction.Commit();
-
-        return ExceptionModel.Successfully;
     }
 
     private void CheckBankAccount(BankAccount item)

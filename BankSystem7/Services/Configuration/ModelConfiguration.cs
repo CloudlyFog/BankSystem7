@@ -11,8 +11,6 @@ public class ModelConfiguration<TUser> where TUser : User
         ConfigureCreditRelationships(modelBuilder);
         ConfigureBankAccountRelationships(modelBuilder);
         
-        //SetTableNames(modelBuilder);
-        
         modelBuilder.Entity<TUser>().Ignore(user => user.Exception);
     }
 

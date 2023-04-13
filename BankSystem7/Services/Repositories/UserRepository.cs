@@ -153,12 +153,7 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
             Console.WriteLine(ex.Message);
             throw;
         }
-
-        var bankAccount = _bankAccountRepository.Get(x => x.ID == item.Card.BankAccount.ID);
-        bankAccount.Bank = _bankRepository.Get(x => x.ID == item.BankID);
-
-        var deleteBankAccount = _bankAccountRepository.Delete(bankAccount);
-        return deleteBankAccount;
+        return _bankAccountRepository.Delete(_bankAccountRepository.Get(x => x.ID == item.Card.BankAccount.ID));
     }
 
     public bool Exist(Expression<Func<TUser, bool>> predicate) => _applicationContext.Users.AsNoTracking().Any(predicate);
@@ -173,7 +168,7 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         return true;
     }
 
-    public IEnumerable<TUser> All => _applicationContext.Users.AsNoTracking();
+    public IEnumerable<TUser> All => _applicationContext.Users.Include(x => x.Card.BankAccount).Include(x => x.Card.BankAccount.Bank).AsNoTracking();
 
     public TUser? Get(Expression<Func<TUser, bool>> predicate)
     {
@@ -188,9 +183,8 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         
         using var userUpdateTransaction = _applicationContext.Database.BeginTransaction(IsolationLevel.RepeatableRead);
 
-        var bankAccount = _bankAccountRepository.Get(x => x.ID == item.Card.BankAccount.ID);
-        bankAccount.Bank = _bankRepository.Get(x => x.ID == item.BankID);
-        var bankAccountUpdateOperation = _bankAccountRepository.Update(bankAccount);
+        var bankAccountUpdateOperation = _bankAccountRepository
+            .Update(_bankAccountRepository.Get(x => x.ID == item.Card.BankAccount.ID));
         if (bankAccountUpdateOperation != ExceptionModel.Successfully)
         {
             userUpdateTransaction.Rollback();
