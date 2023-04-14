@@ -10,7 +10,7 @@ public class ModelConfiguration<TUser> where TUser : User
         ConfigureCardRelationships(modelBuilder);
         ConfigureCreditRelationships(modelBuilder);
         ConfigureBankAccountRelationships(modelBuilder);
-        
+
         modelBuilder.Entity<TUser>().Ignore(user => user.Exception);
     }
 
@@ -36,7 +36,7 @@ public class ModelConfiguration<TUser> where TUser : User
             .WithMany(bank => bank.Credits)
             .HasForeignKey(credit => credit.BankID)
             .OnDelete(DeleteBehavior.Cascade);
-        
+
         // user
         modelBuilder.Entity<Credit>()
             .HasOne(credit => credit.User)
@@ -53,7 +53,6 @@ public class ModelConfiguration<TUser> where TUser : User
             .WithOne(user => user.Card)
             .HasForeignKey<Card>(card => card.UserID)
             .OnDelete(DeleteBehavior.Cascade);
-
     }
 
     private static void ConfigureBankAccountRelationships(ModelBuilder modelBuilder)

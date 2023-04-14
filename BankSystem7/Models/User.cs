@@ -2,14 +2,14 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BankSystem7.Models;
+
 public class User
 {
-
     [Key]
     public Guid? ID { get; set; } = Guid.NewGuid();
-    
+
     public string Name { get; set; } = string.Empty;
-    
+
     public string Email { get; set; } = string.Empty;
 
     public string Password { get; set; }
@@ -17,12 +17,12 @@ public class User
     public string PhoneNumber { get; set; }
 
     public Guid? BankID { get; set; } = Guid.Empty;
-    
+
     public int Age { get; set; }
     public Credit? Credit { get; set; }
-    
+
     public Card? Card { get; set; }
-    
+
     [NotMapped]
     public ExceptionModel Exception { get; set; } = ExceptionModel.Successfully;
 }
@@ -38,6 +38,7 @@ public enum ExceptionModel
     OperationFailed = 400,
     OperationNotExist = 401
 }
+
 public enum Warning
 {
     NoRestrictions,

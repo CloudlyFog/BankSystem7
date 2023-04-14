@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using MongoDB.Bson.Serialization.Attributes;
+﻿using MongoDB.Bson.Serialization.Attributes;
 
 namespace BankSystem7.Models;
 
@@ -16,7 +15,6 @@ public class GeneralReport<TOperationType> : Report
 {
     public GeneralReport()
     {
-        
     }
 
     public GeneralReport(Report report)
@@ -29,6 +27,7 @@ public class GeneralReport<TOperationType> : Report
         SetReport(report);
         MethodName = report.MethodName;
     }
+
     public string MethodName { get; set; }
     public string ClassName { get; set; }
     public TOperationType OperationType { get; set; }
@@ -40,6 +39,7 @@ public class GeneralReport<TOperationType> : Report
         ExceptionModel = report.ExceptionModel;
     }
 }
+
 public enum OperationType
 {
     Create = 1,
@@ -50,4 +50,3 @@ public enum OperationType
     All,
     FitsConditions,
 }
-

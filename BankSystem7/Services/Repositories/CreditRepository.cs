@@ -1,15 +1,15 @@
-﻿using System.Data;
-using System.Linq.Expressions;
-using BankSystem7.AppContext;
+﻿using BankSystem7.AppContext;
 using BankSystem7.Models;
 using BankSystem7.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
+using System.Linq.Expressions;
 
 namespace BankSystem7.Services.Repositories;
 
 public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit> : IRepository<TCredit>
-    where TUser : User 
-    where TCard : Card 
+    where TUser : User
+    where TCard : Card
     where TBankAccount : BankAccount
     where TBank : Bank
     where TCredit : Credit
@@ -70,6 +70,7 @@ public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>
     }
 
     public IEnumerable<TCredit> All => _applicationContext.Credits.AsNoTracking();
+
     public TCredit Get(Expression<Func<TCredit, bool>> predicate) => _applicationContext.Credits.AsNoTracking().FirstOrDefault(predicate);
 
     public bool Exist(Expression<Func<TCredit, bool>> predicate) => _applicationContext.Credits.AsNoTracking().Any(predicate);
@@ -108,7 +109,6 @@ public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>
         if (_bankContext.BankAccountAccrual(user, user.Card?.BankAccount?.Bank, operationAccrualOnUserAccount) != ExceptionModel.Successfully)
             return (ExceptionModel)operationAccrualOnUserAccount.OperationStatus.GetHashCode();
 
-        
         if (Create(credit) != ExceptionModel.Successfully)
             return (ExceptionModel)operationAccrualOnUserAccount.OperationStatus.GetHashCode();
 
@@ -155,7 +155,6 @@ public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>
             if (Delete(credit) != ExceptionModel.Successfully)
                 return (ExceptionModel)operationAccrualOnUserAccount.OperationStatus.GetHashCode();
         }
-
         else
         {
             credit.RepaymentAmount -= operationAccrualOnUserAccount.TransferAmount;

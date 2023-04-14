@@ -1,15 +1,15 @@
-﻿using System.Data;
-using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
-using BankSystem7.AppContext;
+﻿using BankSystem7.AppContext;
 using BankSystem7.Models;
 using BankSystem7.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using System.Data;
+using System.Linq.Expressions;
 
 namespace BankSystem7.Services.Repositories;
 
 public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit> : IRepository<TBankAccount>
-    where TUser : User 
-    where TCard : Card 
+    where TUser : User
+    where TCard : Card
     where TBankAccount : BankAccount
     where TBank : Bank
     where TCredit : Credit
@@ -28,6 +28,7 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
         SetBankServicesOptions();
         _bankRepository = new BankRepository<TUser, TCard, TBankAccount, TBank, TCredit>(ConnectionString);
     }
+
     public BankAccountRepository(BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> bankRepository)
     {
         _bankRepository = bankRepository;
@@ -36,6 +37,7 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
         _bankContext = _bankRepository.BankContext;
         SetBankServicesOptions();
     }
+
     public BankAccountRepository(string connection)
     {
         _applicationContext = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ApplicationContext ??
@@ -51,11 +53,11 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
         Dispose(true);
         GC.SuppressFinalize(this);
     }
-        
+
     // Protected implementation of Dispose pattern.
     private void Dispose(bool disposing)
     {
-        if (_disposedValue) 
+        if (_disposedValue)
             return;
         if (disposing)
         {
@@ -76,10 +78,10 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
         if (from is null || to is null || from.Card is null || to.Card is null || from.Card.BankAccount is null ||
             to.Card.BankAccount is null || transferAmount <= 0)
             return ExceptionModel.OperationFailed;
-            
+
         if (!Exist(x => x.ID == from.Card.BankAccount.ID) || !Exist(x => x.ID == to.Card.BankAccount.ID))
             return ExceptionModel.OperationFailed;
-            
+
         using var transaction = _bankContext.Database.BeginTransaction(IsolationLevel.RepeatableRead);
         _bankRepository.AnotherBankTransactionOperation = AnotherBankTransactionOperation(from, to);
 
@@ -99,7 +101,7 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
         transaction.Commit();
         return ExceptionModel.Successfully;
     }
-        
+
     /// <summary>
     /// asynchronously accrual money on account with the same user id
     /// </summary>
@@ -128,7 +130,7 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
 
         return ExceptionModel.Successfully;
     }
-        
+
     /// <summary>
     /// withdraw money from account with the same user id
     /// </summary>
@@ -139,7 +141,7 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
     {
         if (item.Card is null)
             return ExceptionModel.VariableIsNull;
-            
+
         CheckBankAccount(item.Card.BankAccount);
 
         var operation = new Operation
@@ -150,11 +152,11 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
             TransferAmount = amountAccrual,
             OperationKind = OperationKind.Withdraw
         };
-            
+
         var createOperation = _bankContext.CreateOperation(operation, OperationKind.Withdraw);
         if (createOperation != ExceptionModel.Successfully)
             return createOperation;
-            
+
         var withdraw = _bankRepository.BankAccountWithdraw(item, operation);
         if (withdraw != ExceptionModel.Successfully)
             return withdraw;
@@ -220,14 +222,14 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
     {
         if (item is null)
             throw new Exception("Passed instance of BankAccount is null.");
-            
+
         if (!_applicationContext.Users.AsNoTracking().Any(x => x.ID == item.UserID))
             throw new Exception("Doesn't exist user with specified ID in the database.");
 
-        if (!Exist(x => x.ID == item.ID)) 
+        if (!Exist(x => x.ID == item.ID))
             throw new Exception($"Doesn't exist bank with id {{{item.ID}}}");
     }
-    
+
     private bool AnotherBankTransactionOperation(TUser from, TUser to)
     {
         return from.Card.BankAccount.Bank != to.Card.BankAccount.Bank;

@@ -1,8 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using MongoDB.Bson.Serialization.Attributes;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using BankSystem7.Services.Repositories;
-using Microsoft.EntityFrameworkCore.Query.Internal;
-using MongoDB.Bson.Serialization.Attributes;
 
 namespace BankSystem7.Models;
 
@@ -10,6 +8,7 @@ public class Bank
 {
     [Key]
     public Guid ID { get; set; } = Guid.NewGuid(); // id for identification in the database
+
     public string BankName { get; set; } = string.Empty;
     public List<Credit>? Credits { get; set; } = new();
     public List<BankAccount>? BankAccounts { get; set; } = new();
@@ -49,8 +48,8 @@ public class Credit
 
     private Credit()
     {
-        
     }
+
     private Credit(User user = null, Bank bank = null)
     {
         if (bank is null || user is null)
@@ -61,8 +60,10 @@ public class Credit
         User = user;
         UserID = user.ID;
     }
+
     [Key]
     public Guid ID { get; set; } = Guid.NewGuid();
+
     public Guid? BankID { get; set; }
     public Guid? UserID { get; set; }
     public decimal CreditAmount { get; set; }
@@ -73,7 +74,7 @@ public class Credit
     public Bank? Bank { get; set; }
     public User? User { get; set; }
 
-    [NotMapped] 
+    [NotMapped]
     public StatusOperationCode OperationStatus { get; set; } = StatusOperationCode.Successfully;
 
     public decimal CalculateRepaymentAmount()
@@ -90,11 +91,10 @@ public class Credit
 
 public class BankAccount
 {
-
     public BankAccount()
     {
-        
     }
+
     public BankAccount(User user, Bank bank)
     {
         PhoneNumber = user.PhoneNumber;
@@ -102,12 +102,13 @@ public class BankAccount
         Bank = bank;
         BankID = bank.ID;
     }
-    
+
     [Key]
     public Guid ID { get; set; } = Guid.NewGuid();
+
     public Guid? BankID { get; set; } = Guid.NewGuid();
     public Guid? UserID { get; set; } = Guid.Empty;
-    
+
     public Card? Card { get; set; }
     public Bank? Bank { get; set; }
     public User? User { get; set; }
@@ -121,13 +122,13 @@ public class BankAccount
 /// <summary>
 /// Describes debit/credit card.
 /// Necessarily:
-/// 1) Check property <see cref="Exception"/> because it will changed in constructor if any condititon will violated 
+/// 1) Check property <see cref="Exception"/> because it will changed in constructor if any condititon will violated
 /// 2) Set value for <see cref="CVV"/> and <see cref="Age"/>
 /// </summary>
 public class Card
 {
     private const int CvvLength = 3;
- 
+
     public Card(int age, string cvv = "default", User user = null, BankAccount bankAccount = null)
     {
         Age = SetAge(age);
@@ -155,6 +156,7 @@ public class Card
 
     [Key]
     public Guid ID { get; set; } = Guid.NewGuid();
+
     public Guid? BankID { get; set; } = Guid.Empty;
     public Guid? BankAccountID { get; set; } = Guid.Empty;
     public Guid? UserID { get; set; } = Guid.Empty;
@@ -166,7 +168,7 @@ public class Card
     public User? User { get; set; }
     public BankAccount? BankAccount { get; set; }
 
-    [NotMapped] 
+    [NotMapped]
     public Warning Exception { get; private set; } = Warning.NoRestrictions;
 
     private static string SetCvv(string cvv)
@@ -184,10 +186,10 @@ public class Card
             Exception = Warning.AgeRestricted;
         return age;
     }
-    
+
     private static string RandomString(int length, bool onlyDigits = false)
     {
-        const string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; 
+        const string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         var chars = $"{alphabet.ToLower()}{alphabet}0123456789_@#$%";
         if (onlyDigits)
             chars = "0123456789";

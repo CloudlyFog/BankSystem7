@@ -1,17 +1,16 @@
-﻿using System.Data;
-using System.Linq.Expressions;
-using BankSystem7.AppContext;
+﻿using BankSystem7.AppContext;
 using BankSystem7.Models;
 using BankSystem7.Services.Configuration;
 using BankSystem7.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
+using System.Linq.Expressions;
 
 namespace BankSystem7.Services.Repositories;
 
-
-public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> : LoggerExecutor<OperationType>, IRepository<TUser> 
-    where TUser : User 
-    where TCard : Card 
+public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> : LoggerExecutor<OperationType>, IRepository<TUser>
+    where TUser : User
+    where TCard : Card
     where TBankAccount : BankAccount
     where TBank : Bank
     where TCredit : Credit
@@ -23,6 +22,7 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
     private ILogger _logger;
     private List<GeneralReport<OperationType>> _reports = new();
     private bool _disposed;
+
     public UserRepository()
     {
         _bankAccountRepository = new BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit>(BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.Connection);
@@ -32,6 +32,7 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
                               new ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>(_bankAccountRepository);
         _logger = new Logger<TUser, TCard, TBankAccount, TBank, TCredit>(ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>.Options.LoggerOptions);
     }
+
     public UserRepository(string connection)
     {
         _bankAccountRepository = new BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit>(connection);
@@ -40,8 +41,8 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         _applicationContext = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ApplicationContext ??
                               new ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>(_bankAccountRepository);
         _logger = new Logger<TUser, TCard, TBankAccount, TBank, TCredit>(ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>.Options.LoggerOptions);
-        
     }
+
     public UserRepository(BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit> repository)
     {
         _bankAccountRepository = repository;
@@ -57,9 +58,11 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         Dispose(true);
         GC.SuppressFinalize(this);
     }
+
     private void Dispose(bool disposing)
     {
-        if (_disposed) return;
+        if (_disposed)
+            return;
         if (disposing)
         {
             _bankAccountRepository.Dispose();
@@ -86,7 +89,6 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
             return ExceptionModel.OperationFailed;
         using var userCreationTransaction = _applicationContext.Database.BeginTransaction(IsolationLevel
                                                 .RepeatableRead);
-
 
         var avoidDuplication = _applicationContext.AvoidDuplication(item.Card.BankAccount.Bank);
         if (avoidDuplication != ExceptionModel.Successfully)
@@ -136,6 +138,7 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
 
         return ExceptionModel.Successfully;
     }
+
     public ExceptionModel Delete(TUser item)
     {
         if (!FitsConditions(item))
@@ -156,6 +159,7 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
     }
 
     public bool Exist(Expression<Func<TUser, bool>> predicate) => _applicationContext.Users.AsNoTracking().Any(predicate);
+
     public bool FitsConditions(TUser? item)
     {
         if (item?.Card?.BankAccount?.Bank is null)
@@ -181,7 +185,7 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
     {
         if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;
-        
+
         using var userUpdateTransaction = _applicationContext.Database.BeginTransaction(IsolationLevel.RepeatableRead);
 
         var bankAccountUpdateOperation = _bankAccountRepository
@@ -191,7 +195,7 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
             userUpdateTransaction.Rollback();
             return bankAccountUpdateOperation;
         }
-            
+
         _applicationContext.ChangeTracker.Clear();
         _applicationContext.Users.Update(item);
         try
