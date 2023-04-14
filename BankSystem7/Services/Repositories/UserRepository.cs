@@ -125,7 +125,6 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         }
         item.Card.BankAccount.Bank ??= bank;
 
-        _applicationContext.ChangeTracker.Clear();
         var updateBank = _bankRepository.Update(_bankRepository.Get(x => x.ID == item.Card.BankID));
         if (updateBank != ExceptionModel.Successfully)
         {
@@ -168,11 +167,13 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         return true;
     }
 
-    public IEnumerable<TUser> All => _applicationContext.Users.Include(x => x.Card.BankAccount).Include(x => x.Card.BankAccount.Bank).AsNoTracking();
+    public IEnumerable<TUser> All => _applicationContext.Users
+        .Include(x => x.Card.BankAccount).Include(x => x.Card.BankAccount.Bank).AsNoTracking();
 
     public TUser? Get(Expression<Func<TUser, bool>> predicate)
     {
-        return _applicationContext.Users.Include(x => x.Card.BankAccount).Include(x => x.Card.BankAccount.Bank)
+        return _applicationContext.Users
+            .Include(x => x.Card.BankAccount).Include(x => x.Card.BankAccount.Bank).Include(x => x.Credit)
             .AsNoTracking().FirstOrDefault(predicate);
     }
 

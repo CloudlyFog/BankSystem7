@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BankSystem7", "BankSystem7\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestBankSystem", "G:\TestBankSystem\TestBankSystem\TestBankSystem.csproj", "{9118CFFB-103C-40CE-86AB-66A3EF890D26}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Profiler", "G:\TestBankSystem\Profiler\Profiler.csproj", "{8BAE58C1-CA9C-474B-9848-0591C2A2496C}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benchmarks", "G:\TestBankSystem\Benchmarks\Benchmarks.csproj", "{5042DA93-6F69-460E-B881-B2DA3467846F}"
 EndProject
 Global
@@ -25,10 +23,6 @@ Global
 		{9118CFFB-103C-40CE-86AB-66A3EF890D26}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9118CFFB-103C-40CE-86AB-66A3EF890D26}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9118CFFB-103C-40CE-86AB-66A3EF890D26}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8BAE58C1-CA9C-474B-9848-0591C2A2496C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8BAE58C1-CA9C-474B-9848-0591C2A2496C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8BAE58C1-CA9C-474B-9848-0591C2A2496C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8BAE58C1-CA9C-474B-9848-0591C2A2496C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5042DA93-6F69-460E-B881-B2DA3467846F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5042DA93-6F69-460E-B881-B2DA3467846F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5042DA93-6F69-460E-B881-B2DA3467846F}.Release|Any CPU.ActiveCfg = Release|Any CPU

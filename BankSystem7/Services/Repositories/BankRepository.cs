@@ -169,6 +169,7 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;
 
+        _applicationContext.ChangeTracker.Clear();
         _applicationContext.Banks.Update(item);
         _applicationContext.SaveChanges();
         return ExceptionModel.Successfully;
