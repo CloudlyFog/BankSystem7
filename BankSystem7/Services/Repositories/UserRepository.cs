@@ -85,8 +85,8 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
             return ExceptionModel.OperationFailed;
 
         //if user exists method will send false
-        if (Exist(x => x.ID == item.ID))
-            return ExceptionModel.OperationFailed;
+        if (Exist(x => x.ID == item.ID && x.Name == item.Name && x.Email == item.Email))
+            return ExceptionModel.OperationRestricted;
         using var userCreationTransaction = _applicationContext.Database.BeginTransaction(IsolationLevel
                                                 .RepeatableRead);
 
