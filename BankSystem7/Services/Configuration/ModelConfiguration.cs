@@ -7,25 +7,17 @@ public class ModelConfiguration<TUser> where TUser : User
 {
     public virtual void Invoke(ModelBuilder modelBuilder)
     {
+        ConfigureRelationships(modelBuilder);
+
+        modelBuilder.Entity<TUser>().Ignore(user => user.Exception);
+        modelBuilder.Entity<TUser>().HasIndex(x => x.ID);
+    }
+
+    private static void ConfigureRelationships(ModelBuilder modelBuilder)
+    {
         ConfigureCardRelationships(modelBuilder);
         ConfigureCreditRelationships(modelBuilder);
         ConfigureBankAccountRelationships(modelBuilder);
-
-        modelBuilder.Entity<TUser>().Ignore(user => user.Exception);
-    }
-
-    public virtual void SetTableNames(ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<TUser>()
-            .ToTable($"{nameof(User)}s");
-        modelBuilder.Entity<Card>()
-            .ToTable($"{nameof(Card)}s");
-        modelBuilder.Entity<BankAccount>()
-            .ToTable($"{nameof(BankAccount)}s");
-        modelBuilder.Entity<Bank>()
-            .ToTable($"{nameof(Bank)}s");
-        modelBuilder.Entity<Credit>()
-            .ToTable($"{nameof(Credit)}s");
     }
 
     private static void ConfigureCreditRelationships(ModelBuilder modelBuilder)

@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 
 namespace BankSystem7.Services.Repositories;
 
-public sealed class OperationRepository<TUser, TCard, TBankAccount, TBank, TCredit> : LoggerExecutor<OperationType>, IRepository<Operation>
+public sealed class OperationRepository<TUser, TCard, TBankAccount, TBank, TCredit> : LoggerExecutor<OperationType>, IExpressionRepository<Operation>
     where TUser : User
     where TCard : Card
     where TBankAccount : BankAccount

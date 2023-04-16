@@ -27,8 +27,6 @@ public class User
 
     public string PhoneNumber { get; set; }
 
-    public Guid? BankID { get; set; } = Guid.Empty;
-
     public int Age { get; set; }
     public Credit? Credit { get; set; }
 
@@ -39,7 +37,7 @@ public class User
 }
 
 /// <summary>
-/// defines model of possible exceptions of methods's returns
+/// defines model of possible exceptions of returns of methdos
 /// </summary>
 public enum ExceptionModel
 {

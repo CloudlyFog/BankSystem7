@@ -36,7 +36,8 @@ internal sealed class BankContext<TUser, TCard, TBankAccount, TBank, TCredit> : 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.EnableSensitiveDataLogging();
-        optionsBuilder.UseSqlServer(ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>.Connection);
+        optionsBuilder.UseSqlServer(ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>.Connection,
+            o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery));
     }
 
     /// <summary>

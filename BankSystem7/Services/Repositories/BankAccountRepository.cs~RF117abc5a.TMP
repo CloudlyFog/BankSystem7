@@ -6,7 +6,7 @@ using System.Data;
 
 namespace BankSystem7.Services.Repositories;
 
-public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit> : IRepository<TBankAccount>
+public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit> : IReadOnlyRepository<TBankAccount>
     where TUser : User
     where TCard : Card
     where TBankAccount : BankAccount
@@ -171,7 +171,7 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
         return ExceptionModel.Successfully;
     }
 
-    public IEnumerable<TBankAccount> All => _applicationContext.BankAccounts
+    public ICollection<TBankAccount> All => _applicationContext.BankAccounts
         .Include(x => x.User.Card)
         .Include(x => x.Bank)
         .AsNoTracking() ?? Enumerable.Empty<TBankAccount>();

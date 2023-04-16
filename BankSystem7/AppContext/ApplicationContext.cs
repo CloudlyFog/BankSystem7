@@ -1,7 +1,6 @@
 using BankSystem7.Models;
 using BankSystem7.Services;
 using BankSystem7.Services.Configuration;
-using BankSystem7.Services.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace BankSystem7.AppContext;
@@ -29,11 +28,6 @@ public class ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit> : Db
     public ApplicationContext(string connection)
     {
         ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>.SetConnection(connection);
-        DatabaseHandle();
-    }
-
-    public ApplicationContext(BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit> bankAccountRepository)
-    {
         DatabaseHandle();
     }
 

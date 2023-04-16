@@ -1,4 +1,5 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
+﻿using Microsoft.EntityFrameworkCore;
+using MongoDB.Bson.Serialization.Attributes;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -17,11 +18,13 @@ public class Bank
     };
 
     [Key]
-    public Guid ID { get; set; } = Guid.NewGuid(); // id for identification in the database
+    public Guid ID { get; set; } = Guid.NewGuid();
 
     public string BankName { get; set; } = string.Empty;
     public List<Credit> Credits { get; set; } = new();
     public List<BankAccount> BankAccounts { get; set; } = new();
+
+    [Precision(18, 2)]
     public decimal AccountAmount { get; set; }
 }
 
@@ -138,9 +141,7 @@ public class BankAccount
     public Card? Card { get; set; }
     public Bank? Bank { get; set; }
     public User? User { get; set; }
-
     public string PhoneNumber { get; set; }
-
     public AccountType AccountType { get; set; } = AccountType.User;
     public decimal BankAccountAmount { get; set; }
 }
@@ -156,7 +157,6 @@ public class Card
     public static readonly Card Default = new()
     {
         ID = Guid.Empty,
-        BankID = Guid.Empty,
         UserID = Guid.Empty,
         BankAccountID = Guid.Empty,
         Exception = CardException.Error,
@@ -171,7 +171,6 @@ public class Card
         if (user is null)
             return;
         UserID = user.ID;
-        user.BankID = bankAccount.BankID;
         User = user;
 
         if (bankAccount is null)
@@ -179,7 +178,6 @@ public class Card
 
         BankAccount = bankAccount;
         BankAccountID = bankAccount.ID;
-        BankID = bankAccount.BankID;
         Amount = bankAccount.BankAccountAmount;
 
         BankAccount.Bank = bankAccount.Bank;
@@ -192,7 +190,6 @@ public class Card
     [Key]
     public Guid ID { get; set; } = Guid.NewGuid();
 
-    public Guid? BankID { get; set; } = Guid.Empty;
     public Guid? BankAccountID { get; set; } = Guid.Empty;
     public Guid? UserID { get; set; } = Guid.Empty;
     public decimal Amount { get; set; }

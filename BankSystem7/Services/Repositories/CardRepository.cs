@@ -28,7 +28,8 @@ public sealed class CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
     {
         _bankAccountRepository = bankAccountRepository;
         _applicationContext = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ApplicationContext ??
-                              new ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>(bankAccountRepository);
+                              new ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>
+                              (BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.Connection);
     }
 
     public CardRepository(string connection)
@@ -98,21 +99,22 @@ public sealed class CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         return ExceptionModel.Successfully;
     }
 
-    public bool Exist(Expression<Func<TCard, bool>> predicate) => _applicationContext.Cards
+    public bool Exist(Func<TCard, bool> predicate) => _applicationContext.Cards
         .Include(x => x.BankAccount.Bank)
         .Include(x => x.User)
-        .AsNoTracking().Any(predicate);
+        .AsNoTracking().AsEnumerable()
+        .Any(predicate);
 
     public bool FitsConditions(TCard? item)
     {
         return item is not null && Exist(x => x.ID == item.ID);
     }
 
-    public TCard Get(Expression<Func<TCard, bool>> predicate)
+    public TCard Get(Func<TCard, bool> predicate)
     {
         return _applicationContext.Cards.AsNoTracking()
             .Include(x => x.User)
-            .Include(x => x.BankAccount.Bank)
+            .Include(x => x.BankAccount.Bank).AsEnumerable()
             .FirstOrDefault(predicate) ?? (TCard)Card.Default;
     }
 

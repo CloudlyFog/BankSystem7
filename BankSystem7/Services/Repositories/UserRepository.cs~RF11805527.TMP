@@ -7,7 +7,7 @@ using System.Data;
 
 namespace BankSystem7.Services.Repositories;
 
-public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> : LoggerExecutor<OperationType>, IRepository<TUser>
+public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> : LoggerExecutor<OperationType>, IReadOnlyRepository<TUser>
     where TUser : User
     where TCard : Card
     where TBankAccount : BankAccount
@@ -177,7 +177,7 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         return true;
     }
 
-    public IEnumerable<TUser> All =>
+    public IReadOnlyCollection<TUser> All =>
         _applicationContext.Users
         .Include(x => x.Card.BankAccount.Bank)
         .AsNoTracking() ?? Enumerable.Empty<TUser>();
