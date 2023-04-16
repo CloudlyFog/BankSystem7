@@ -186,7 +186,8 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
     {
         return _applicationContext.Users
             .Include(x => x.Card.BankAccount.Bank)
-            .AsNoTracking().AsEnumerable().FirstOrDefault(predicate) ?? (TUser)User.Default;
+            .AsNoTracking().AsEnumerable()
+            .FirstOrDefault(predicate) ?? (TUser)User.Default;
     }
 
     public ExceptionModel Update(TUser item)

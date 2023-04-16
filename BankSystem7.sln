@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestBankSystem", "G:\TestBa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benchmarks", "G:\TestBankSystem\Benchmarks\Benchmarks.csproj", "{5042DA93-6F69-460E-B881-B2DA3467846F}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Profiler", "G:\TestBankSystem\Profiler\Profiler.csproj", "{00F781F2-AC97-4BAC-9E45-705303EDB30F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{5042DA93-6F69-460E-B881-B2DA3467846F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5042DA93-6F69-460E-B881-B2DA3467846F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5042DA93-6F69-460E-B881-B2DA3467846F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{00F781F2-AC97-4BAC-9E45-705303EDB30F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00F781F2-AC97-4BAC-9E45-705303EDB30F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00F781F2-AC97-4BAC-9E45-705303EDB30F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00F781F2-AC97-4BAC-9E45-705303EDB30F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
