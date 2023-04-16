@@ -11,7 +11,7 @@ CREATE TABLE Users
 	BankID UNIQUEIDENTIFIER,
 	BankAccountAmount DECIMAL
 );
-INSERT INTO Users(ID, Name, Email, Password, Authenticated, Access, BankAccountID, BankID, BankAccountAmount) VALUES 
+INSERT INTO Users(ID, Name, Email, Password, Authenticated, Access, BankAccountID, BankID, BankAccountAmount) VALUES
 ('A08AB3E5-E3EC-47CD-84EF-C0EB75045A70', 'Admin','maximkirichenk0.06@gmail.com','erwkAsDWjzRNIZZrUawEwyd5z4r5ZGCbkTorVKuuhIw=', 1, 1, '216fbfbb-07a7-434e-9eff-fbeb1bd4e087', 'bed62930-9356-477a-bed5-b84d59336122', 1000)
 
 DROP TABLE BankAccounts
@@ -73,7 +73,7 @@ CREATE TABLE Cards
 	Expiration DATETIME,
 	CardKind INT,
 	CVV NVARCHAR(3),
-	Age INT CHECK(Age > 14 OR Age < 99) 
+	Age INT CHECK(Age > 14 OR Age < 99)
 )
 INSERT INTO Cards(ID, BankID, BankAccountID, Amount, Expiration, CardKind, CVV, Age) VALUES
 ('e0c100db-4262-408a-a43a-c29763bb7147', 'bed62930-9356-477a-bed5-b84d59336122', '216fbfbb-07a7-434e-9eff-fbeb1bd4e087', 100, '07/12/2026', 0, '542', 16),

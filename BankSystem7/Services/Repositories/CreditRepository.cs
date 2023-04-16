@@ -69,11 +69,24 @@ public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>
         return ExceptionModel.Successfully;
     }
 
-    public IEnumerable<TCredit> All => _applicationContext.Credits.AsNoTracking();
+    public IEnumerable<TCredit> All =>
+        _applicationContext.Credits
+        .Include(x => x.Bank).Include(x => x.User)
+        .AsNoTracking() ?? Enumerable.Empty<TCredit>();
 
-    public TCredit Get(Expression<Func<TCredit, bool>> predicate) => _applicationContext.Credits.AsNoTracking().FirstOrDefault(predicate);
+    public TCredit Get(Expression<Func<TCredit, bool>> predicate)
+    {
+        return _applicationContext.Credits
+        .Include(x => x.Bank).Include(x => x.User)
+        .AsNoTracking().FirstOrDefault(predicate) ?? (TCredit)Credit.Default;
+    }
 
-    public bool Exist(Expression<Func<TCredit, bool>> predicate) => _applicationContext.Credits.AsNoTracking().Any(predicate);
+    public bool Exist(Expression<Func<TCredit, bool>> predicate)
+    {
+        return _applicationContext.Credits
+            .Include(x => x.Bank).Include(x => x.User)
+            .AsNoTracking().Any(predicate);
+    }
 
     public bool FitsConditions(TCredit? item)
     {

@@ -15,8 +15,10 @@ public class Bank
         Credits = new List<Credit>(),
         BankAccounts = new List<BankAccount>(),
     };
+
     [Key]
     public Guid ID { get; set; } = Guid.NewGuid(); // id for identification in the database
+
     public string BankName { get; set; } = string.Empty;
     public List<Credit> Credits { get; set; } = new();
     public List<BankAccount> BankAccounts { get; set; } = new();
@@ -85,6 +87,7 @@ public class Credit
         var monthlyPayment = CreditAmount * (InterestRate / 1200) / decimal.Parse(x.ToString());
         return monthlyPayment * repaymentDateMonth;
     }
+
     public static Credit CreateInstance()
     {
         return new Credit();
@@ -125,11 +128,11 @@ public class BankAccount
 
     private BankAccount()
     {
-
-    };
+    }
 
     [Key]
     public Guid ID { get; set; } = Guid.NewGuid();
+
     public Guid? BankID { get; set; } = Guid.NewGuid();
     public Guid? UserID { get; set; } = Guid.Empty;
     public Card? Card { get; set; }
@@ -158,6 +161,7 @@ public class Card
         BankAccountID = Guid.Empty,
         Exception = CardException.Error,
     };
+
     private const int CvvLength = 3;
 
     public Card(int age, string cvv = "default", User user = null, BankAccount bankAccount = null)

@@ -52,7 +52,6 @@ public class ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit> : Db
         base.OnModelCreating(modelBuilder);
     }
 
-
     /// <summary>
     /// handle creating and deleting database
     /// </summary>

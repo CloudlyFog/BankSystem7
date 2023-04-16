@@ -64,6 +64,7 @@ public sealed class CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
     {
         if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;
+        _applicationContext.ChangeTracker.Clear();
         _applicationContext.Cards.Update(item);
         _applicationContext.SaveChanges();
         return ExceptionModel.Successfully;
@@ -90,23 +91,34 @@ public sealed class CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
     {
         if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;
+
+        _applicationContext.ChangeTracker.Clear();
         _applicationContext.Cards.Remove(item);
         _applicationContext.SaveChanges();
         return ExceptionModel.Successfully;
     }
 
-    public bool Exist(Expression<Func<TCard, bool>> predicate) => _applicationContext.Cards.AsNoTracking().Any(predicate);
+    public bool Exist(Expression<Func<TCard, bool>> predicate) => _applicationContext.Cards
+        .Include(x => x.BankAccount.Bank)
+        .Include(x => x.User)
+        .AsNoTracking().Any(predicate);
 
     public bool FitsConditions(TCard? item)
     {
         return item is not null && Exist(x => x.ID == item.ID);
     }
 
-    public TCard? Get(Expression<Func<TCard, bool>> predicate) => _applicationContext.Cards.AsNoTracking().FirstOrDefault(predicate);
+    public TCard Get(Expression<Func<TCard, bool>> predicate)
+    {
+        return _applicationContext.Cards.AsNoTracking()
+            .Include(x => x.User)
+            .Include(x => x.BankAccount.Bank)
+            .FirstOrDefault(predicate) ?? (TCard)Card.Default;
+    }
 
-    public IEnumerable<TCard> All => _applicationContext.Cards.AsNoTracking();
-
-    public void ChangeTrackerCardContext() => _applicationContext.ChangeTracker.Clear();
+    public IEnumerable<TCard> All => _applicationContext.Cards
+        .Include(x => x.BankAccount.Bank)
+        .Include(x => x.User).AsNoTracking();
 
     ~CardRepository()
     {

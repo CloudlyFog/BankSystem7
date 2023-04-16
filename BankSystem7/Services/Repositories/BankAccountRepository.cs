@@ -172,12 +172,17 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
         return ExceptionModel.Successfully;
     }
 
-    public IEnumerable<TBankAccount> All => _applicationContext.BankAccounts.Include(x => x.Bank).AsNoTracking();
+    public IEnumerable<TBankAccount> All => _applicationContext.BankAccounts
+        .Include(x => x.User.Card)
+        .Include(x => x.Bank)
+        .AsNoTracking() ?? Enumerable.Empty<TBankAccount>();
 
-    public TBankAccount? Get(Expression<Func<TBankAccount, bool>> predicate)
+    public TBankAccount Get(Expression<Func<TBankAccount, bool>> predicate)
     {
-        return _applicationContext.BankAccounts.Include(x => x.Bank)
-            .AsNoTracking().FirstOrDefault(predicate);
+        return _applicationContext.BankAccounts
+            .Include(x => x.Bank)
+            .Include(x => x.User.Card)
+            .AsNoTracking().FirstOrDefault(predicate) ?? (TBankAccount)BankAccount.Default;
     }
 
     /// <summary>
@@ -211,7 +216,11 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
     }
 
     public bool Exist(Expression<Func<TBankAccount, bool>> predicate)
-        => _applicationContext.BankAccounts.AsNoTracking().Any(predicate);
+    {
+        return _applicationContext.BankAccounts
+        .Include(x => x.Bank).Include(x => x.User.Card)
+        .AsNoTracking().Any(predicate);
+    }
 
     public bool FitsConditions(TBankAccount? item)
     {

@@ -8,6 +8,7 @@ public class User
     [NotMapped]
     public static readonly User Default = new()
     {
+        ID = Guid.Empty,
         Name = "name",
         Email = "email",
         Password = "password",
@@ -16,7 +17,7 @@ public class User
     };
 
     [Key]
-    public Guid? ID { get; } = Guid.NewGuid();
+    public Guid? ID { get; set; } = Guid.NewGuid();
 
     public string Name { get; set; } = string.Empty;
 
@@ -35,7 +36,6 @@ public class User
 
     [NotMapped]
     public ExceptionModel Exception { get; set; } = ExceptionModel.Successfully;
-
 }
 
 /// <summary>
