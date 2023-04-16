@@ -45,7 +45,7 @@ public sealed class OperationRepository<TUser, TCard, TBankAccount, TBank, TCred
 
     public void Dispose()
     {
-        _logger.Log(_reports);
+        _logger?.Log(_reports);
         _operationService = null;
         _logger = null;
         _reports = null;

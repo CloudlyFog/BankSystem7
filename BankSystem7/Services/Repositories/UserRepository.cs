@@ -54,7 +54,7 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
 
     public void Dispose()
     {
-        _logger.Log(_reports);
+        _logger?.Log(_reports);
         Dispose(true);
         GC.SuppressFinalize(this);
     }
@@ -85,7 +85,7 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
             return ExceptionModel.OperationFailed;
 
         //if user exists method will send false
-        if (Exist(x => x.ID == item.ID && x.Name == item.Name && x.Email == item.Email))
+        if (Exist(x => x.ID.Equals(item.ID) || x.Name.Equals(item.Name) && x.Email.Equals(item.Email)))
             return ExceptionModel.OperationRestricted;
         using var userCreationTransaction = _applicationContext.Database.BeginTransaction(IsolationLevel
                                                 .RepeatableRead);
@@ -158,7 +158,10 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         return _bankAccountRepository.Delete(_bankAccountRepository.Get(x => x.ID == item.Card.BankAccount.ID));
     }
 
-    public bool Exist(Expression<Func<TUser, bool>> predicate) => _applicationContext.Users.AsNoTracking().Any(predicate);
+    public bool Exist(Expression<Func<TUser, bool>> predicate) => 
+        _applicationContext.Users
+        .AsNoTracking()
+        .Any(predicate);
 
     public bool FitsConditions(TUser? item)
     {
