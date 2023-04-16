@@ -177,11 +177,11 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
     public IEnumerable<TUser> All => _applicationContext.Users
         .Include(x => x.Card.BankAccount).Include(x => x.Card.BankAccount.Bank).AsNoTracking();
 
-    public TUser? Get(Expression<Func<TUser, bool>> predicate)
+    public TUser Get(Expression<Func<TUser, bool>> predicate)
     {
         return _applicationContext.Users
             .Include(x => x.Card.BankAccount).Include(x => x.Card.BankAccount.Bank).Include(x => x.Credit)
-            .AsNoTracking().FirstOrDefault(predicate);
+            .AsNoTracking().FirstOrDefault(predicate) ?? (TUser)User.Default;
     }
 
     public ExceptionModel Update(TUser item)

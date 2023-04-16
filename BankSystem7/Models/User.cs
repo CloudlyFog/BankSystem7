@@ -5,8 +5,18 @@ namespace BankSystem7.Models;
 
 public class User
 {
+    [NotMapped]
+    public static readonly User Default = new()
+    {
+        Name = "name",
+        Email = "email",
+        Password = "password",
+        PhoneNumber = "123456789",
+        Age = 0,
+    };
+
     [Key]
-    public Guid? ID { get; set; } = Guid.NewGuid();
+    public Guid? ID { get; } = Guid.NewGuid();
 
     public string Name { get; set; } = string.Empty;
 
@@ -25,6 +35,7 @@ public class User
 
     [NotMapped]
     public ExceptionModel Exception { get; set; } = ExceptionModel.Successfully;
+
 }
 
 /// <summary>
@@ -39,8 +50,9 @@ public enum ExceptionModel
     OperationNotExist = 401
 }
 
-public enum Warning
+public enum CardException
 {
     NoRestrictions,
     AgeRestricted,
+    Error,
 }

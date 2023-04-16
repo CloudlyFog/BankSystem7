@@ -77,7 +77,7 @@ public sealed class CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
     /// <returns></returns>
     public ExceptionModel Create(TCard item)
     {
-        if (item.Exception == Warning.AgeRestricted)
+        if (item.Exception == CardException.AgeRestricted)
             return ExceptionModel.OperationRestricted;
         if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;

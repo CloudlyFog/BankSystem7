@@ -6,12 +6,20 @@ namespace BankSystem7.Models;
 
 public class Bank
 {
+    [NotMapped]
+    public static readonly Bank Default = new()
+    {
+        ID = Guid.Empty,
+        BankName = "bankName",
+        AccountAmount = 0,
+        Credits = new List<Credit>(),
+        BankAccounts = new List<BankAccount>(),
+    };
     [Key]
     public Guid ID { get; set; } = Guid.NewGuid(); // id for identification in the database
-
     public string BankName { get; set; } = string.Empty;
-    public List<Credit>? Credits { get; set; } = new();
-    public List<BankAccount>? BankAccounts { get; set; } = new();
+    public List<Credit> Credits { get; set; } = new();
+    public List<BankAccount> BankAccounts { get; set; } = new();
     public decimal AccountAmount { get; set; }
 }
 
@@ -29,22 +37,12 @@ public class Operation
 
 public class Credit
 {
-    public static Credit CreateInstance()
+    [NotMapped]
+    public static readonly Credit Default = new()
     {
-        return new Credit();
-    }
-
-    public static Credit CreateInstance(decimal creditAmount, decimal interestRate, DateTime repaymentDate, User user = null, Bank bank = null)
-    {
-        var credit = new Credit(user, bank)
-        {
-            CreditAmount = creditAmount,
-            InterestRate = interestRate,
-            RepaymentDate = repaymentDate,
-        };
-        credit.RepaymentAmount = credit.CalculateRepaymentAmount();
-        return credit;
-    }
+        ID = Guid.Empty,
+        OperationStatus = StatusOperationCode.Error,
+    };
 
     private Credit()
     {
@@ -87,13 +85,35 @@ public class Credit
         var monthlyPayment = CreditAmount * (InterestRate / 1200) / decimal.Parse(x.ToString());
         return monthlyPayment * repaymentDateMonth;
     }
+    public static Credit CreateInstance()
+    {
+        return new Credit();
+    }
+
+    public static Credit CreateInstance(decimal creditAmount, decimal interestRate, DateTime repaymentDate, User user = null, Bank bank = null)
+    {
+        var credit = new Credit(user, bank)
+        {
+            ID = Guid.Empty,
+            CreditAmount = creditAmount,
+            InterestRate = interestRate,
+            RepaymentDate = repaymentDate,
+        };
+        credit.RepaymentAmount = credit.CalculateRepaymentAmount();
+        return credit;
+    }
 }
 
 public class BankAccount
 {
-    public BankAccount()
+    [NotMapped]
+    public static readonly BankAccount Default = new()
     {
-    }
+        ID = Guid.Empty,
+        BankID = Guid.Empty,
+        UserID = Guid.Empty,
+        PhoneNumber = "123456789",
+    };
 
     public BankAccount(User user, Bank bank)
     {
@@ -103,12 +123,15 @@ public class BankAccount
         BankID = bank.ID;
     }
 
+    private BankAccount()
+    {
+
+    };
+
     [Key]
     public Guid ID { get; set; } = Guid.NewGuid();
-
     public Guid? BankID { get; set; } = Guid.NewGuid();
     public Guid? UserID { get; set; } = Guid.Empty;
-
     public Card? Card { get; set; }
     public Bank? Bank { get; set; }
     public User? User { get; set; }
@@ -127,6 +150,14 @@ public class BankAccount
 /// </summary>
 public class Card
 {
+    public static readonly Card Default = new()
+    {
+        ID = Guid.Empty,
+        BankID = Guid.Empty,
+        UserID = Guid.Empty,
+        BankAccountID = Guid.Empty,
+        Exception = CardException.Error,
+    };
     private const int CvvLength = 3;
 
     public Card(int age, string cvv = "default", User user = null, BankAccount bankAccount = null)
@@ -164,12 +195,12 @@ public class Card
     public DateTime Expiration { get; } = DateTime.Now.AddYears(4);
     public CardKind CardKind { get; set; } = CardKind.DebitCard;
     public string CVV { get; init; } = "000";
-    public int Age { get; init; } = -1;
+    public int Age { get; init; } = 0;
     public User? User { get; set; }
     public BankAccount? BankAccount { get; set; }
 
     [NotMapped]
-    public Warning Exception { get; private set; } = Warning.NoRestrictions;
+    public CardException Exception { get; private set; } = CardException.NoRestrictions;
 
     private static string SetCvv(string cvv)
     {
@@ -183,7 +214,7 @@ public class Card
     private int SetAge(int age)
     {
         if (age < 14 || age > 99)
-            Exception = Warning.AgeRestricted;
+            Exception = CardException.AgeRestricted;
         return age;
     }
 
