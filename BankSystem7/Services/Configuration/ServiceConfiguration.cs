@@ -35,7 +35,7 @@ public class ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>
             LoggerRepository = new LoggerRepository(Options.LoggerOptions);
             Logger = new Logger<TUser, TCard, TBankAccount, TBank, TCredit>(LoggerRepository, Options.LoggerOptions);
         }
-        OperationRepository = new OperationRepository<TUser, TCard, TBankAccount, TBank, TCredit>(Logger, Options.OperationOptions);
+        OperationRepository = new OperationRepository<TUser, TCard, TBankAccount, TBank, TCredit>(Options.OperationOptions);
     }
 
     public BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit>? BankAccountRepository { get; protected internal set; }

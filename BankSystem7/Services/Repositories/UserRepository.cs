@@ -1,6 +1,5 @@
 ﻿using BankSystem7.AppContext;
 using BankSystem7.Models;
-using BankSystem7.Services.Configuration;
 using BankSystem7.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
@@ -18,8 +17,6 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
     private ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit> _applicationContext;
     private BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> _bankRepository;
     private CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> _cardRepository;
-    private ILogger _logger;
-    private List<GeneralReport<OperationType>> _reports = new();
     private bool _disposed;
 
     public UserRepository()
@@ -30,8 +27,6 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         _applicationContext = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ApplicationContext ??
                               new ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>
                               (BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.Connection);
-        _logger = new Logger<TUser, TCard, TBankAccount, TBank, TCredit>
-            (ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>.Options.LoggerOptions);
     }
 
     public UserRepository(string connection)
@@ -42,7 +37,6 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         _applicationContext = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ApplicationContext ??
                               new ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>
                               (BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.Connection);
-        _logger = new Logger<TUser, TCard, TBankAccount, TBank, TCredit>(ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>.Options.LoggerOptions);
     }
 
     public UserRepository(BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit> repository)
@@ -52,12 +46,10 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         _cardRepository = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ServiceConfiguration?.CardRepository ?? new CardRepository<TUser, TCard, TBankAccount, TBank, TCredit>(_bankAccountRepository);
         _applicationContext = new ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>
             (BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.Connection);
-        _logger = new Logger<TUser, TCard, TBankAccount, TBank, TCredit>(ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>.Options.LoggerOptions);
     }
 
     public void Dispose()
     {
-        _logger?.Log(_reports);
         Dispose(true);
         GC.SuppressFinalize(this);
     }
@@ -77,8 +69,6 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         _bankRepository = null;
         _cardRepository = null;
         _applicationContext = null;
-        _reports = null;
-        _logger = null;
         _disposed = true;
     }
 
@@ -102,7 +92,7 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
 
         Bank bank = null;
 
-        if (_bankRepository.Exist(x => x.ID == item.Card.BankAccount.Bank.ID))
+        if (_bankRepository.Exist(x => x.ID == item.Card.BankAccount.Bank.ID || x.BankName == item.Card.BankAccount.Bank.BankName))
         {
             bank = item.Card.BankAccount.Bank;
             item.Card.BankAccount.Bank = null;
@@ -224,7 +214,6 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
 
     ~UserRepository()
     {
-        _logger.Log(_reports);
         Dispose(false);
     }
 }

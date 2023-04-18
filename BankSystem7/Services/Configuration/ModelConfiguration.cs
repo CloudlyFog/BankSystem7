@@ -8,6 +8,7 @@ public class ModelConfiguration<TUser> where TUser : User
     public virtual void Invoke(ModelBuilder modelBuilder)
     {
         ConfigureRelationships(modelBuilder);
+        ConfigureDecimalColumnTypes(modelBuilder);
 
         modelBuilder.Entity<TUser>().Ignore(user => user.Exception);
         modelBuilder.Entity<TUser>().HasIndex(x => x.ID);
@@ -18,6 +19,16 @@ public class ModelConfiguration<TUser> where TUser : User
         ConfigureCardRelationships(modelBuilder);
         ConfigureCreditRelationships(modelBuilder);
         ConfigureBankAccountRelationships(modelBuilder);
+    }
+
+    private static void ConfigureDecimalColumnTypes(ModelBuilder modelBuilder)
+    {
+        foreach (var property in modelBuilder.Model.GetEntityTypes()
+                .SelectMany(t => t.GetProperties())
+                .Where(p => p.ClrType == typeof(decimal) || p.ClrType == typeof(decimal?)))
+        {
+            property.SetColumnType("decimal(18,2)");
+        }
     }
 
     private static void ConfigureCreditRelationships(ModelBuilder modelBuilder)
