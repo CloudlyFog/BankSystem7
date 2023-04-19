@@ -1,6 +1,6 @@
-﻿using System.Linq.Expressions;
-using BankSystem7.Models;
+﻿using BankSystem7.Models;
 using MongoDB.Driver;
+using System.Linq.Expressions;
 
 namespace BankSystem7.Services.Repositories;
 
@@ -20,11 +20,13 @@ public sealed class LoggerRepository
         };
         _operationService = new OperationService<Report>(LoggerOptions.OperationServiceOptions ?? new OperationServiceOptions());
     }
+
     public LoggerRepository(LoggerOptions options)
     {
         _operationService = new OperationService<Report>(options?.OperationServiceOptions ?? new OperationServiceOptions());
         LoggerOptions = options;
     }
+
     public LoggerOptions LoggerOptions { get; }
 
     public ExceptionModel Create(Report? item)
@@ -59,6 +61,7 @@ public sealed class LoggerRepository
     }
 
     public IEnumerable<Report> All => _operationService.Collection.Find(_ => true).ToList();
+
     public Report Get(Expression<Func<Report, bool>> predicate)
     {
         var report = (GeneralReport<OperationType>)_operationService.Collection.Find(predicate).FirstOrDefault();

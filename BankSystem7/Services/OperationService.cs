@@ -11,7 +11,7 @@ internal sealed class OperationService<T> where T : class
     public const string DefaultConnection = "mongodb://localhost:27017";
     public const string DefaultDatabaseName = "Test";
     public const string DefaultCollectionName = "Operations";
-    
+
     public OperationService()
     {
         _settings = MongoClientSettings.FromConnectionString(DefaultConnection);
@@ -19,6 +19,7 @@ internal sealed class OperationService<T> where T : class
         _database = _client.GetDatabase(DefaultDatabaseName);
         Collection = _database.GetCollection<T>(DefaultCollectionName);
     }
+
     public OperationService(string databaseName)
     {
         _settings = MongoClientSettings.FromConnectionString(DefaultConnection);
@@ -26,6 +27,7 @@ internal sealed class OperationService<T> where T : class
         _database = _client.GetDatabase(databaseName);
         Collection = _database.GetCollection<T>(DefaultCollectionName);
     }
+
     public OperationService(OperationServiceOptions? options)
     {
         _settings = MongoClientSettings.FromConnectionString(options?.Connection ?? DefaultConnection);

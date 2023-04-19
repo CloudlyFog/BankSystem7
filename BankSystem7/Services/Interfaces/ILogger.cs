@@ -6,7 +6,9 @@ public interface ILogger
 {
     public bool IsReused { get; set; }
     public LoggerOptions LoggerOptions { get; set; }
+
     ExceptionModel Log(Report report);
+
     ExceptionModel Log(IEnumerable<Report> reports);
 }
 

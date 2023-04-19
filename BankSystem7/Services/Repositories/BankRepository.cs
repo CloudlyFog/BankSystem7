@@ -1,14 +1,13 @@
-﻿using BankSystem7.Services.Interfaces;
-using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
-using BankSystem7.AppContext;
+﻿using BankSystem7.AppContext;
 using BankSystem7.Models;
+using BankSystem7.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace BankSystem7.Services.Repositories;
 
 public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> : IRepository<TBank>
-    where TUser : User 
-    where TCard : Card 
+    where TUser : User
+    where TCard : Card
     where TBankAccount : BankAccount
     where TBank : Bank
     where TCredit : Credit
@@ -19,6 +18,7 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
     internal bool AnotherBankTransactionOperation { get; set; }
 
     private bool _disposedValue;
+
     public BankRepository()
     {
         _bankContext = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.BankContext ?? new BankContext<TUser, TCard, TBankAccount, TBank, TCredit>();
@@ -35,6 +35,7 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         _applicationContext = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ApplicationContext ??
                               new ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>(connection);
     }
+
     public void Dispose()
     {
         Dispose(true);
@@ -44,11 +45,11 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
     // Protected implementation of Dispose pattern.
     private void Dispose(bool disposing)
     {
-        if (_disposedValue) 
+        if (_disposedValue)
             return;
         if (disposing)
         {
-            if (BankContext is null) 
+            if (BankContext is null)
                 return;
             _bankContext.Dispose();
             BankContext.Dispose();
@@ -62,7 +63,7 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
         _disposedValue = true;
     }
-        
+
     /// <summary>
     /// accrual money to user bank account from bank's account
     /// </summary>
@@ -75,13 +76,13 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
             return ExceptionModel.VariableIsNull;
         if (operation.OperationStatus != StatusOperationCode.Successfully)
             return (ExceptionModel)operation.OperationStatus.GetHashCode();
-            
+
         if (user is null)
             return ExceptionModel.VariableIsNull;
 
         if (AnotherBankTransactionOperation)
             user.Card.BankAccount.Bank.AccountAmount -= operation.TransferAmount;
-        
+
         user.Card.BankAccount.BankAccountAmount += operation.TransferAmount;
         user.Card.Amount = user.Card.BankAccount.BankAccountAmount;
         _bankContext.ChangeTracker.Clear();
@@ -97,7 +98,7 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         }
         return ExceptionModel.Successfully;
     }
-    
+
     /// <summary>
     /// withdraw money from user bank account and accrual to bank's account
     /// </summary>
@@ -113,7 +114,7 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
 
         if (AnotherBankTransactionOperation)
             user.Card.BankAccount.Bank.AccountAmount += operation.TransferAmount;
-        
+
         user.Card.BankAccount.BankAccountAmount -= operation.TransferAmount;
         user.Card.Amount = user.Card.BankAccount.BankAccountAmount;
         _bankContext.ChangeTracker.Clear();
@@ -129,6 +130,7 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         }
         return ExceptionModel.Successfully;
     }
+
     public ExceptionModel Create(TBank item)
     {
         if (item is null)
@@ -139,7 +141,7 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
             Update(item);
         else
             _applicationContext.Add(item);
-        
+
         _applicationContext.SaveChanges();
         return ExceptionModel.Successfully;
     }
@@ -149,26 +151,42 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;
 
+        _applicationContext.ChangeTracker.Clear();
         _applicationContext.Remove(item);
         _applicationContext.SaveChanges();
         return ExceptionModel.Successfully;
     }
 
-    public bool Exist(Expression<Func<TBank, bool>> predicate) => _applicationContext.Banks.AsNoTracking().Any(predicate);
+    public bool Exist(Func<TBank, bool> predicate) =>
+        _applicationContext.Banks
+        .Include(x => x.BankAccounts)
+        .Include(x => x.Credits)
+        .AsNoTracking().AsEnumerable()
+        .Any(predicate);
+
     public bool FitsConditions(TBank? item)
     {
         return item is not null && Exist(x => x.ID == item.ID);
     }
 
-    public IEnumerable<TBank> All => _applicationContext.Banks.AsNoTracking();
+    public IEnumerable<TBank> All =>
+        _applicationContext.Banks
+        .Include(x => x.BankAccounts)
+        .Include(x => x.Credits)
+        .AsNoTracking() ?? Enumerable.Empty<TBank>();
 
-    public TBank? Get(Expression<Func<TBank, bool>> predicate) => _applicationContext.Banks.AsNoTracking().FirstOrDefault(predicate);
+    public TBank Get(Func<TBank, bool> predicate) => _applicationContext.Banks
+        .Include(x => x.BankAccounts)
+        .Include(x => x.Credits)
+        .AsNoTracking().AsEnumerable()
+        .FirstOrDefault(predicate) ?? (TBank)Bank.Default;
 
     public ExceptionModel Update(TBank item)
     {
         if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;
 
+        _applicationContext.ChangeTracker.Clear();
         _applicationContext.Banks.Update(item);
         _applicationContext.SaveChanges();
         return ExceptionModel.Successfully;
