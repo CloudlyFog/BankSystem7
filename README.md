@@ -2,7 +2,7 @@
 This library provides opportunities for using likeness of bank system. You can handle not only users but also other models like banks, cards and etc.
 
 ### Updates in version 0.3.8
-- Removed unnecessary asynchronously from method Transfer in BankAccountRepository.
+- Removed unnecessary asynchrony from method Transfer in BankAccountRepository.
 ****
 # Documentation
 
