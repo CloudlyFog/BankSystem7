@@ -1,8 +1,6 @@
 # Bank system 7
 This library provides opportunities for using likeness of bank system. You can handle not only users but also other models like banks, cards and etc.
 
-**It's a beta version of library. Some exceptions can be weren't found.**
-
 ### Updates in version 0.3.7
 - Improved performance of queries.
 - Added split interfaces to `IRepository<T>` for more flexible architecture.
@@ -97,35 +95,35 @@ Here located interfaces which describes behavior of inherited repo-classes.
 - `bool FitsConditions(T? item);` - implements logic for checking on conditions true of passed entity.
 
 3. Interface `IReaderService<T> where T : class` - interface for implement reading data from database.   
-   <br>**Methods**
+<br>**Methods**
 - `T Get(Func<T, bool> predicate);` - implements getting an object from database with predicate.
 - `bool Exist(Func<T, bool> predicate);` - implements checking exist object with in database predicate.
-  <br>**Properties**
+<br>**Properties**
 - `IEnumerable<T> All {  get; }` - implements getting a sequence of the objects from database.
 
 4. Interface `IExpressionReaderService<T> where T : class` - interface for implement reading data from database with another type of parameters.
-   <br>**Methods**
+<br>**Methods**
 - `T Get(Expression<Func<T, bool>> predicate);` - implements getting an object from database with predicate.
 - `bool Exist(Expression<Func<T, bool>> predicate);` - implements checking exist object with in database predicate.
-  **Properties**
+    **Properties**
 - `IEnumerable<T> All {  get; }` - implements getting a sequence of the objects from database.
 
 5. Interface `IWriterService<in T> where T : class` - interface for implement writing, updating and deleting data in database
-   <br>**Methods**
+<br>**Methods**
 - `ExceptionModel  Create(T item);` - implements adding item in database.
 - `ExceptionModel  Update(T item);` - implements updating item in database.
 - `ExceptionModel  Delete(T item);` - implements deleting item from database.
 
 6. Interface `ILogger` - interface that provides standard set for logging
-   <br>**Methods**
+<br>**Methods**
 - `ExceptionModel Log(Report report);` - implements logging report in database.
 - `ExceptionModel Log(IEnumerable<Report> reports);` - implements logging collection of reports in database.
-  <br>**Properties**
+<br>**Properties**
 - `public bool IsReused { get; set; }` - defines possibility use already initialized logger.
 - `public LoggerOptions LoggerOptions { get; set; }` - defines options for logger configuration.
 
 7. Abstract class `LoggerExecutor<TOperationType> where TOperationType : Enum` - simple implementation of service for added reports to logger queue
-   <br>**Methods**
+<br>**Methods**
 - `virtual void Log(ExceptionModel exceptionModel, string methodName, string className, TOperationType operationType, ICollection<GeneralReport<TOperationType>> reports)` - implements standard logic of inserting log data to logger queue. Can be overrided.
 
 ### Repositories

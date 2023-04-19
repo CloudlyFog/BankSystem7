@@ -1,8 +1,6 @@
 # Bank system 7
 This library provides opportunities for using likeness of bank system. You can handle not only users but also other models like banks, cards and etc.
 
-**It's a beta version of library. Some exceptions can be weren't found.**
-
 ### Updates in version 0.3.7
 - Improved performance of queries.
 - Added split interfaces to `IRepository<T>` for more flexible architecture.
