@@ -7,27 +7,28 @@ public class ModelConfiguration<TUser> where TUser : User
 {
     public virtual void Invoke(ModelBuilder modelBuilder)
     {
+        ConfigureRelationships(modelBuilder);
+        ConfigureDecimalColumnTypes(modelBuilder);
+
+        modelBuilder.Entity<TUser>().Ignore(user => user.Exception);
+        modelBuilder.Entity<TUser>().HasIndex(x => x.ID);
+    }
+
+    private static void ConfigureRelationships(ModelBuilder modelBuilder)
+    {
         ConfigureCardRelationships(modelBuilder);
         ConfigureCreditRelationships(modelBuilder);
         ConfigureBankAccountRelationships(modelBuilder);
-        
-        //SetTableNames(modelBuilder);
-        
-        modelBuilder.Entity<TUser>().Ignore(user => user.Exception);
     }
 
-    public virtual void SetTableNames(ModelBuilder modelBuilder)
+    private static void ConfigureDecimalColumnTypes(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<TUser>()
-            .ToTable($"{nameof(User)}s");
-        modelBuilder.Entity<Card>()
-            .ToTable($"{nameof(Card)}s");
-        modelBuilder.Entity<BankAccount>()
-            .ToTable($"{nameof(BankAccount)}s");
-        modelBuilder.Entity<Bank>()
-            .ToTable($"{nameof(Bank)}s");
-        modelBuilder.Entity<Credit>()
-            .ToTable($"{nameof(Credit)}s");
+        foreach (var property in modelBuilder.Model.GetEntityTypes()
+                .SelectMany(t => t.GetProperties())
+                .Where(p => p.ClrType == typeof(decimal) || p.ClrType == typeof(decimal?)))
+        {
+            property.SetColumnType("decimal(18,2)");
+        }
     }
 
     private static void ConfigureCreditRelationships(ModelBuilder modelBuilder)
@@ -38,7 +39,7 @@ public class ModelConfiguration<TUser> where TUser : User
             .WithMany(bank => bank.Credits)
             .HasForeignKey(credit => credit.BankID)
             .OnDelete(DeleteBehavior.Cascade);
-        
+
         // user
         modelBuilder.Entity<Credit>()
             .HasOne(credit => credit.User)
@@ -55,7 +56,6 @@ public class ModelConfiguration<TUser> where TUser : User
             .WithOne(user => user.Card)
             .HasForeignKey<Card>(card => card.UserID)
             .OnDelete(DeleteBehavior.Cascade);
-
     }
 
     private static void ConfigureBankAccountRelationships(ModelBuilder modelBuilder)

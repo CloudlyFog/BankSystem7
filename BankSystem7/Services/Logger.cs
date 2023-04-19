@@ -5,8 +5,8 @@ using BankSystem7.Services.Repositories;
 namespace BankSystem7.Services;
 
 public sealed class Logger<TUser, TCard, TBankAccount, TBank, TCredit> : ILogger
-    where TUser : User 
-    where TCard : Card 
+    where TUser : User
+    where TCard : Card
     where TBankAccount : BankAccount
     where TBank : Bank
     where TCredit : Credit
@@ -25,6 +25,7 @@ public sealed class Logger<TUser, TCard, TBankAccount, TBank, TCredit> : ILogger
             },
         };
     }
+
     public Logger(ILogger logger)
     {
         _logger = logger;
@@ -67,7 +68,7 @@ public sealed class Logger<TUser, TCard, TBankAccount, TBank, TCredit> : ILogger
     {
         if (reports is null || reports.Any(x => x is null))
             return ExceptionModel.VariableIsNull;
-        
+
         foreach (var report in reports)
         {
             var log = Log(report);

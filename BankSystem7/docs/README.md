@@ -1,11 +1,10 @@
-
 # Bank system 7
 This library provides opportunities for using likeness of bank system. You can handle not only users but also other models like banks, cards and etc.
 
 **It's a beta version of library. Some exceptions can be weren't found.**
 
-### Updates in version 0.3.5-beta
-- Added possibility use own models in repositories.
+### Updates in version 0.3.7-beta
+-
 ****
 # Documentation
 
@@ -50,7 +49,6 @@ There are 2 classes context:
 5. `protected internal DbSet<BankAccount> BankAccounts { get; set; }` - an instance of the table `BankAccounts` in database.
 6. `protected internal DbSet<Credit> Credits { get; set; }` - an instance of the table `Credits` in database.
 
-
 #### API BankContext
 
 **Methods:**
@@ -68,7 +66,6 @@ There are 2 classes context:
 3. `public DbSet<Operation> Operations { get; set; }` - an instance of the table `Operations` in database.
 4. `public DbSet<BankAccount> BankAccounts { get; set; }` - an instance of the table `BankAccounts` in database.
 
-
 ### Services
 Services are dividing on 3 sub-folders:
 
@@ -81,7 +78,6 @@ And some classes that don't belong to any of folders:
 1. `BankServiceOptions` - defines options that used by internal services.
 2. `Logger` - service for logging some info about repositories operations.
 3. `OperationService` - provides connection to mongodb services.
-
 
 ### Configuration
 Here located services for configuring library.
@@ -107,7 +103,6 @@ Here located interfaces which describes behavior of inherited repo-classes.
 - `public bool IsReused { get; set; }` - defines possibility use already initialized logger.
 - `public LoggerOptions LoggerOptions { get; set; }` - defines options for logger configuration.
 
-
 ### Repositories
 Repositories are implementation of various interfaces and working with context classes for interact with database.
 
@@ -118,7 +113,6 @@ Repositories are implementation of various interfaces and working with context c
 5. `CreditRepository` - implements interface `IRepository<T>` for handling credit model and  operations with credit(loan). For example: take, pay credit.
 6. `LoggerRepository` - implements interface `IRepository<T>` for handling reports.
 7. `OperationRepository` - implements interface `IRepository<T>` for handling operations.
-
 
 ## When cause exception or error?
 There are a lot of points when you can catch an exception or error while using api of project but we describe some of them:

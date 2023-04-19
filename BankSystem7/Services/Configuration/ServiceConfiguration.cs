@@ -7,8 +7,8 @@ using Microsoft.AspNetCore.Http;
 namespace BankSystem7.Services.Configuration;
 
 public class ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>
-    where TUser : User 
-    where TCard : Card 
+    where TUser : User
+    where TCard : Card
     where TBankAccount : BankAccount
     where TBank : Bank
     where TCredit : Credit
@@ -21,9 +21,8 @@ public class ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>
     public const string DefaultDataSource = "maxim";
     private const string DefaultDatabaseName = "Test";
 
-    
     private bool _disposed;
-    
+
     private ServiceConfiguration()
     {
         BankAccountRepository = new BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit>(Connection);
@@ -36,10 +35,10 @@ public class ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>
             LoggerRepository = new LoggerRepository(Options.LoggerOptions);
             Logger = new Logger<TUser, TCard, TBankAccount, TBank, TCredit>(LoggerRepository, Options.LoggerOptions);
         }
-        OperationRepository = new OperationRepository<TUser, TCard, TBankAccount, TBank, TCredit>(Logger, Options.OperationOptions);
+        OperationRepository = new OperationRepository<TUser, TCard, TBankAccount, TBank, TCredit>(Options.OperationOptions);
     }
-    
-    public BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit>? BankAccountRepository { get; protected internal  set; }
+
+    public BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit>? BankAccountRepository { get; protected internal set; }
     public BankRepository<TUser, TCard, TBankAccount, TBank, TCredit>? BankRepository { get; protected internal set; }
     public CardRepository<TUser, TCard, TBankAccount, TBank, TCredit>? CardRepository { get; protected internal set; }
     public UserRepository<TUser, TCard, TBankAccount, TBank, TCredit>? UserRepository { get; protected internal set; }
@@ -68,7 +67,7 @@ public class ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>
             BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.Connection = Connection;
             return;
         }
-        
+
         Connection = @$"Server=localhost\\SQLEXPRESS;Data Source={dataSource};Initial Catalog={databaseName};
             Integrated Security=True;Persist Security Info=False;Pooling=False;
             MultipleActiveResultSets=False; Encrypt=False;TrustServerCertificate=False";
@@ -88,7 +87,8 @@ public class ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>
 
     private void Dispose(bool disposing)
     {
-        if (_disposed) return;
+        if (_disposed)
+            return;
         if (disposing)
         {
             BankAccountRepository?.Dispose();

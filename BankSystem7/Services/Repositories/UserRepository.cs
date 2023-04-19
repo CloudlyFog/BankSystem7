@@ -1,17 +1,14 @@
-﻿using System.Data;
-using System.Linq.Expressions;
-using BankSystem7.AppContext;
+﻿using BankSystem7.AppContext;
 using BankSystem7.Models;
-using BankSystem7.Services.Configuration;
 using BankSystem7.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 
 namespace BankSystem7.Services.Repositories;
 
-
-public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> : LoggerExecutor<OperationType>, IRepository<TUser> 
-    where TUser : User 
-    where TCard : Card 
+public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> : LoggerExecutor<OperationType>, IRepository<TUser>
+    where TUser : User
+    where TCard : Card
     where TBankAccount : BankAccount
     where TBank : Bank
     where TCredit : Credit
@@ -20,48 +17,72 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
     private ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit> _applicationContext;
     private BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> _bankRepository;
     private CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> _cardRepository;
-    private ILogger _logger;
-    private List<GeneralReport<OperationType>> _reports = new();
     private bool _disposed;
+
     public UserRepository()
     {
         _bankAccountRepository = new BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit>(BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.Connection);
         _bankRepository = new BankRepository<TUser, TCard, TBankAccount, TBank, TCredit>(BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.Connection);
         _cardRepository = new CardRepository<TUser, TCard, TBankAccount, TBank, TCredit>(_bankAccountRepository);
         _applicationContext = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ApplicationContext ??
-                              new ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>(_bankAccountRepository);
-        _logger = new Logger<TUser, TCard, TBankAccount, TBank, TCredit>(ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>.Options.LoggerOptions);
+                              new ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>
+                              (BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.Connection);
     }
+
     public UserRepository(string connection)
     {
         _bankAccountRepository = new BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit>(connection);
         _bankRepository = new BankRepository<TUser, TCard, TBankAccount, TBank, TCredit>(connection);
         _cardRepository = new CardRepository<TUser, TCard, TBankAccount, TBank, TCredit>(_bankAccountRepository);
         _applicationContext = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ApplicationContext ??
-                              new ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>(_bankAccountRepository);
-        _logger = new Logger<TUser, TCard, TBankAccount, TBank, TCredit>(ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>.Options.LoggerOptions);
-        
+                              new ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>
+                              (BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.Connection);
     }
+
     public UserRepository(BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit> repository)
     {
         _bankAccountRepository = repository;
         _bankRepository = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ServiceConfiguration?.BankRepository ?? new BankRepository<TUser, TCard, TBankAccount, TBank, TCredit>(BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.Connection);
         _cardRepository = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ServiceConfiguration?.CardRepository ?? new CardRepository<TUser, TCard, TBankAccount, TBank, TCredit>(_bankAccountRepository);
-        _applicationContext = new ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>(_bankAccountRepository);
-        _logger = new Logger<TUser, TCard, TBankAccount, TBank, TCredit>(ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>.Options.LoggerOptions);
+        _applicationContext = new ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>
+            (BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.Connection);
     }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    private void Dispose(bool disposing)
+    {
+        if (_disposed)
+            return;
+        if (disposing)
+        {
+            _bankAccountRepository.Dispose();
+            _bankRepository.Dispose();
+            _cardRepository.Dispose();
+            _applicationContext.Dispose();
+        }
+        _bankAccountRepository = null;
+        _bankRepository = null;
+        _cardRepository = null;
+        _applicationContext = null;
+        _disposed = true;
+    }
+
     public ExceptionModel Create(TUser item)
     {
         if (item?.Card?.BankAccount?.Bank is null)
             return ExceptionModel.OperationFailed;
-            
+
         //if user exists method will send false
-        if (Exist(x => x.ID == item.ID))
-            return ExceptionModel.OperationFailed;
+        if (Exist(x => x.ID.Equals(item.ID) || x.Name.Equals(item.Name) && x.Email.Equals(item.Email)))
+            return ExceptionModel.OperationRestricted;
         using var userCreationTransaction = _applicationContext.Database.BeginTransaction(IsolationLevel
                                                 .RepeatableRead);
-            
-        
+
         var avoidDuplication = _applicationContext.AvoidDuplication(item.Card.BankAccount.Bank);
         if (avoidDuplication != ExceptionModel.Successfully)
         {
@@ -71,14 +92,15 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
 
         Bank bank = null;
 
-        if (_bankRepository.Exist(x => x.ID == item.Card.BankAccount.Bank.ID))
+        if (_bankRepository.Exist(x => x.ID == item.Card.BankAccount.Bank.ID || x.BankName == item.Card.BankAccount.Bank.BankName))
         {
             bank = item.Card.BankAccount.Bank;
             item.Card.BankAccount.Bank = null;
         }
-        
+
         _applicationContext.ChangeTracker.Clear();
         _applicationContext.Users.Add(item);
+
         try
         {
             _applicationContext.SaveChanges();
@@ -97,8 +119,8 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
             return ExceptionModel.Successfully;
         }
         item.Card.BankAccount.Bank ??= bank;
-        _applicationContext.ChangeTracker.Clear();
-        var updateBank = _bankRepository.Update(_bankRepository.Get(x => x.ID == item.Card.BankID));
+
+        var updateBank = _bankRepository.Update(_bankRepository.Get(x => x.ID == item.Card.BankAccount.Bank.ID));
         if (updateBank != ExceptionModel.Successfully)
         {
             userCreationTransaction.Rollback();
@@ -106,40 +128,16 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         }
 
         userCreationTransaction.Commit();
-        
-        return ExceptionModel.Successfully;
-    }
 
-    public void Dispose()
-    {
-        _logger.Log(_reports);
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-    private void Dispose(bool disposing)
-    {
-        if (_disposed) return;
-        if (disposing)
-        {
-            _bankAccountRepository.Dispose();
-            _bankRepository.Dispose();
-            _cardRepository.Dispose();
-            _applicationContext.Dispose();
-        }
-        _bankAccountRepository = null;
-        _bankRepository = null;
-        _cardRepository = null;
-        _applicationContext = null;
-        _reports = null;
-        _logger = null;
-        _disposed = true;
+        return ExceptionModel.Successfully;
     }
 
     public ExceptionModel Delete(TUser item)
     {
         if (!FitsConditions(item))
             return ExceptionModel.OperationNotExist;
-        
+
+        _applicationContext.ChangeTracker.Clear();
         _applicationContext.Users.Remove(item);
         try
         {
@@ -150,11 +148,16 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
             Console.WriteLine(ex.Message);
             throw;
         }
-        var deleteBankAccount = _bankAccountRepository.Delete(_bankAccountRepository.Get(x => x.ID == item.Card.BankAccountID));
-        return deleteBankAccount;
+        return _bankAccountRepository.Delete(_bankAccountRepository.Get(x => x.ID == item.Card.BankAccount.ID));
     }
 
-    public bool Exist(Expression<Func<TUser, bool>> predicate) => _applicationContext.Users.AsNoTracking().Any(predicate);
+    public bool Exist(Func<TUser, bool> predicate) =>
+        _applicationContext.Users
+            .Include(x => x.Card)
+            .ThenInclude(x => x.BankAccount)
+            .ThenInclude(x => x.Bank)
+            .AsNoTracking().Any(predicate);
+
     public bool FitsConditions(TUser? item)
     {
         if (item?.Card?.BankAccount?.Bank is null)
@@ -166,40 +169,38 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         return true;
     }
 
-    public IEnumerable<TUser> All => _applicationContext.Users.AsNoTracking();
+    public IEnumerable<TUser> All =>
+        _applicationContext.Users
+            .Include(x => x.Card)
+            .ThenInclude(x => x.BankAccount)
+            .ThenInclude(x => x.Bank)
+            .AsNoTracking() ?? Enumerable.Empty<TUser>();
 
-    public TUser? Get(Expression<Func<TUser, bool>> predicate)
+    public TUser Get(Func<TUser, bool> predicate)
     {
-        var user = _applicationContext.Users.AsNoTracking().FirstOrDefault(predicate);
-        if (user is null)
-            return user;
-        user.Card = _cardRepository.Get(x => x.UserID == user.ID);
-        if (user.Card is null)
-            return user;
-        user.Card.BankAccount = _bankAccountRepository.Get(x => x.UserID == user.ID);
-        if (user.Card.BankAccount is null)
-            return user;
-        user.Card.BankAccount.Bank = _bankRepository.Get(x => x.BankAccounts.Contains(user.Card.BankAccount));
-        if (user.Card.BankAccount.Bank is null)
-            return user;
-        
-        return user;
+        return _applicationContext.Users
+            .Include(x => x.Card)
+            .ThenInclude(x => x.BankAccount)
+            .ThenInclude(x => x.Bank)
+            .AsNoTracking().AsEnumerable()
+            .FirstOrDefault(predicate) ?? (TUser)User.Default;
     }
-    
+
     public ExceptionModel Update(TUser item)
     {
         if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;
-        
+
         using var userUpdateTransaction = _applicationContext.Database.BeginTransaction(IsolationLevel.RepeatableRead);
-            
-        var bankAccountUpdateOperation = _bankAccountRepository.Update(_bankAccountRepository.Get(x => x.ID == item.Card.BankAccountID));
+
+        var bankAccountUpdateOperation = _bankAccountRepository
+            .Update(_bankAccountRepository.Get(x => x.ID == item.Card.BankAccount.ID));
         if (bankAccountUpdateOperation != ExceptionModel.Successfully)
         {
             userUpdateTransaction.Rollback();
             return bankAccountUpdateOperation;
         }
-            
+
         _applicationContext.ChangeTracker.Clear();
         _applicationContext.Users.Update(item);
         try
@@ -219,7 +220,6 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
 
     ~UserRepository()
     {
-        _logger.Log(_reports);
         Dispose(false);
     }
 }

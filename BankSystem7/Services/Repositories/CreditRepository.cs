@@ -1,15 +1,14 @@
-﻿using System.Data;
-using System.Linq.Expressions;
-using BankSystem7.AppContext;
+﻿using BankSystem7.AppContext;
 using BankSystem7.Models;
 using BankSystem7.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 
 namespace BankSystem7.Services.Repositories;
 
 public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit> : IRepository<TCredit>
-    where TUser : User 
-    where TCard : Card 
+    where TUser : User
+    where TCard : Card
     where TBankAccount : BankAccount
     where TBank : Bank
     where TCredit : Credit
@@ -69,10 +68,27 @@ public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>
         return ExceptionModel.Successfully;
     }
 
-    public IEnumerable<TCredit> All => _applicationContext.Credits.AsNoTracking();
-    public TCredit Get(Expression<Func<TCredit, bool>> predicate) => _applicationContext.Credits.AsNoTracking().FirstOrDefault(predicate);
+    public IEnumerable<TCredit> All =>
+        _applicationContext.Credits
+        .Include(x => x.Bank).Include(x => x.User)
+        .AsNoTracking() ?? Enumerable.Empty<TCredit>();
 
-    public bool Exist(Expression<Func<TCredit, bool>> predicate) => _applicationContext.Credits.AsNoTracking().Any(predicate);
+    public TCredit Get(Func<TCredit, bool> predicate)
+    {
+        return _applicationContext.Credits
+        .Include(x => x.Bank).Include(x => x.User)
+        .AsNoTracking().AsEnumerable()
+        .FirstOrDefault(predicate) ?? (TCredit)Credit.Default;
+    }
+
+    public bool Exist(Func<TCredit, bool> predicate)
+    {
+        return _applicationContext.Credits
+            .Include(x => x.Bank)
+            .Include(x => x.User)
+            .AsNoTracking().AsEnumerable()
+            .Any(predicate);
+    }
 
     public bool FitsConditions(TCredit? item)
     {
@@ -108,7 +124,6 @@ public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>
         if (_bankContext.BankAccountAccrual(user, user.Card?.BankAccount?.Bank, operationAccrualOnUserAccount) != ExceptionModel.Successfully)
             return (ExceptionModel)operationAccrualOnUserAccount.OperationStatus.GetHashCode();
 
-        
         if (Create(credit) != ExceptionModel.Successfully)
             return (ExceptionModel)operationAccrualOnUserAccount.OperationStatus.GetHashCode();
 
@@ -155,7 +170,6 @@ public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>
             if (Delete(credit) != ExceptionModel.Successfully)
                 return (ExceptionModel)operationAccrualOnUserAccount.OperationStatus.GetHashCode();
         }
-
         else
         {
             credit.RepaymentAmount -= operationAccrualOnUserAccount.TransferAmount;
