@@ -153,8 +153,10 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
 
     public bool Exist(Func<TUser, bool> predicate) =>
         _applicationContext.Users
-        .Include(x => x.Card.BankAccount.Bank)
-        .AsNoTracking().Any(predicate);
+            .Include(x => x.Card)
+            .ThenInclude(x => x.BankAccount)
+            .ThenInclude(x => x.Bank)
+            .AsNoTracking().Any(predicate);
 
     public bool FitsConditions(TUser? item)
     {
@@ -169,13 +171,17 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
 
     public IEnumerable<TUser> All =>
         _applicationContext.Users
-        .Include(x => x.Card.BankAccount.Bank)
-        .AsNoTracking() ?? Enumerable.Empty<TUser>();
+            .Include(x => x.Card)
+            .ThenInclude(x => x.BankAccount)
+            .ThenInclude(x => x.Bank)
+            .AsNoTracking() ?? Enumerable.Empty<TUser>();
 
     public TUser Get(Func<TUser, bool> predicate)
     {
         return _applicationContext.Users
-            .Include(x => x.Card.BankAccount.Bank)
+            .Include(x => x.Card)
+            .ThenInclude(x => x.BankAccount)
+            .ThenInclude(x => x.Bank)
             .AsNoTracking().AsEnumerable()
             .FirstOrDefault(predicate) ?? (TUser)User.Default;
     }

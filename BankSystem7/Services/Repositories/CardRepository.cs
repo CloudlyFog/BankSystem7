@@ -98,11 +98,13 @@ public sealed class CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         return ExceptionModel.Successfully;
     }
 
-    public bool Exist(Func<TCard, bool> predicate) => _applicationContext.Cards
-        .Include(x => x.BankAccount.Bank)
-        .Include(x => x.User)
-        .AsNoTracking().AsEnumerable()
-        .Any(predicate);
+    public bool Exist(Func<TCard, bool> predicate) => 
+        _applicationContext.Cards
+            .Include(x => x.User)
+            .Include(x => x.BankAccount)
+            .ThenInclude(x => x.Bank)
+            .AsNoTracking().AsEnumerable()
+            .Any(predicate);
 
     public bool FitsConditions(TCard? item)
     {
@@ -111,15 +113,20 @@ public sealed class CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
 
     public TCard Get(Func<TCard, bool> predicate)
     {
-        return _applicationContext.Cards.AsNoTracking()
+        return _applicationContext.Cards
             .Include(x => x.User)
-            .Include(x => x.BankAccount.Bank).AsEnumerable()
+            .Include(x => x.BankAccount)
+            .ThenInclude(x => x.Bank)
+            .AsNoTracking().AsEnumerable()
             .FirstOrDefault(predicate) ?? (TCard)Card.Default;
     }
 
-    public IEnumerable<TCard> All => _applicationContext.Cards
-        .Include(x => x.BankAccount.Bank)
-        .Include(x => x.User).AsNoTracking();
+    public IEnumerable<TCard> All => 
+        _applicationContext.Cards
+            .Include(x => x.User)
+            .Include(x => x.BankAccount)
+            .ThenInclude(x => x.Bank)
+            .AsNoTracking();
 
     ~CardRepository()
     {

@@ -159,7 +159,8 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
 
     public bool Exist(Func<TBank, bool> predicate) =>
         _applicationContext.Banks
-        .Include(x => x.BankAccounts).Include(x => x.Credits)
+        .Include(x => x.BankAccounts)
+        .Include(x => x.Credits)
         .AsNoTracking().AsEnumerable()
         .Any(predicate);
 
@@ -170,11 +171,13 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
 
     public IEnumerable<TBank> All =>
         _applicationContext.Banks
-        .Include(x => x.BankAccounts).Include(x => x.Credits)
+        .Include(x => x.BankAccounts)
+        .Include(x => x.Credits)
         .AsNoTracking() ?? Enumerable.Empty<TBank>();
 
     public TBank Get(Func<TBank, bool> predicate) => _applicationContext.Banks
-        .Include(x => x.BankAccounts).Include(x => x.Credits)
+        .Include(x => x.BankAccounts)
+        .Include(x => x.Credits)
         .AsNoTracking().AsEnumerable()
         .FirstOrDefault(predicate) ?? (TBank)Bank.Default;
 
