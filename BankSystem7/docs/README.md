@@ -1,11 +1,8 @@
 # Bank system 7
 This library provides opportunities for using likeness of bank system. You can handle not only users but also other models like banks, cards and etc.
 
-### Updates in version 0.3.7
-- Improved performance of queries.
-- Added split interfaces to `IRepository<T>` for more flexible architecture.
-- Updated checking on existing user in the database.
-- Added wider predicates capabilities for methods Get and Exist in repositories.
+### Updates in version 0.3.8
+- Removed unnecessary asynchronously from method Transfer in BankAccountRepository.
 ****
 # Documentation
 
@@ -18,7 +15,7 @@ This library provides opportunities for using likeness of bank system. You can h
 5. Folder **Repositories** is folder with all business logic of project. Only there simple developer has access.
 
 ## How to interact with library?
-The library provides ways to pass and use own models. For example, You can inherite Your class from base class User and pass it as type to initialized instance of `ServiceConfiguration` or `ServiceConfigurationMiddleware`
+The library provides ways to pass and use own models. For example, You can inherit Your class from base class User and pass it as type to initialized instance of `ServiceConfiguration` or `ServiceConfigurationMiddleware`
 and use own model.
 Developer can interact with library by following next steps:
 1. create instance of class `ServiceConfiguration` and pass as parameters class `ConfigurationOptions` with own settings. (or do the same steps but instead of create instance of `ServiceConfiguration`, use middleware `ServiceConfigurationMiddleware`)

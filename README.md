@@ -1,11 +1,8 @@
 # Bank system 7
 This library provides opportunities for using likeness of bank system. You can handle not only users but also other models like banks, cards and etc.
 
-### Updates in version 0.3.7
-- Improved performance of queries.
-- Added split interfaces to `IRepository<T>` for more flexible architecture.
-- Updated checking on existing user in the database.
-- Added wider predicates capabilities for methods Get and Exist in repositories.
+### Updates in version 0.3.8
+- Removed unnecessary asynchronously from method Transfer in BankAccountRepository.
 ****
 # Documentation
 
@@ -18,7 +15,7 @@ This library provides opportunities for using likeness of bank system. You can h
 5. Folder **Repositories** is folder with all business logic of project. Only there simple developer has access.
 
 ## How to interact with library?
-The library provides ways to pass and use own models. For example, You can inherite Your class from base class User and pass it as type to initialized instance of `ServiceConfiguration` or `ServiceConfigurationMiddleware`
+The library provides ways to pass and use own models. For example, You can inherit Your class from base class User and pass it as type to initialized instance of `ServiceConfiguration` or `ServiceConfigurationMiddleware`
 and use own model.
 Developer can interact with library by following next steps:
 1. create instance of class `ServiceConfiguration` and pass as parameters class `ConfigurationOptions` with own settings. (or do the same steps but instead of create instance of `ServiceConfiguration`, use middleware `ServiceConfigurationMiddleware`)
@@ -95,35 +92,35 @@ Here located interfaces which describes behavior of inherited repo-classes.
 - `bool FitsConditions(T? item);` - implements logic for checking on conditions true of passed entity.
 
 3. Interface `IReaderService<T> where T : class` - interface for implement reading data from database.   
-<br>**Methods**
+   <br>**Methods**
 - `T Get(Func<T, bool> predicate);` - implements getting an object from database with predicate.
 - `bool Exist(Func<T, bool> predicate);` - implements checking exist object with in database predicate.
-<br>**Properties**
+  <br>**Properties**
 - `IEnumerable<T> All {  get; }` - implements getting a sequence of the objects from database.
 
 4. Interface `IExpressionReaderService<T> where T : class` - interface for implement reading data from database with another type of parameters.
-<br>**Methods**
+   <br>**Methods**
 - `T Get(Expression<Func<T, bool>> predicate);` - implements getting an object from database with predicate.
 - `bool Exist(Expression<Func<T, bool>> predicate);` - implements checking exist object with in database predicate.
-    **Properties**
+  **Properties**
 - `IEnumerable<T> All {  get; }` - implements getting a sequence of the objects from database.
 
 5. Interface `IWriterService<in T> where T : class` - interface for implement writing, updating and deleting data in database
-<br>**Methods**
+   <br>**Methods**
 - `ExceptionModel  Create(T item);` - implements adding item in database.
 - `ExceptionModel  Update(T item);` - implements updating item in database.
 - `ExceptionModel  Delete(T item);` - implements deleting item from database.
 
 6. Interface `ILogger` - interface that provides standard set for logging
-<br>**Methods**
+   <br>**Methods**
 - `ExceptionModel Log(Report report);` - implements logging report in database.
 - `ExceptionModel Log(IEnumerable<Report> reports);` - implements logging collection of reports in database.
-<br>**Properties**
+  <br>**Properties**
 - `public bool IsReused { get; set; }` - defines possibility use already initialized logger.
 - `public LoggerOptions LoggerOptions { get; set; }` - defines options for logger configuration.
 
 7. Abstract class `LoggerExecutor<TOperationType> where TOperationType : Enum` - simple implementation of service for added reports to logger queue
-<br>**Methods**
+   <br>**Methods**
 - `virtual void Log(ExceptionModel exceptionModel, string methodName, string className, TOperationType operationType, ICollection<GeneralReport<TOperationType>> reports)` - implements standard logic of inserting log data to logger queue. Can be overrided.
 
 ### Repositories

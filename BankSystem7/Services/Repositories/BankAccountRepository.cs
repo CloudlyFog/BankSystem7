@@ -72,7 +72,7 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
         _disposedValue = true;
     }
 
-    public async Task<ExceptionModel> Transfer(TUser? from, TUser? to, decimal transferAmount)
+    public ExceptionModel Transfer(TUser? from, TUser? to, decimal transferAmount)
     {
         if (from is null || to is null || from.Card is null || to.Card is null || from.Card.BankAccount is null ||
             to.Card.BankAccount is null || transferAmount <= 0)
