@@ -1,11 +1,13 @@
-
 # Bank system 7
 This library provides opportunities for using likeness of bank system. You can handle not only users but also other models like banks, cards and etc.
 
 **It's a beta version of library. Some exceptions can be weren't found.**
 
-### Updates in version 0.3.6-beta
-- Fixed fatal exception with sequence tracking the same entity and doings with it.
+### Updates in version 0.3.7
+- Improved performance of queries.
+- Added split interfaces to `IRepository<T>` for more flexible architecture.
+- Updated checking on existing user in the database.
+- Added wider predicates capabilities for methods Get and Exist in repositories.
 ****
 # Documentation
 
@@ -50,7 +52,6 @@ There are 2 classes context:
 5. `protected internal DbSet<BankAccount> BankAccounts { get; set; }` - an instance of the table `BankAccounts` in database.
 6. `protected internal DbSet<Credit> Credits { get; set; }` - an instance of the table `Credits` in database.
 
-
 #### API BankContext
 
 **Methods:**
@@ -68,7 +69,6 @@ There are 2 classes context:
 3. `public DbSet<Operation> Operations { get; set; }` - an instance of the table `Operations` in database.
 4. `public DbSet<BankAccount> BankAccounts { get; set; }` - an instance of the table `BankAccounts` in database.
 
-
 ### Services
 Services are dividing on 3 sub-folders:
 
@@ -82,7 +82,6 @@ And some classes that don't belong to any of folders:
 2. `Logger` - service for logging some info about repositories operations.
 3. `OperationService` - provides connection to mongodb services.
 
-
 ### Configuration
 Here located services for configuring library.
 1. `ConfigurationOptions` - service provides options for the most full configuring of library.
@@ -91,22 +90,43 @@ Here located services for configuring library.
 
 ### Interfaces (and abstract classes)
 Here located interfaces which describes behavior of inherited repo-classes.
-1. Interface `IRepository<T>` - parent interface from which will inherit other interfaces and repo-classes. Describes main logic and structure of the project.
-   **Methods**:
-- `ExceptionModel  Create(T item);` - implements creating item and adding it in database.
-- `ExceptionModel  Update(T item);` -implements updating item in database.
-- `ExceptionModel  Delete(T item);` - implements deleting item from database.
+1. Interface `IRepository<T> : IReaderService<T>, IWriterService<T>, IDisposable where T : class` - interface for implement standard library logic.
+- `bool FitsConditions(T? item);` - implements logic for checking on conditions true of passed entity.
+
+2. Interface `IExpressionRepository<T> : IExpressionReaderService<T>, IWriterService<T>, IDisposable where T : class` - interface for implement standard library logic with another type of parameters.
+- `bool FitsConditions(T? item);` - implements logic for checking on conditions true of passed entity.
+
+3. Interface `IReaderService<T> where T : class` - interface for implement reading data from database.   
+   <br>**Methods**
+- `T Get(Func<T, bool> predicate);` - implements getting an object from database with predicate.
+- `bool Exist(Func<T, bool> predicate);` - implements checking exist object with in database predicate.
+  <br>**Properties**
 - `IEnumerable<T> All {  get; }` - implements getting a sequence of the objects from database.
-- `T  Get(Expression<Func<T, bool>> predicate);` - implements getting an object from database with func-condition.
-- `bool  Exist(Expression<Func<T, bool>> predicate);` - implements checking exist object with in database func-condition.
-2. Interface `ILogger` - interface that provides standard set for logging
-   **Methods**:
+
+4. Interface `IExpressionReaderService<T> where T : class` - interface for implement reading data from database with another type of parameters.
+   <br>**Methods**
+- `T Get(Expression<Func<T, bool>> predicate);` - implements getting an object from database with predicate.
+- `bool Exist(Expression<Func<T, bool>> predicate);` - implements checking exist object with in database predicate.
+  **Properties**
+- `IEnumerable<T> All {  get; }` - implements getting a sequence of the objects from database.
+
+5. Interface `IWriterService<in T> where T : class` - interface for implement writing, updating and deleting data in database
+   <br>**Methods**
+- `ExceptionModel  Create(T item);` - implements adding item in database.
+- `ExceptionModel  Update(T item);` - implements updating item in database.
+- `ExceptionModel  Delete(T item);` - implements deleting item from database.
+
+6. Interface `ILogger` - interface that provides standard set for logging
+   <br>**Methods**
 - `ExceptionModel Log(Report report);` - implements logging report in database.
 - `ExceptionModel Log(IEnumerable<Report> reports);` - implements logging collection of reports in database.
-  **Properties**
+  <br>**Properties**
 - `public bool IsReused { get; set; }` - defines possibility use already initialized logger.
 - `public LoggerOptions LoggerOptions { get; set; }` - defines options for logger configuration.
 
+7. Abstract class `LoggerExecutor<TOperationType> where TOperationType : Enum` - simple implementation of service for added reports to logger queue
+   <br>**Methods**
+- `virtual void Log(ExceptionModel exceptionModel, string methodName, string className, TOperationType operationType, ICollection<GeneralReport<TOperationType>> reports)` - implements standard logic of inserting log data to logger queue. Can be overrided.
 
 ### Repositories
 Repositories are implementation of various interfaces and working with context classes for interact with database.
@@ -118,7 +138,6 @@ Repositories are implementation of various interfaces and working with context c
 5. `CreditRepository` - implements interface `IRepository<T>` for handling credit model and  operations with credit(loan). For example: take, pay credit.
 6. `LoggerRepository` - implements interface `IRepository<T>` for handling reports.
 7. `OperationRepository` - implements interface `IRepository<T>` for handling operations.
-
 
 ## When cause exception or error?
 There are a lot of points when you can catch an exception or error while using api of project but we describe some of them:
