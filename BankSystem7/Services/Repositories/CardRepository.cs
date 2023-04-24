@@ -98,13 +98,10 @@ public sealed class CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         return ExceptionModel.Successfully;
     }
 
-    public bool Exist(Func<TCard, bool> predicate) => 
-        _applicationContext.Cards
-            .Include(x => x.User)
-            .Include(x => x.BankAccount)
-            .ThenInclude(x => x.Bank)
-            .AsNoTracking().AsEnumerable()
-            .Any(predicate);
+    public bool Exist(Func<TCard, bool> predicate)
+    {
+        return All.Any(predicate); 
+    }
 
     public bool FitsConditions(TCard? item)
     {

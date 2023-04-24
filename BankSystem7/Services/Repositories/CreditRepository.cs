@@ -80,11 +80,7 @@ public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>
 
     public bool Exist(Func<TCredit, bool> predicate)
     {
-        return _applicationContext.Credits
-            .Include(x => x.Bank)
-            .Include(x => x.User)
-            .AsNoTracking().AsEnumerable()
-            .Any(predicate);
+        return All.Any(predicate);
     }
 
     public bool FitsConditions(TCredit? item)

@@ -214,12 +214,7 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
 
     public bool Exist(Func<TBankAccount, bool> predicate)
     {
-        return _applicationContext.BankAccounts
-        .Include(x => x.Bank)
-        .Include(x => x.User)
-        .ThenInclude(x => x.Card)
-        .AsNoTracking().AsEnumerable()
-        .Any(predicate);
+        return All.Any(predicate);
     }
 
     public bool FitsConditions(TBankAccount? item)

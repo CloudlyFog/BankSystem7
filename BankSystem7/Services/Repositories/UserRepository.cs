@@ -149,12 +149,10 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         return ExceptionModel.Successfully;
     }
 
-    public bool Exist(Func<TUser, bool> predicate) =>
-        _applicationContext.Users
-            .Include(x => x.Card)
-            .ThenInclude(x => x.BankAccount)
-            .ThenInclude(x => x.Bank)
-            .AsNoTracking().Any(predicate);
+    public bool Exist(Func<TUser, bool> predicate)
+    {
+        return All.Any(predicate);
+    }
 
     public bool FitsConditions(TUser? item)
     {

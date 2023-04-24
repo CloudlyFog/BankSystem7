@@ -157,12 +157,10 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         return ExceptionModel.Successfully;
     }
 
-    public bool Exist(Func<TBank, bool> predicate) =>
-        _applicationContext.Banks
-        .Include(x => x.BankAccounts)
-        .Include(x => x.Credits)
-        .AsNoTracking().AsEnumerable()
-        .Any(predicate);
+    public bool Exist(Func<TBank, bool> predicate)
+    {
+        return All.Any(predicate);
+    }
 
     public bool FitsConditions(TBank? item)
     {
@@ -175,7 +173,10 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         .Include(x => x.Credits)
         .AsNoTracking() ?? Enumerable.Empty<TBank>();
 
-    public TBank Get(Func<TBank, bool> predicate) => All.FirstOrDefault(predicate) ?? (TBank)Bank.Default;
+    public TBank Get(Func<TBank, bool> predicate)
+    {
+        return All.FirstOrDefault(predicate) ?? (TBank)Bank.Default;
+    }
 
     public ExceptionModel Update(TBank item)
     {
