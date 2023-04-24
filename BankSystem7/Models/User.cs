@@ -45,7 +45,8 @@ public enum ExceptionModel
     Successfully = 200,
     OperationRestricted = 300,
     OperationFailed = 400,
-    OperationNotExist = 401
+    OperationNotExist = 401,
+    ThrewException = 402,
 }
 
 public enum CardException

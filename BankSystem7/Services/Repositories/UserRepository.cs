@@ -105,12 +105,10 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         {
             _applicationContext.SaveChanges();
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            Console.WriteLine(ex.Message);
-            Console.WriteLine(ex.InnerException.Message);
             userCreationTransaction.Rollback();
-            throw;
+            return ExceptionModel.ThrewException;
         }
 
         if (bank is null)
@@ -143,10 +141,9 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         {
             _applicationContext.SaveChanges();
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            Console.WriteLine(ex.Message);
-            throw;
+            return ExceptionModel.ThrewException;
         }
         return _bankAccountRepository.Delete(_bankAccountRepository.Get(x => x.ID == item.Card.BankAccount.ID));
     }
@@ -207,11 +204,10 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         {
             _applicationContext.SaveChanges();
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            Console.WriteLine(ex.Message);
             userUpdateTransaction.Rollback();
-            throw;
+            return ExceptionModel.ThrewException;
         }
 
         userUpdateTransaction.Commit();
