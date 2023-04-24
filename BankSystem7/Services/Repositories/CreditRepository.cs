@@ -75,10 +75,7 @@ public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>
 
     public TCredit Get(Func<TCredit, bool> predicate)
     {
-        return _applicationContext.Credits
-        .Include(x => x.Bank).Include(x => x.User)
-        .AsNoTracking().AsEnumerable()
-        .FirstOrDefault(predicate) ?? (TCredit)Credit.Default;
+        return All.FirstOrDefault(predicate) ?? (TCredit)Credit.Default;
     }
 
     public bool Exist(Func<TCredit, bool> predicate)

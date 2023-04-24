@@ -179,12 +179,7 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
 
     public TBankAccount Get(Func<TBankAccount, bool> predicate)
     {
-        return _applicationContext.BankAccounts
-            .Include(x => x.Bank)
-            .Include(x => x.User)
-            .ThenInclude(x => x.Card)
-            .AsNoTracking().AsEnumerable()
-            .FirstOrDefault(predicate) ?? (TBankAccount)BankAccount.Default;
+        return All.FirstOrDefault(predicate) ?? (TBankAccount)BankAccount.Default;
     }
 
     /// <summary>
