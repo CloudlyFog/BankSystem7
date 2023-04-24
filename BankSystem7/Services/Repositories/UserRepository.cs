@@ -79,53 +79,23 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
 
         if (Exist(x => x.ID.Equals(item.ID) || x.Name.Equals(item.Name) && x.Email.Equals(item.Email)))
             return ExceptionModel.OperationRestricted;
-        using var userCreationTransaction = _applicationContext.Database.BeginTransaction(IsolationLevel
-                                                .RepeatableRead);
 
-        var avoidDuplication = _applicationContext.AvoidDuplication(item.Card.BankAccount.Bank);
-        if (avoidDuplication != ExceptionModel.Successfully)
-        {
-            userCreationTransaction.Rollback();
-            return avoidDuplication;
-        }
-
-        Bank bank = null;
-
-        if (_bankRepository.Exist(x => x.ID == item.Card.BankAccount.Bank.ID || x.BankName == item.Card.BankAccount.Bank.BankName))
-        {
-            bank = item.Card.BankAccount.Bank;
-            item.Card.BankAccount.Bank = null;
-        }
 
         _applicationContext.ChangeTracker.Clear();
-        _applicationContext.Users.Add(item);
 
-        try
+        item.Card.BankAccount.Bank.AccountAmount = 
+            _bankRepository.CalculateBankAmount(item.Card.BankAccount.Bank.ID, 0, item.Card.Amount);
+
+        if (!_bankRepository.Exist(x => x.ID == item.Card.BankAccount.Bank.ID || x.BankName == item.Card.BankAccount.Bank.BankName))
         {
+            _applicationContext.Users.Add(item);
             _applicationContext.SaveChanges();
-        }
-        catch (Exception)
-        {
-            userCreationTransaction.Rollback();
-            return ExceptionModel.ThrewException;
-        }
-
-        if (bank is null)
-        {
-            userCreationTransaction.Commit();
             return ExceptionModel.Successfully;
         }
-        item.Card.BankAccount.Bank ??= bank;
 
-        var updateBank = _bankRepository.Update(_bankRepository.Get(x => x.ID == item.Card.BankAccount.Bank.ID));
-        if (updateBank != ExceptionModel.Successfully)
-        {
-            userCreationTransaction.Rollback();
-            return updateBank;
-        }
-
-        userCreationTransaction.Commit();
-
+        _applicationContext.Entry(item.Card.BankAccount.Bank).State = EntityState.Unchanged;
+        _applicationContext.Users.Add(item);
+        _applicationContext.SaveChanges();
         return ExceptionModel.Successfully;
     }
 
@@ -195,6 +165,7 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         }
         return ExceptionModel.Successfully;
     }
+
 
     ~UserRepository()
     {

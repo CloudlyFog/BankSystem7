@@ -100,7 +100,7 @@ public sealed class CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
 
     public bool Exist(Func<TCard, bool> predicate)
     {
-        return All.Any(predicate); 
+        return All.Any(predicate);
     }
 
     public bool FitsConditions(TCard? item)
@@ -113,7 +113,7 @@ public sealed class CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         return All.FirstOrDefault(predicate) ?? (TCard)Card.Default;
     }
 
-    public IEnumerable<TCard> All => 
+    public IEnumerable<TCard> All =>
         _applicationContext.Cards
             .Include(x => x.User)
             .Include(x => x.BankAccount)

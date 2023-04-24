@@ -98,7 +98,7 @@ public sealed class CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         return ExceptionModel.Successfully;
     }
 
-    public bool Exist(Func<TCard, bool> predicate) => 
+    public bool Exist(Func<TCard, bool> predicate) =>
         _applicationContext.Cards
             .Include(x => x.User)
             .Include(x => x.BankAccount)
@@ -121,7 +121,7 @@ public sealed class CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
             .FirstOrDefault(predicate) ?? (TCard)Card.Default;
     }
 
-    public IEnumerable<TCard> All => 
+    public IEnumerable<TCard> All =>
         _applicationContext.Cards
             .Include(x => x.User)
             .Include(x => x.BankAccount)

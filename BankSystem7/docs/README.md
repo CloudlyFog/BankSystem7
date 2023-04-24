@@ -91,7 +91,7 @@ Here located interfaces which describes behavior of inherited repo-classes.
 2. Interface `IExpressionRepository<T> : IExpressionReaderService<T>, IWriterService<T>, IDisposable where T : class` - interface for implement standard library logic with another type of parameters.
 - `bool FitsConditions(T? item);` - implements logic for checking on conditions true of passed entity.
 
-3. Interface `IReaderService<T> where T : class` - interface for implement reading data from database.   
+3. Interface `IReaderService<T> where T : class` - interface for implement reading data from database.
 <br>**Methods**
 - `T Get(Func<T, bool> predicate);` - implements getting an object from database with predicate.
 - `bool Exist(Func<T, bool> predicate);` - implements checking exist object with in database predicate.

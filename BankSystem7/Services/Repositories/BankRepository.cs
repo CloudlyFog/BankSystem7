@@ -189,6 +189,15 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         return ExceptionModel.Successfully;
     }
 
+    internal decimal CalculateBankAmount(Guid bankId, decimal oldValue, decimal newValue)
+    {
+        var bank = Get(x => x.ID == bankId);
+
+        bank.AccountAmount = newValue - oldValue;
+
+        return 0;
+    }
+
     ~BankRepository()
     {
         Dispose(false);
