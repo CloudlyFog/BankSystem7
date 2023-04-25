@@ -171,7 +171,7 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
         return ExceptionModel.Ok;
     }
 
-    public IEnumerable<TBankAccount> All => 
+    public IEnumerable<TBankAccount> All =>
         _applicationContext.BankAccounts
         .Include(x => x.Bank)
         .Include(x => x.User)

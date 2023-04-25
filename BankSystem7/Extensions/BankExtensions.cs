@@ -1,16 +1,9 @@
-﻿using BankSystem7.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Reflection;
 
 namespace BankSystem7.Extensions
 {
     public static class BankExtensions
     {
-
         public static TBank SetValuesTo<TBank>(this TBank from, TBank to, PropertyInfo[]? excludeProperties = null)
         {
             foreach (var toProperty in to.GetType().GetProperties())

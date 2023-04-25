@@ -172,11 +172,10 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         .Include(x => x.Credits)
         .AsNoTracking() ?? Enumerable.Empty<TBank>();
 
-    public IEnumerable<TBank> AllWithTracking => 
+    public IEnumerable<TBank> AllWithTracking =>
         _applicationContext.Banks
         .Include(x => x.BankAccounts)
         .Include(x => x.Credits) ?? Enumerable.Empty<TBank>();
-
 
     public TBank Get(Func<TBank, bool> predicate)
     {

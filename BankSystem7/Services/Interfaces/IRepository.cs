@@ -67,7 +67,6 @@ public interface IReaderServiceWithTracking<T> where T : class
     bool ExistWithTracking(Func<T, bool> predicate);
 }
 
-
 public interface IExpressionReaderService<T> where T : class
 {
     /// <summary>

@@ -1,11 +1,7 @@
-﻿using Azure;
-using BankSystem7.AppContext;
-using BankSystem7.Extensions;
+﻿using BankSystem7.AppContext;
 using BankSystem7.Models;
 using BankSystem7.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using System.Data;
-using System.Runtime.Intrinsics.X86;
 
 namespace BankSystem7.Services.Repositories;
 
@@ -157,7 +153,6 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         _applicationContext.Banks.Update(bank);
         return ExceptionModel.Ok;
     }
-
 
     ~UserRepository()
     {
