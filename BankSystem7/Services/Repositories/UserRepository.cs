@@ -100,6 +100,7 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         _applicationContext.ChangeTracker.Clear();
         _applicationContext.Users.Remove(item);
         _applicationContext.BankAccounts.Remove((TBankAccount)item.Card.BankAccount);
+        _applicationContext.Banks.Update((TBank)item.Card.BankAccount.Bank);
         _applicationContext.SaveChanges();
 
         return ExceptionModel.Ok;
