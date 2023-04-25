@@ -68,6 +68,6 @@ public class ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit> : Db
         foreach (var credit in item.Credits)
             Entry(credit).State = EntityState.Unchanged;
 
-        return ExceptionModel.Successfully;
+        return ExceptionModel.Ok;
     }
 }

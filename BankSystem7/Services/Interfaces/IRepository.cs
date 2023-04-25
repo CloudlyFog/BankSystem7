@@ -45,6 +45,29 @@ public interface IReaderService<T> where T : class
     bool Exist(Func<T, bool> predicate);
 }
 
+public interface IReaderServiceWithTracking<T> where T : class
+{
+    /// <summary>
+    /// returns collection of entities
+    /// </summary>
+    IEnumerable<T> AllWithTracking { get; }
+
+    /// <summary>
+    /// returns entity with specified predicate from database
+    /// </summary>
+    /// <param name="predicate">predicate for function expression</param>
+    /// <returns></returns>
+    T GetWithTracking(Func<T, bool> predicate);
+
+    /// <summary>
+    /// returns true or false depending exists entity in the database or not
+    /// </summary>
+    /// <param name="predicate">predicate for function expression</param>
+    /// <returns></returns>
+    bool ExistWithTracking(Func<T, bool> predicate);
+}
+
+
 public interface IExpressionReaderService<T> where T : class
 {
     /// <summary>

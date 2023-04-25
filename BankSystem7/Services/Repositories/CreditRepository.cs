@@ -34,7 +34,7 @@ public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>
     public ExceptionModel Create(TCredit item)
     {
         if (item is null)
-            return ExceptionModel.VariableIsNull;
+            return ExceptionModel.EntityIsNull;
 
         if (Exist(x => x.ID == item.ID))
             return ExceptionModel.OperationFailed;
@@ -43,7 +43,7 @@ public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>
         item.Bank = null;
         _applicationContext.Credits.Add(item);
         _applicationContext.SaveChanges();
-        return ExceptionModel.Successfully;
+        return ExceptionModel.Ok;
     }
 
     public ExceptionModel Update(TCredit item)
@@ -54,7 +54,7 @@ public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>
         _applicationContext.ChangeTracker.Clear();
         _applicationContext.Credits.Update(item);
         _applicationContext.SaveChanges();
-        return ExceptionModel.Successfully;
+        return ExceptionModel.Ok;
     }
 
     public ExceptionModel Delete(TCredit item)
@@ -65,7 +65,7 @@ public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>
         _applicationContext.ChangeTracker.Clear();
         _applicationContext.Credits.Remove(item);
         _applicationContext.SaveChanges();
-        return ExceptionModel.Successfully;
+        return ExceptionModel.Ok;
     }
 
     public IEnumerable<TCredit> All =>
@@ -98,7 +98,7 @@ public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>
     public ExceptionModel TakeCredit(User? user, TCredit? credit)
     {
         if (user.Card?.BankAccount?.Bank is null || credit is null || Exist(x => x.ID == credit.ID || x.UserID == user.ID))
-            return ExceptionModel.VariableIsNull;
+            return ExceptionModel.EntityIsNull;
 
         var operationAccrualOnUserAccount = new Operation
         {
@@ -110,19 +110,19 @@ public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>
         using var transaction = _applicationContext.Database.BeginTransaction(IsolationLevel.Serializable);
 
         if (_bankContext.CreateOperation(operationAccrualOnUserAccount, OperationKind.Accrual) !=
-            ExceptionModel.Successfully)
+            ExceptionModel.Ok)
             return (ExceptionModel)operationAccrualOnUserAccount.OperationStatus.GetHashCode();
 
         // accrual money to user's bank account
-        if (_bankContext.BankAccountAccrual(user, user.Card?.BankAccount?.Bank, operationAccrualOnUserAccount) != ExceptionModel.Successfully)
+        if (_bankContext.BankAccountAccrual(user, user.Card?.BankAccount?.Bank, operationAccrualOnUserAccount) != ExceptionModel.Ok)
             return (ExceptionModel)operationAccrualOnUserAccount.OperationStatus.GetHashCode();
 
-        if (Create(credit) != ExceptionModel.Successfully)
+        if (Create(credit) != ExceptionModel.Ok)
             return (ExceptionModel)operationAccrualOnUserAccount.OperationStatus.GetHashCode();
 
         transaction.Commit();
 
-        return ExceptionModel.Successfully;
+        return ExceptionModel.Ok;
     }
 
     /// <summary>
@@ -135,7 +135,7 @@ public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>
     public ExceptionModel PayCredit(TUser? user, TCredit credit, decimal payAmount)
     {
         if (user.Card?.BankAccount?.Bank is null || credit is null || !Exist(x => x.ID == credit.ID || x.UserID == user.ID))
-            return ExceptionModel.VariableIsNull;
+            return ExceptionModel.EntityIsNull;
 
         var operationAccrualOnUserAccount = new Operation()
         {
@@ -151,28 +151,28 @@ public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>
         using var transaction = _applicationContext.Database.BeginTransaction(IsolationLevel.Serializable);
 
         if (_bankContext.CreateOperation(operationAccrualOnUserAccount, OperationKind.Accrual) !=
-            ExceptionModel.Successfully) // here creates operation for accrual money on user bank account
+            ExceptionModel.Ok) // here creates operation for accrual money on user bank account
             return (ExceptionModel)operationAccrualOnUserAccount.OperationStatus.GetHashCode();
 
         // withdraw money to user's bank account
-        if (_bankContext.BankAccountWithdraw(user, user.Card?.BankAccount?.Bank, operationAccrualOnUserAccount) != ExceptionModel.Successfully)
+        if (_bankContext.BankAccountWithdraw(user, user.Card?.BankAccount?.Bank, operationAccrualOnUserAccount) != ExceptionModel.Ok)
             return (ExceptionModel)operationAccrualOnUserAccount.OperationStatus.GetHashCode();
 
         if (credit.RepaymentAmount == operationAccrualOnUserAccount.TransferAmount)
         {
-            if (Delete(credit) != ExceptionModel.Successfully)
+            if (Delete(credit) != ExceptionModel.Ok)
                 return (ExceptionModel)operationAccrualOnUserAccount.OperationStatus.GetHashCode();
         }
         else
         {
             credit.RepaymentAmount -= operationAccrualOnUserAccount.TransferAmount;
-            if (Update(credit) != ExceptionModel.Successfully)
+            if (Update(credit) != ExceptionModel.Ok)
                 return (ExceptionModel)operationAccrualOnUserAccount.OperationStatus.GetHashCode();
         }
 
         transaction.Commit();
 
-        return ExceptionModel.Successfully;
+        return ExceptionModel.Ok;
     }
 
     /// <summary>

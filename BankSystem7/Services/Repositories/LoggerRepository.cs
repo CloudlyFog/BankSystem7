@@ -34,7 +34,7 @@ public sealed class LoggerRepository
         if (item is null || Exist(x => x.Id == item.Id))
             return ExceptionModel.OperationFailed;
         _operationService.Collection.InsertOne(item);
-        return ExceptionModel.Successfully;
+        return ExceptionModel.Ok;
     }
 
     public ExceptionModel Update(Report item)
@@ -47,7 +47,7 @@ public sealed class LoggerRepository
         var update = Builders<Report>.Update
             .Set(x => x, item);
         _operationService.Collection.UpdateOne(filter, update);
-        return ExceptionModel.Successfully;
+        return ExceptionModel.Ok;
     }
 
     public ExceptionModel Delete(Report item)
@@ -57,7 +57,7 @@ public sealed class LoggerRepository
         var filter = Builders<Report>.Filter
             .Eq(x => x.Id, item.Id);
         _operationService.Collection.DeleteOne(filter);
-        return ExceptionModel.Successfully;
+        return ExceptionModel.Ok;
     }
 
     public IEnumerable<Report> All => _operationService.Collection.Find(_ => true).ToList();

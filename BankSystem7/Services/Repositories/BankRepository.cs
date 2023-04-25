@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BankSystem7.Services.Repositories;
 
-public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> : IRepository<TBank>
+public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> : IRepository<TBank>, IReaderServiceWithTracking<TBank>
     where TUser : User
     where TCard : Card
     where TBankAccount : BankAccount
@@ -73,12 +73,12 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
     public ExceptionModel BankAccountAccrual(TUser user, Operation operation)
     {
         if (user?.Card?.BankAccount?.Bank is null || !Exist(x => x.ID == user.Card.BankAccount.Bank.ID))
-            return ExceptionModel.VariableIsNull;
+            return ExceptionModel.EntityIsNull;
         if (operation.OperationStatus != StatusOperationCode.Successfully)
             return (ExceptionModel)operation.OperationStatus.GetHashCode();
 
         if (user is null)
-            return ExceptionModel.VariableIsNull;
+            return ExceptionModel.EntityIsNull;
 
         if (AnotherBankTransactionOperation)
             user.Card.BankAccount.Bank.AccountAmount -= operation.TransferAmount;
@@ -96,7 +96,7 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
             Console.WriteLine(e);
             throw;
         }
-        return ExceptionModel.Successfully;
+        return ExceptionModel.Ok;
     }
 
     /// <summary>
@@ -108,7 +108,7 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
     public ExceptionModel BankAccountWithdraw(TUser user, Operation operation)
     {
         if (user?.Card?.BankAccount?.Bank is null || !Exist(x => x.ID == user.Card.BankAccount.Bank.ID))
-            return ExceptionModel.VariableIsNull;
+            return ExceptionModel.EntityIsNull;
         if (operation.OperationStatus != StatusOperationCode.Successfully)
             return (ExceptionModel)operation.OperationStatus.GetHashCode();
 
@@ -128,22 +128,21 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
             Console.WriteLine(e);
             throw;
         }
-        return ExceptionModel.Successfully;
+        return ExceptionModel.Ok;
     }
 
     public ExceptionModel Create(TBank item)
     {
         if (item is null)
-            return ExceptionModel.VariableIsNull;
+            return ExceptionModel.EntityIsNull;
 
         _applicationContext.ChangeTracker.Clear();
         if (Exist(x => x.ID == item.ID))
-            Update(item);
-        else
-            _applicationContext.Add(item);
+            return Update(item);
 
+        _applicationContext.Add(item);
         _applicationContext.SaveChanges();
-        return ExceptionModel.Successfully;
+        return ExceptionModel.Ok;
     }
 
     public ExceptionModel Delete(TBank item)
@@ -154,7 +153,7 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         _applicationContext.ChangeTracker.Clear();
         _applicationContext.Remove(item);
         _applicationContext.SaveChanges();
-        return ExceptionModel.Successfully;
+        return ExceptionModel.Ok;
     }
 
     public bool Exist(Func<TBank, bool> predicate)
@@ -173,9 +172,19 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         .Include(x => x.Credits)
         .AsNoTracking() ?? Enumerable.Empty<TBank>();
 
+    public IEnumerable<TBank> AllWithTracking => 
+        _applicationContext.Banks
+        .Include(x => x.BankAccounts)
+        .Include(x => x.Credits) ?? Enumerable.Empty<TBank>();
+
+
     public TBank Get(Func<TBank, bool> predicate)
     {
-        return All.FirstOrDefault(predicate) ?? (TBank)Bank.Default;
+        return _applicationContext.Banks
+        .Include(x => x.BankAccounts)
+        .Include(x => x.Credits)
+        .AsNoTracking().AsEnumerable()
+        .FirstOrDefault(predicate) ?? (TBank)Bank.Default;
     }
 
     public ExceptionModel Update(TBank item)
@@ -186,16 +195,22 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         _applicationContext.ChangeTracker.Clear();
         _applicationContext.Banks.Update(item);
         _applicationContext.SaveChanges();
-        return ExceptionModel.Successfully;
+        return ExceptionModel.Ok;
     }
 
-    internal decimal CalculateBankAmount(Guid bankId, decimal oldValue, decimal newValue)
+    internal decimal CalculateBankAccountAmount(decimal oldValue, decimal newValue)
     {
-        var bank = Get(x => x.ID == bankId);
+        return newValue - oldValue;
+    }
 
-        bank.AccountAmount = newValue - oldValue;
+    public TBank GetWithTracking(Func<TBank, bool> predicate)
+    {
+        return AllWithTracking.FirstOrDefault(predicate) ?? (TBank)Bank.Default;
+    }
 
-        return 0;
+    public bool ExistWithTracking(Func<TBank, bool> predicate)
+    {
+        return AllWithTracking.Any(predicate);
     }
 
     ~BankRepository()

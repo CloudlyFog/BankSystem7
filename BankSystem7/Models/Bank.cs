@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using MongoDB.Bson.Serialization.Attributes;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -26,6 +27,22 @@ public class Bank
 
     [Precision(18, 2)]
     public decimal AccountAmount { get; set; }
+
+    public override bool Equals(object? obj)
+    {
+        var item = obj as Bank;
+
+        if (item is null)
+            return false;
+
+        foreach (var thisProp in GetType().GetProperties())
+        {
+            var objProp = item.GetType().GetProperty(thisProp.Name);
+            if (!thisProp.GetValue(this).Equals(objProp?.GetValue(obj)))
+                return false;
+        }
+        return true;
+    }
 }
 
 [BsonIgnoreExtraElements]

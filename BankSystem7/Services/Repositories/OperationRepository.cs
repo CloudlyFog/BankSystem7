@@ -35,7 +35,7 @@ public sealed class OperationRepository<TUser, TCard, TBankAccount, TBank, TCred
             return ExceptionModel.OperationFailed;
         _operationService.Collection.InsertOne(item);
 
-        return ExceptionModel.Successfully;
+        return ExceptionModel.Ok;
     }
 
     public ExceptionModel Update(Operation item)
@@ -49,7 +49,7 @@ public sealed class OperationRepository<TUser, TCard, TBankAccount, TBank, TCred
             .Set(x => x, item);
         _operationService.Collection.UpdateOne(filter, update);
 
-        return ExceptionModel.Successfully;
+        return ExceptionModel.Ok;
     }
 
     public ExceptionModel Delete(Operation item)
@@ -60,7 +60,7 @@ public sealed class OperationRepository<TUser, TCard, TBankAccount, TBank, TCred
             .Eq(x => x.ID, item.ID);
 
         _operationService.Collection.DeleteOne(filter);
-        return ExceptionModel.Successfully;
+        return ExceptionModel.Ok;
     }
 
     public IEnumerable<Operation> All => _operationService.Collection.Find(_ => true).ToList();

@@ -61,21 +61,21 @@ public sealed class Logger<TUser, TCard, TBankAccount, TBank, TCredit> : ILogger
 
         _loggerRepository.Create(report);
 
-        return ExceptionModel.Successfully;
+        return ExceptionModel.Ok;
     }
 
     public ExceptionModel Log(IEnumerable<Report?>? reports)
     {
         if (reports is null || reports.Any(x => x is null))
-            return ExceptionModel.VariableIsNull;
+            return ExceptionModel.EntityIsNull;
 
         foreach (var report in reports)
         {
             var log = Log(report);
-            if (log != ExceptionModel.Successfully)
+            if (log != ExceptionModel.Ok)
                 return ExceptionModel.OperationFailed;
         }
-        return ExceptionModel.Successfully;
+        return ExceptionModel.Ok;
     }
 }
 

@@ -67,7 +67,7 @@ public sealed class CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         _applicationContext.ChangeTracker.Clear();
         _applicationContext.Cards.Update(item);
         _applicationContext.SaveChanges();
-        return ExceptionModel.Successfully;
+        return ExceptionModel.Ok;
     }
 
     /// <summary>
@@ -84,7 +84,7 @@ public sealed class CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
             return ExceptionModel.OperationFailed;
         _applicationContext.Cards.Add(item);
         _applicationContext.SaveChanges();
-        return ExceptionModel.Successfully;
+        return ExceptionModel.Ok;
     }
 
     public ExceptionModel Delete(TCard item)
@@ -95,7 +95,7 @@ public sealed class CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         _applicationContext.ChangeTracker.Clear();
         _applicationContext.Cards.Remove(item);
         _applicationContext.SaveChanges();
-        return ExceptionModel.Successfully;
+        return ExceptionModel.Ok;
     }
 
     public bool Exist(Func<TCard, bool> predicate)
