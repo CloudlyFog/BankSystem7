@@ -2,6 +2,7 @@
 using BankSystem7.Models;
 using BankSystem7.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace BankSystem7.Services.Repositories;
 
@@ -98,7 +99,7 @@ public sealed class CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         return ExceptionModel.Ok;
     }
 
-    public bool Exist(Func<TCard, bool> predicate)
+    public bool Exist(Expression<Func<TCard, bool>> predicate)
     {
         return All.Any(predicate);
     }
@@ -108,17 +109,17 @@ public sealed class CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         return item is not null && Exist(x => x.ID == item.ID);
     }
 
-    public TCard Get(Func<TCard, bool> predicate)
+    public TCard Get(Expression<Func<TCard, bool>> predicate)
     {
         return All.FirstOrDefault(predicate) ?? (TCard)Card.Default;
     }
 
-    public IEnumerable<TCard> All =>
+    public IQueryable<TCard> All =>
         _applicationContext.Cards
             .Include(x => x.User)
             .Include(x => x.BankAccount)
             .ThenInclude(x => x.Bank)
-            .AsNoTracking();
+            .AsNoTracking() ?? Enumerable.Empty<TCard>().AsQueryable();
 
     ~CardRepository()
     {

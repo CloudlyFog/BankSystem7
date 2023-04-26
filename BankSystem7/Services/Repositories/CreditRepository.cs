@@ -3,6 +3,7 @@ using BankSystem7.Models;
 using BankSystem7.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
+using System.Linq.Expressions;
 
 namespace BankSystem7.Services.Repositories;
 
@@ -68,17 +69,18 @@ public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>
         return ExceptionModel.Ok;
     }
 
-    public IEnumerable<TCredit> All =>
+    public IQueryable<TCredit> All =>
         _applicationContext.Credits
-        .Include(x => x.Bank).Include(x => x.User)
-        .AsNoTracking() ?? Enumerable.Empty<TCredit>();
+        .Include(x => x.Bank)
+        .Include(x => x.User)
+        .AsNoTracking() ?? Enumerable.Empty<TCredit>().AsQueryable();
 
-    public TCredit Get(Func<TCredit, bool> predicate)
+    public TCredit Get(Expression<Func<TCredit, bool>> predicate)
     {
         return All.FirstOrDefault(predicate) ?? (TCredit)Credit.Default;
     }
 
-    public bool Exist(Func<TCredit, bool> predicate)
+    public bool Exist(Expression<Func<TCredit, bool>> predicate)
     {
         return All.Any(predicate);
     }

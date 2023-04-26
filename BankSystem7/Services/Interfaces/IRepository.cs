@@ -13,66 +13,12 @@ public interface IRepository<T> : IReaderService<T>, IWriterService<T>, IDisposa
     bool FitsConditions(T? item);
 }
 
-public interface IExpressionRepository<T> : IExpressionReaderService<T>, IWriterService<T>, IDisposable where T : class
-{
-    /// <summary>
-    /// checks if the passed item meets the conditions
-    /// </summary>
-    /// <param name="item">inherited model type</param>
-    /// <returns></returns>
-    bool FitsConditions(T? item);
-}
-
 public interface IReaderService<T> where T : class
 {
     /// <summary>
     /// returns collection of entities
     /// </summary>
-    IEnumerable<T> All { get; }
-
-    /// <summary>
-    /// returns entity with specified predicate from database
-    /// </summary>
-    /// <param name="predicate">predicate for function expression</param>
-    /// <returns></returns>
-    T Get(Func<T, bool> predicate);
-
-    /// <summary>
-    /// returns true or false depending exists entity in the database or not
-    /// </summary>
-    /// <param name="predicate">predicate for function expression</param>
-    /// <returns></returns>
-    bool Exist(Func<T, bool> predicate);
-}
-
-public interface IReaderServiceWithTracking<T> where T : class
-{
-    /// <summary>
-    /// returns collection of entities
-    /// </summary>
-    IEnumerable<T> AllWithTracking { get; }
-
-    /// <summary>
-    /// returns entity with specified predicate from database
-    /// </summary>
-    /// <param name="predicate">predicate for function expression</param>
-    /// <returns></returns>
-    T GetWithTracking(Func<T, bool> predicate);
-
-    /// <summary>
-    /// returns true or false depending exists entity in the database or not
-    /// </summary>
-    /// <param name="predicate">predicate for function expression</param>
-    /// <returns></returns>
-    bool ExistWithTracking(Func<T, bool> predicate);
-}
-
-public interface IExpressionReaderService<T> where T : class
-{
-    /// <summary>
-    /// returns collection of entities
-    /// </summary>
-    IEnumerable<T> All { get; }
+    IQueryable<T> All { get; }
 
     /// <summary>
     /// returns entity with specified predicate from database
@@ -87,6 +33,28 @@ public interface IExpressionReaderService<T> where T : class
     /// <param name="predicate">predicate for function expression</param>
     /// <returns></returns>
     bool Exist(Expression<Func<T, bool>> predicate);
+}
+
+public interface IReaderServiceWithTracking<T> where T : class
+{
+    /// <summary>
+    /// returns collection of entities
+    /// </summary>
+    IQueryable<T> AllWithTracking { get; }
+
+    /// <summary>
+    /// returns entity with specified predicate from database
+    /// </summary>
+    /// <param name="predicate">predicate for function expression</param>
+    /// <returns></returns>
+    T GetWithTracking(Expression<Func<T, bool>> predicate);
+
+    /// <summary>
+    /// returns true or false depending exists entity in the database or not
+    /// </summary>
+    /// <param name="predicate">predicate for function expression</param>
+    /// <returns></returns>
+    bool ExistWithTracking(Expression<Func<T, bool>> predicate);
 }
 
 public interface IWriterService<in T> where T : class

@@ -3,6 +3,7 @@ using BankSystem7.Models;
 using BankSystem7.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
+using System.Linq.Expressions;
 
 namespace BankSystem7.Services.Repositories;
 
@@ -171,20 +172,20 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
         return ExceptionModel.Ok;
     }
 
-    public IEnumerable<TBankAccount> All =>
+    public IQueryable<TBankAccount> All =>
         _applicationContext.BankAccounts
         .Include(x => x.Bank)
         .Include(x => x.User)
         .ThenInclude(x => x.Card)
-        .AsNoTracking() ?? Enumerable.Empty<TBankAccount>();
+        .AsNoTracking() ?? Enumerable.Empty<TBankAccount>().AsQueryable();
 
-    public IEnumerable<TBankAccount> AllWithTracking =>
+    public IQueryable<TBankAccount> AllWithTracking =>
         _applicationContext.BankAccounts
         .Include(x => x.Bank)
         .Include(x => x.User)
-        .ThenInclude(x => x.Card) ?? Enumerable.Empty<TBankAccount>();
+        .ThenInclude(x => x.Card) ?? Enumerable.Empty<TBankAccount>().AsQueryable();
 
-    public TBankAccount Get(Func<TBankAccount, bool> predicate)
+    public TBankAccount Get(Expression<Func<TBankAccount, bool>> predicate)
     {
         return All.FirstOrDefault(predicate) ?? (TBankAccount)BankAccount.Default;
     }
@@ -219,7 +220,7 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
         return ExceptionModel.Ok;
     }
 
-    public bool Exist(Func<TBankAccount, bool> predicate)
+    public bool Exist(Expression<Func<TBankAccount, bool>> predicate)
     {
         return All.Any(predicate);
     }
@@ -252,12 +253,12 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
         BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ApplicationContext = _applicationContext;
     }
 
-    public TBankAccount GetWithTracking(Func<TBankAccount, bool> predicate)
+    public TBankAccount GetWithTracking(Expression<Func<TBankAccount, bool>> predicate)
     {
         return AllWithTracking.FirstOrDefault(predicate);
     }
 
-    public bool ExistWithTracking(Func<TBankAccount, bool> predicate)
+    public bool ExistWithTracking(Expression<Func<TBankAccount, bool>> predicate)
     {
         return AllWithTracking.Any(predicate);
     }

@@ -2,6 +2,8 @@
 using BankSystem7.Models;
 using BankSystem7.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using System.Linq.Expressions;
 
 namespace BankSystem7.Services.Repositories;
 
@@ -17,6 +19,15 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
     private BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> _bankRepository;
     private CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> _cardRepository;
     private bool _disposed;
+
+    private readonly Func<ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>, LambdaExpression, TUser?> GetEntity =
+        EF.CompileQuery(
+            (ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit> context, LambdaExpression predicate) =>
+            context.Users
+            .Include(x => x.Card)
+            .ThenInclude(x => x.BankAccount)
+            .ThenInclude(x => x.Bank)
+            .AsNoTracking().FirstOrDefault((Expression<Func<TUser, bool>>)predicate));
 
     public UserRepository()
     {
@@ -102,7 +113,7 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         return ExceptionModel.Ok;
     }
 
-    public bool Exist(Func<TUser, bool> predicate)
+    public bool Exist(Expression<Func<TUser, bool>> predicate)
     {
         return All.Any(predicate);
     }
@@ -112,16 +123,34 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         return item?.Card?.BankAccount?.Bank is not null && Exist(x => x.ID == item.ID);
     }
 
-    public IEnumerable<TUser> All =>
+    public IQueryable<TUser> All =>
         _applicationContext.Users
             .Include(x => x.Card)
             .ThenInclude(x => x.BankAccount)
             .ThenInclude(x => x.Bank)
-            .AsNoTracking() ?? Enumerable.Empty<TUser>();
+            .AsNoTracking() ?? Enumerable.Empty<TUser>().AsQueryable();
 
-    public TUser Get(Func<TUser, bool> predicate)
+    public TUser Get(Expression<Func<TUser, bool>> predicate)
     {
         return All.FirstOrDefault(predicate) ?? (TUser)User.Default;
+    }
+
+    public TUser GetCompiled(Expression<Func<User, bool>> predicate)
+    {
+        try
+        {
+            var parameters = new ParameterExpression[]
+            {
+                Expression.Parameter(typeof(TUser)),
+            };
+            var expression = Expression.Lambda<Func<TUser, bool>>(predicate, parameters);
+            return GetEntity(_applicationContext, expression) ?? (TUser)User.Default;
+        }
+        catch (Exception e)
+        {
+
+            throw;
+        }
     }
 
     public ExceptionModel Update(TUser item)
@@ -136,7 +165,7 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         return ExceptionModel.Ok;
     }
 
-    public ExceptionModel UpdateBankTracker(TUser user)
+    internal ExceptionModel UpdateBankTracker(TUser user)
     {
         _applicationContext.ChangeTracker.Clear();
 

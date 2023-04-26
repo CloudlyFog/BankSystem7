@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 
 namespace BankSystem7.Services.Repositories;
 
-public sealed class OperationRepository<TUser, TCard, TBankAccount, TBank, TCredit> : LoggerExecutor<OperationType>, IExpressionRepository<Operation>
+public sealed class OperationRepository<TUser, TCard, TBankAccount, TBank, TCredit> : LoggerExecutor<OperationType>, IRepository<Operation>
     where TUser : User
     where TCard : Card
     where TBankAccount : BankAccount
@@ -63,7 +63,7 @@ public sealed class OperationRepository<TUser, TCard, TBankAccount, TBank, TCred
         return ExceptionModel.Ok;
     }
 
-    public IEnumerable<Operation> All => _operationService.Collection.Find(_ => true).ToList();
+    public IQueryable<Operation> All => _operationService.Collection.Find(_ => true).ToList().AsQueryable();
 
     public Operation Get(Expression<Func<Operation, bool>> predicate)
     {
