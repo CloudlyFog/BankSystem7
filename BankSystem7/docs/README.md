@@ -1,8 +1,8 @@
 # Bank system 7
 This library provides opportunities for using likeness of bank system. You can handle not only users but also other models like banks, cards and etc.
 
-### Updates in version 0.4.0
-- Added compatibility with .net 8.
+### Updates in version 0.4.1
+- 
 ****
 # Documentation
 
@@ -18,11 +18,43 @@ This library provides opportunities for using likeness of bank system. You can h
 The library provides ways to pass and use own models. For example, You can inherit Your class from base class User and pass it as type to initialized instance of `ServiceConfiguration` or `ServiceConfigurationMiddleware`
 and use own model.
 Developer can interact with library by following next steps:
-1. create instance of class `ServiceConfiguration` and pass as parameters class `ConfigurationOptions` with own settings. (or do the same steps but instead of create instance of `ServiceConfiguration`, use middleware `ServiceConfigurationMiddleware`)
+1. create instance of class `ServiceConfiguration` and pass as parameters class `ConfigurationOptions` with own settings. 
 2. interact with repositories throughout public properties of instanced class `ServiceConfiguration`
+
+New feature for library is adding services to internal DI in ASP.Net application. For that You have to write something like this:
+
+1. in Program.cs
+
+        
+        builder.Services.AddNationBankSystem<User, Card, BankAccount, Bank, Credit>(o =>
+        {
+            o.EnsureCreated = false;
+            o.EnsureDeleted = false;
+            o.DatabaseName = "Test";
+            o.OperationOptions = new OperationServiceOptions()
+            {
+                DatabaseName = "Test",
+            };
+            o.LoggerOptions = new LoggerOptions()
+            {
+                // In the example we aren't using logger
+                IsEnabled = false,
+            };
+        });
+        
+2. in Your controller
+
+        private readonly IServiceConfiguration<User, Card, BankAccount, Bank, Credit> _service;
+
+        public UsersController(IServiceConfiguration<User, Card, BankAccount, Bank, Credit> service) 
+        {
+            _service = service;
+        }
+
+And all will work
+
 #### Remember!
-If you'll not change connection string to database in class BankServiceOptions or directly in repository classes program may don't work correctly.
-You can catch exception like "There isn't database which has been specified." because databases which was used in developing project may doesn't exist on your machine.
+If you'll not pass options to `ServiceConfiguration` method `CreateInstance` You can get different kind of exceptions.
 
 ## API documentation
 ### AppContext
@@ -33,11 +65,11 @@ There are 2 classes context:
 
 #### API ApplicationContext
 
-Methods:
+**Methods:**
 1. `internal ExceptionModel AvoidDuplication(Bank item)` - implements function for avoiding duplication in table Banks in the database.
 2. `private void DatabaseHandle()` - implements handling creating and deleting database.
 
-Properties:
+**Properties:**
 
 1. `public static bool EnsureCreated { get; set; }` - property for handling create database operation
 1. `public static bool EnsureDeleted { get; set; }` - property for handling delete database operation
@@ -48,7 +80,7 @@ Properties:
 
 #### API BankContext
 
-Methods:
+**Methods:**
 1. `public ExceptionModel CreateOperation(Operation operation, OperationKind operationKind)` - creates transaction operation.
 2. `public ExceptionModel DeleteOperation(Operation operation)` - deletes transaction operation
 3. `public ExceptionModel BankAccountWithdraw(User user, Bank bank, Operation operation)` - withdraws money from user bank account and accrual to bank's account.
@@ -56,7 +88,7 @@ Methods:
 5. `private StatusOperationCode StatusOperation(Operation operation, OperationKind operationKind)` - returns status of operation for next handling of operation.
 6. `private void DatabaseHandle()` - implements handling creating and deleting database.
 
-Properties:
+**Properties:**
 
 1. `public  DbSet<User> Users { get; set; }` - an instance of the table `Users` in database.
 2. `public DbSet<Bank> Banks { get; set; }` -an instance of the table `Banks` in database.
@@ -84,7 +116,7 @@ Here located services for configuring library.
 
 ### Interfaces (and abstract classes)
 Here located interfaces which describes behavior of inherited repo-classes.
-1. **Interface** `IRepository<T> : IReaderService<T>, IWriterService<T>, IDisposable where T : class` - interface for implement standard library logic.
+1. Interface `IRepository<T> : IReaderService<T>, IWriterService<T>, IDisposable where T : class` - interface for implement standard library logic.
       - `bool FitsConditions(T? item);` - implements logic for checking on conditions true of passed entity.
 
 2. **Interface** `IReaderService<T> where T : class` - interface for implement reading data from database.
