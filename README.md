@@ -1,8 +1,8 @@
 # Bank system 7
 This library provides opportunities for using likeness of bank system. You can handle not only users but also other models like banks, cards and etc.
 
-### Updates in version 0.3.9
-- Updated logic of creation, update and deletion user. Instead of using external methods to operate with entity we just attach to ef core tracker needed child entity and update with parent entity.
+### Updates in version 0.4.0
+- Added compatibility with .net 8.
 ****
 # Documentation
 
@@ -32,32 +32,36 @@ There are 2 classes context:
 2. **BankContext** - is responsible for handling operations when use ApplicationContext is impossible.
 
 #### API ApplicationContext
-<br>**Methods:**
+
+Methods:
 1. `internal ExceptionModel AvoidDuplication(Bank item)` - implements function for avoiding duplication in table Banks in the database.
 2. `private void DatabaseHandle()` - implements handling creating and deleting database.
-   <br>**Properties:**
+
+Properties:
 
 1. `public static bool EnsureCreated { get; set; }` - property for handling create database operation
 1. `public static bool EnsureDeleted { get; set; }` - property for handling delete database operation
 2. `protected internal DbSet<User> Users { get; set; }` - an instance of the table `Users` in database.
 3. `protected internal DbSet<Bank> Banks { get; set; }` -an instance of the table `Banks` in database.
-5. `protected internal DbSet<BankAccount> BankAccounts { get; set; }` - an instance of the table `BankAccounts` in database.
-6. `protected internal DbSet<Credit> Credits { get; set; }` - an instance of the table `Credits` in database.
+4. `protected internal DbSet<BankAccount> BankAccounts { get; set; }` - an instance of the table `BankAccounts` in database.
+5. `protected internal DbSet<Credit> Credits { get; set; }` - an instance of the table `Credits` in database.
 
-### API BankContext
-<br>**Methods:**
+#### API BankContext
+
+Methods:
 1. `public ExceptionModel CreateOperation(Operation operation, OperationKind operationKind)` - creates transaction operation.
 2. `public ExceptionModel DeleteOperation(Operation operation)` - deletes transaction operation
 3. `public ExceptionModel BankAccountWithdraw(User user, Bank bank, Operation operation)` - withdraws money from user bank account and accrual to bank's account.
 4. `private ExceptionModel BankAccountAccrual(User user, Bank bank, Operation operation)` - accruals money to user bank account from bank's account.
 5. `private StatusOperationCode StatusOperation(Operation operation, OperationKind operationKind)` - returns status of operation for next handling of operation.
 6. `private void DatabaseHandle()` - implements handling creating and deleting database.
-   <br>**Properties:**
+
+Properties:
 
 1. `public  DbSet<User> Users { get; set; }` - an instance of the table `Users` in database.
 2. `public DbSet<Bank> Banks { get; set; }` -an instance of the table `Banks` in database.
+3. `public DbSet<Cards> Cards { get; set; }` - an instance of the table `Cards` in database.
 4. `public DbSet<BankAccount> BankAccounts { get; set; }` - an instance of the table `BankAccounts` in database.
-5. `protected internal DbSet<Cards> Cards { get; set; }` - an instance of the table `Cards` in database.
 
 ### Services
 Services are dividing on 3 sub-folders:
@@ -78,55 +82,49 @@ Here located services for configuring library.
 2. `ModelConfiguration` - service ensures correct relationships between models.
 3. `ServiceConifiguration` - service that handles all services that there are in the library.
 
-
 ### Interfaces (and abstract classes)
 Here located interfaces which describes behavior of inherited repo-classes.
-1. Interface `IRepository<T> : IReaderService<T>, IWriterService<T>, IDisposable where T : class` - interface for implement standard library logic.
-   <br>**Methods:**
-- `bool FitsConditions(T? item);` - implements logic for checking on conditions true of passed entity.
+1. **Interface** `IRepository<T> : IReaderService<T>, IWriterService<T>, IDisposable where T : class` - interface for implement standard library logic.
+      - `bool FitsConditions(T? item);` - implements logic for checking on conditions true of passed entity.
 
-2. Interface `IExpressionRepository<T> : IExpressionReaderService<T>, IWriterService<T>, IDisposable where T : class` - interface for implement standard library logic with another type of parameters.
-   <br>**Methods:**
-- `bool FitsConditions(T? item);` - implements logic for checking on conditions true of passed entity.
+2. **Interface** `IReaderService<T> where T : class` - interface for implement reading data from database.
 
-3. Interface `IReaderService<T> where T : class` - interface for implement reading data from database.
-   <br>**Methods:**
-- `T Get(Func<T, bool> predicate);` - implements getting an object from database with predicate.
-- `bool Exist(Func<T, bool> predicate);` - implements checking exist object with in database predicate.
-   <br>**Properties:**
-- `IEnumerable<T> All {  get; }` - implements getting a sequence of the entity from database.
+   Methods
+      - `T Get(Expression<Func<T, bool>> predicate);` - implements getting an object from database with predicate.
+      - `bool Exist(Expression<Func<T, bool>> predicate);` - implements checking exist object with in database predicate.
 
-4. Interface `IReaderServiceWithTracking<T> where T : class` - interface for implement reading data with tracking from database.
-   <br>**Methods:**
-- `T Get(Func<T, bool> predicate);` - implements getting an entity from database with predicate.
-- `bool Exist(Func<T, bool> predicate);` - implements checking exist object with in database predicate.
-   <br>**Properties:**
-- `IEnumerable<T> All {  get; }` - implements getting a sequence of the entity from database.
+   Properties
+      - `IQueryable<T> All {  get; }` - implements getting a sequence of the objects from database.
 
-5. Interface `IExpressionReaderService<T> where T : class` - interface for implement reading data from database with another type of parameters.
-   <br>**Methods:**
-- `T Get(Expression<Func<T, bool>> predicate);` - implements getting an object from database with predicate.
-- `bool Exist(Expression<Func<T, bool>> predicate);` - implements checking exist object with in database predicate.
-   <br>**Properties:**
-- `IEnumerable<T> All {  get; }` - implements getting a sequence of the entity from database.
+3. **Interface** `IReaderServiceWithTracking<T> where T : class` - interface for implement reading data from database with another type of parameters.
 
-6. Interface `IWriterService<in T> where T : class` - interface for implement writing, updating and deleting data in database
-   <br>**Methods:**
-- `ExceptionModel  Create(T item);` - implements adding item in database.
-- `ExceptionModel  Update(T item);` - implements updating item in database.
-- `ExceptionModel  Delete(T item);` - implements deleting item from database.
+   Methods
+      - `T GetWithTracking(Expression<Expression<Func<T, bool>>> predicate);` - implements getting an object from database with predicate.
+      - `bool ExistWithTracking(Expression<Expression<Func<T, bool>>> predicate);` - implements checking exist object with in database predicate.
+   Properties
+      - `IQueryable<T> AllWithTracking {  get; }` - implements getting a sequence of the objects from database.
 
-7. Interface `ILogger` - interface that provides standard set for logging
-   <br>**Methods:**
-- `ExceptionModel Log(Report report);` - implements logging report in database.
-- `ExceptionModel Log(IEnumerable<Report> reports);` - implements logging collection of reports in database.
-   <br>**Properties:**
-- `public bool IsReused { get; set; }` - defines possibility use already initialized logger.
-- `public LoggerOptions LoggerOptions { get; set; }` - defines options for logger configuration.
+4. **Interface** `IWriterService<in T> where T : class` - interface for implement writing, updating and deleting data in database
 
-8. Abstract class `LoggerExecutor<TOperationType> where TOperationType : Enum` - simple implementation of service for added reports to logger queue
-   <br>**Methods:**
-- `virtual void Log(ExceptionModel exceptionModel, string methodName, string className, TOperationType operationType, ICollection<GeneralReport<TOperationType>> reports)` - implements standard logic of inserting log data to logger queue. Can be overrided.
+   Methods
+      - `ExceptionModel  Create(T item);` - implements adding item in database.
+      - `ExceptionModel  Update(T item);` - implements updating item in database.
+      - `ExceptionModel  Delete(T item);` - implements deleting item from database.
+
+5. **Interface** `ILogger` - interface that provides standard set for logging
+
+   Methods
+      - `ExceptionModel Log(Report report);` - implements logging report in database.
+      - `ExceptionModel Log(IEnumerable<Report> reports);` - implements logging collection of reports in database.
+
+   Properties
+      - `public bool IsReused { get; set; }` - defines possibility use already initialized logger.
+      - `public LoggerOptions LoggerOptions { get; set; }` - defines options for logger configuration.
+
+6. **Abstract class** `LoggerExecutor<TOperationType> where TOperationType : Enum` - simple implementation of service for added reports to logger queue
+
+   Methods
+      - `virtual void Log(ExceptionModel exceptionModel, string methodName, string className, TOperationType operationType, ICollection<GeneralReport<TOperationType>> reports)` - implements standard logic of inserting log data to logger queue. Can be overrided.
 
 ### Repositories
 Repositories are implementation of various interfaces and working with context classes for interact with database.

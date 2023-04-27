@@ -75,7 +75,7 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
     {
         if (user?.Card?.BankAccount?.Bank is null || !Exist(x => x.ID == user.Card.BankAccount.Bank.ID))
             return ExceptionModel.EntityIsNull;
-        if (operation.OperationStatus != StatusOperationCode.Successfully)
+        if (operation.OperationStatus != StatusOperationCode.Ok)
             return (ExceptionModel)operation.OperationStatus.GetHashCode();
 
         if (user is null)
@@ -110,7 +110,7 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
     {
         if (user?.Card?.BankAccount?.Bank is null || !Exist(x => x.ID == user.Card.BankAccount.Bank.ID))
             return ExceptionModel.EntityIsNull;
-        if (operation.OperationStatus != StatusOperationCode.Successfully)
+        if (operation.OperationStatus != StatusOperationCode.Ok)
             return (ExceptionModel)operation.OperationStatus.GetHashCode();
 
         if (AnotherBankTransactionOperation)

@@ -70,7 +70,7 @@ internal sealed class BankContext<TUser, TCard, TBankAccount, TBank, TCredit> : 
             return ExceptionModel.EntityNotExist;
 
         operation.OperationStatus = StatusOperation(operation, operationKind);
-        if (operation.OperationStatus != StatusOperationCode.Successfully)
+        if (operation.OperationStatus != StatusOperationCode.Ok)
             return ExceptionModel.OperationRestricted;
 
         _operationService.Collection.InsertOne(operation);
@@ -104,7 +104,7 @@ internal sealed class BankContext<TUser, TCard, TBankAccount, TBank, TCredit> : 
     {
         if (user.Card?.BankAccount?.Bank is null || bank is null || operation is null)
             return ExceptionModel.EntityIsNull;
-        if (operation.OperationStatus != StatusOperationCode.Successfully)
+        if (operation.OperationStatus != StatusOperationCode.Ok)
             return (ExceptionModel)operation.OperationStatus.GetHashCode();
 
         bank.AccountAmount += operation.TransferAmount;
@@ -129,7 +129,7 @@ internal sealed class BankContext<TUser, TCard, TBankAccount, TBank, TCredit> : 
     {
         if (user.Card?.BankAccount?.Bank is null || bank is null || operation is null)
             return ExceptionModel.EntityIsNull;
-        if (operation.OperationStatus != StatusOperationCode.Successfully)
+        if (operation.OperationStatus != StatusOperationCode.Ok)
             return (ExceptionModel)operation.OperationStatus.GetHashCode();
 
         bank.AccountAmount -= operation.TransferAmount;
@@ -152,7 +152,7 @@ internal sealed class BankContext<TUser, TCard, TBankAccount, TBank, TCredit> : 
     /// </summary>
     /// <param name="operationModel"></param>
     /// <param name="operationKind"></param>
-    /// <returns>status of operation, default - Successfully</returns>
+    /// <returns>status of operation, default - Ok or Successfully</returns>
     /// <exception cref="ArgumentNullException"></exception>
     private StatusOperationCode StatusOperation(Operation? operationModel, OperationKind operationKind)
     {

@@ -42,7 +42,9 @@ public class User
 public enum ExceptionModel
 {
     Ok = 1,
-    Successfully,
+    Successfully = 2,
+    Restricted = 3,
+    Error = 4,
     EntityIsNull,
     VariableIsNull,
     OperationRestricted,

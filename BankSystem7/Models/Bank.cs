@@ -52,7 +52,7 @@ public class Operation
     public Guid? ReceiverID { get; set; } = Guid.NewGuid();
     public Guid? SenderID { get; set; } = Guid.NewGuid();
     public decimal TransferAmount { get; set; }
-    public StatusOperationCode OperationStatus { get; set; } = StatusOperationCode.Successfully;
+    public StatusOperationCode OperationStatus { get; set; } = StatusOperationCode.Ok;
     public OperationKind OperationKind { get; set; }
 }
 
@@ -94,7 +94,7 @@ public class Credit
     public User? User { get; set; }
 
     [NotMapped]
-    public StatusOperationCode OperationStatus { get; set; } = StatusOperationCode.Successfully;
+    public StatusOperationCode OperationStatus { get; set; } = StatusOperationCode.Ok;
 
     public decimal CalculateRepaymentAmount()
     {
@@ -255,9 +255,10 @@ public enum CardKind
 
 public enum StatusOperationCode
 {
-    Successfully = 200,
-    Restricted = 300,
-    Error = 400,
+    Ok = 1,
+    Successfully = 2,
+    Restricted = 3,
+    Error = 4,
 }
 
 public enum OperationKind
