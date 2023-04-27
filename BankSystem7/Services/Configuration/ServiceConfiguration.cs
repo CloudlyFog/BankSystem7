@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace BankSystem7.Services.Configuration;
 
-public class ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>
+public class ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit> : IServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>
     where TUser : User
     where TCard : Card
     where TBankAccount : BankAccount
@@ -38,15 +38,15 @@ public class ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>
         OperationRepository = new OperationRepository<TUser, TCard, TBankAccount, TBank, TCredit>(Options.OperationOptions);
     }
 
-    public BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit>? BankAccountRepository { get; protected internal set; }
-    public BankRepository<TUser, TCard, TBankAccount, TBank, TCredit>? BankRepository { get; protected internal set; }
-    public CardRepository<TUser, TCard, TBankAccount, TBank, TCredit>? CardRepository { get; protected internal set; }
-    public UserRepository<TUser, TCard, TBankAccount, TBank, TCredit>? UserRepository { get; protected internal set; }
-    public CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>? CreditRepository { get; protected internal set; }
-    public LoggerRepository? LoggerRepository { get; protected internal set; }
-    public OperationRepository<TUser, TCard, TBankAccount, TBank, TCredit>? OperationRepository { get; protected internal set; }
-    public ILogger? Logger { get; protected internal set; }
-    public static ConfigurationOptions Options { get; protected internal set; }
+    public BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit>? BankAccountRepository { get; }
+    public BankRepository<TUser, TCard, TBankAccount, TBank, TCredit>? BankRepository { get; }
+    public CardRepository<TUser, TCard, TBankAccount, TBank, TCredit>? CardRepository { get; }
+    public UserRepository<TUser, TCard, TBankAccount, TBank, TCredit>? UserRepository { get; }
+    public CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>? CreditRepository { get; }
+    public LoggerRepository? LoggerRepository { get; }
+    public OperationRepository<TUser, TCard, TBankAccount, TBank, TCredit>? OperationRepository { get; }
+    public ILogger? Logger { get; }
+    protected internal static ConfigurationOptions Options { get; set; }
 
     public ServiceConfiguration(RequestDelegate next, ConfigurationOptions options)
     {
@@ -98,15 +98,6 @@ public class ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>
             CreditRepository?.Dispose();
             OperationRepository?.Dispose();
         }
-
-        BankAccountRepository = null;
-        BankRepository = null;
-        CardRepository = null;
-        UserRepository = null;
-        CreditRepository = null;
-        LoggerRepository = null;
-        Logger = null;
-        OperationRepository = null;
         _disposed = true;
     }
 
