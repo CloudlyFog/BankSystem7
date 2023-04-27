@@ -2,7 +2,7 @@
 This library provides opportunities for using likeness of bank system. You can handle not only users but also other models like banks, cards and etc.
 
 ### Updates in version 0.4.1
--
+- Removed possibility to use middleware and instead it You can use library services with DI. Instruction for using it wrote below.
 ****
 # Documentation
 
