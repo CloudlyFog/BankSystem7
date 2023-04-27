@@ -13,8 +13,8 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
     where TBank : Bank
     where TCredit : Credit
 {
-    private BankContext<TUser, TCard, TBankAccount, TBank, TCredit> _bankContext;
-    private ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit> _applicationContext;
+    private readonly BankContext<TUser, TCard, TBankAccount, TBank, TCredit> _bankContext;
+    private readonly ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit> _applicationContext;
     internal BankContext<TUser, TCard, TBankAccount, TBank, TCredit>? BankContext { get; set; }
     internal bool AnotherBankTransactionOperation { get; set; }
 
@@ -56,12 +56,7 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
             BankContext.Dispose();
             _applicationContext.Dispose();
         }
-
-#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
-        _bankContext = null;
         BankContext = null;
-        _applicationContext = null;
-#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
         _disposedValue = true;
     }
 
