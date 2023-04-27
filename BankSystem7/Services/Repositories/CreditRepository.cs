@@ -157,7 +157,7 @@ public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>
         {
             transaction.Rollback();
             return updateAccountsAfterPayCredit;
-        } 
+        }
 
         var upd = UpdateCreditStateAfterPayCredit(credit, operationWithdrawFromUserAccount);
         if (upd != ExceptionModel.Ok)
@@ -173,7 +173,6 @@ public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>
 
     private ExceptionModel UpdateCreditStateAfterPayCredit(TCredit credit, Operation operationWithdrawFromUserAccount)
     {
-
         if (credit.RepaymentAmount == operationWithdrawFromUserAccount.TransferAmount)
             return Delete(credit);
         else
@@ -204,7 +203,6 @@ public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>
         if (accrualOperation != ExceptionModel.Ok)
             return accrualOperation;
 
-
         return ExceptionModel.Ok;
     }
 
@@ -215,7 +213,7 @@ public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>
 
         // here creates operation for accrual money on user bank account
         var createOperation = _bankContext.CreateOperation(operationWithdrawFromUserAccount, OperationKind.Withdraw);
-        if (createOperation != ExceptionModel.Ok) 
+        if (createOperation != ExceptionModel.Ok)
             return createOperation;
 
         // withdraw money to user's bank account

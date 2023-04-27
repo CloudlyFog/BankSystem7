@@ -2,7 +2,7 @@
 This library provides opportunities for using likeness of bank system. You can handle not only users but also other models like banks, cards and etc.
 
 ### Updates in version 0.4.1
-- 
+-
 ****
 # Documentation
 
@@ -18,14 +18,13 @@ This library provides opportunities for using likeness of bank system. You can h
 The library provides ways to pass and use own models. For example, You can inherit Your class from base class User and pass it as type to initialized instance of `ServiceConfiguration` or `ServiceConfigurationMiddleware`
 and use own model.
 Developer can interact with library by following next steps:
-1. create instance of class `ServiceConfiguration` and pass as parameters class `ConfigurationOptions` with own settings. 
+1. create instance of class `ServiceConfiguration` and pass as parameters class `ConfigurationOptions` with own settings.
 2. interact with repositories throughout public properties of instanced class `ServiceConfiguration`
 
 New feature for library is adding services to internal DI in ASP.Net application. For that You have to write something like this:
 
 1. in Program.cs
 
-        
         builder.Services.AddNationBankSystem<User, Card, BankAccount, Bank, Credit>(o =>
         {
             o.EnsureCreated = false;
@@ -41,12 +40,12 @@ New feature for library is adding services to internal DI in ASP.Net application
                 IsEnabled = false,
             };
         });
-        
+
 2. in Your controller
 
         private readonly IServiceConfiguration<User, Card, BankAccount, Bank, Credit> _service;
 
-        public UsersController(IServiceConfiguration<User, Card, BankAccount, Bank, Credit> service) 
+        public UsersController(IServiceConfiguration<User, Card, BankAccount, Bank, Credit> service)
         {
             _service = service;
         }
