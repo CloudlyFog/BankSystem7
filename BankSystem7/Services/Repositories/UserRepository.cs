@@ -13,10 +13,10 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
     where TBank : Bank
     where TCredit : Credit
 {
-    private BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit> _bankAccountRepository;
-    private ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit> _applicationContext;
-    private BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> _bankRepository;
-    private CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> _cardRepository;
+    private readonly BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit> _bankAccountRepository;
+    private readonly ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit> _applicationContext;
+    private readonly BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> _bankRepository;
+    private readonly CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> _cardRepository;
     private bool _disposed;
 
     public UserRepository()
@@ -65,10 +65,6 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
             _cardRepository.Dispose();
             _applicationContext.Dispose();
         }
-        _bankAccountRepository = null;
-        _bankRepository = null;
-        _cardRepository = null;
-        _applicationContext = null;
         _disposed = true;
     }
 
