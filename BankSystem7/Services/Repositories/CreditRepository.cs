@@ -14,8 +14,8 @@ public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>
     where TBank : Bank
     where TCredit : Credit
 {
-    private BankContext<TUser, TCard, TBankAccount, TBank, TCredit> _bankContext;
-    private ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit> _applicationContext;
+    private readonly BankContext<TUser, TCard, TBankAccount, TBank, TCredit> _bankContext;
+    private readonly ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit> _applicationContext;
     private bool _disposedValue;
 
     public CreditRepository()
@@ -232,9 +232,6 @@ public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>
             _bankContext.Dispose();
             _applicationContext.Dispose();
         }
-
-        _bankContext = null;
-        _applicationContext = null;
         _disposedValue = true;
     }
 
