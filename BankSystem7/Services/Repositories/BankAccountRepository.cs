@@ -14,9 +14,9 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
     where TBank : Bank
     where TCredit : Credit
 {
-    private BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> _bankRepository;
-    private BankContext<TUser, TCard, TBankAccount, TBank, TCredit> _bankContext;
-    private ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit> _applicationContext;
+    private readonly BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> _bankRepository;
+    private readonly BankContext<TUser, TCard, TBankAccount, TBank, TCredit> _bankContext;
+    private readonly ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit> _applicationContext;
     private bool _disposedValue;
     private const string ConnectionString = @"Server=localhost\\SQLEXPRESS;Data Source=maxim;Initial Catalog=Test;Integrated Security=True;Persist Security Info=False;Pooling=False;MultipleActiveResultSets=False;Encrypt=False;TrustServerCertificate=False";
 
@@ -65,11 +65,6 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
             _bankRepository.Dispose();
             _applicationContext.Dispose();
         }
-#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
-        _bankContext = null;
-        _bankRepository = null;
-        _applicationContext = null;
-#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
         _disposedValue = true;
     }
 
