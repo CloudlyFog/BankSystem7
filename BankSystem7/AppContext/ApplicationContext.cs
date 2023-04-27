@@ -36,7 +36,6 @@ public class ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit> : Db
         optionsBuilder.EnableSensitiveDataLogging();
         optionsBuilder
             .UseSqlServer(ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>.Connection);
-        optionsBuilder.LogTo(Console.WriteLine, Microsoft.Extensions.Logging.LogLevel.Information);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -68,6 +67,6 @@ public class ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit> : Db
         foreach (var credit in item.Credits)
             Entry(credit).State = EntityState.Unchanged;
 
-        return ExceptionModel.Successfully;
+        return ExceptionModel.Ok;
     }
 }

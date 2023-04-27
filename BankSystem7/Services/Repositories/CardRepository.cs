@@ -2,6 +2,7 @@
 using BankSystem7.Models;
 using BankSystem7.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace BankSystem7.Services.Repositories;
 
@@ -12,8 +13,8 @@ public sealed class CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
     where TBank : Bank
     where TCredit : Credit
 {
-    private BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit> _bankAccountRepository;
-    private ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit> _applicationContext;
+    private readonly BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit> _bankAccountRepository;
+    private readonly ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit> _applicationContext;
     private bool _disposedValue;
 
     public CardRepository()
@@ -55,8 +56,6 @@ public sealed class CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
             _bankAccountRepository.Dispose();
             _applicationContext.Dispose();
         }
-        _bankAccountRepository = null;
-        _applicationContext = null;
         _disposedValue = true;
     }
 
@@ -67,7 +66,7 @@ public sealed class CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         _applicationContext.ChangeTracker.Clear();
         _applicationContext.Cards.Update(item);
         _applicationContext.SaveChanges();
-        return ExceptionModel.Successfully;
+        return ExceptionModel.Ok;
     }
 
     /// <summary>
@@ -84,7 +83,7 @@ public sealed class CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
             return ExceptionModel.OperationFailed;
         _applicationContext.Cards.Add(item);
         _applicationContext.SaveChanges();
-        return ExceptionModel.Successfully;
+        return ExceptionModel.Ok;
     }
 
     public ExceptionModel Delete(TCard item)
@@ -95,38 +94,30 @@ public sealed class CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         _applicationContext.ChangeTracker.Clear();
         _applicationContext.Cards.Remove(item);
         _applicationContext.SaveChanges();
-        return ExceptionModel.Successfully;
+        return ExceptionModel.Ok;
     }
 
-    public bool Exist(Func<TCard, bool> predicate) => 
-        _applicationContext.Cards
-            .Include(x => x.User)
-            .Include(x => x.BankAccount)
-            .ThenInclude(x => x.Bank)
-            .AsNoTracking().AsEnumerable()
-            .Any(predicate);
+    public bool Exist(Expression<Func<TCard, bool>> predicate)
+    {
+        return All.Any(predicate);
+    }
 
     public bool FitsConditions(TCard? item)
     {
         return item is not null && Exist(x => x.ID == item.ID);
     }
 
-    public TCard Get(Func<TCard, bool> predicate)
+    public TCard Get(Expression<Func<TCard, bool>> predicate)
     {
-        return _applicationContext.Cards
-            .Include(x => x.User)
-            .Include(x => x.BankAccount)
-            .ThenInclude(x => x.Bank)
-            .AsNoTracking().AsEnumerable()
-            .FirstOrDefault(predicate) ?? (TCard)Card.Default;
+        return All.FirstOrDefault(predicate) ?? (TCard)Card.Default;
     }
 
-    public IEnumerable<TCard> All => 
+    public IQueryable<TCard> All =>
         _applicationContext.Cards
             .Include(x => x.User)
             .Include(x => x.BankAccount)
             .ThenInclude(x => x.Bank)
-            .AsNoTracking();
+            .AsNoTracking() ?? Enumerable.Empty<TCard>().AsQueryable();
 
     ~CardRepository()
     {

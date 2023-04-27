@@ -36,8 +36,7 @@ internal sealed class BankContext<TUser, TCard, TBankAccount, TBank, TCredit> : 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.EnableSensitiveDataLogging();
-        optionsBuilder.UseSqlServer(ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>.Connection,
-            o => o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery));
+        optionsBuilder.UseSqlServer(ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>.Connection);
     }
 
     /// <summary>
@@ -62,20 +61,20 @@ internal sealed class BankContext<TUser, TCard, TBankAccount, TBank, TCredit> : 
     public ExceptionModel CreateOperation(Operation? operation, OperationKind operationKind)
     {
         if (operation is null)
-            return ExceptionModel.VariableIsNull;
+            return ExceptionModel.EntityIsNull;
 
         // Find(Builders<Operation>.Filter.Eq(predicate)).Any() equals
         // Operations.Any(predicate)
         // we find and in the same time check is there object in database
         if (_operationService.Collection.Find(Builders<Operation>.Filter.Eq(x => x.ID, operation.ID)).Any())
-            return ExceptionModel.OperationNotExist;
+            return ExceptionModel.EntityNotExist;
 
         operation.OperationStatus = StatusOperation(operation, operationKind);
-        if (operation.OperationStatus != StatusOperationCode.Successfully)
+        if (operation.OperationStatus != StatusOperationCode.Ok)
             return ExceptionModel.OperationRestricted;
 
         _operationService.Collection.InsertOne(operation);
-        return ExceptionModel.Successfully;
+        return ExceptionModel.Ok;
     }
 
     /// <summary>
@@ -86,12 +85,12 @@ internal sealed class BankContext<TUser, TCard, TBankAccount, TBank, TCredit> : 
     public ExceptionModel DeleteOperation(Operation? operation)
     {
         if (operation is null)
-            return ExceptionModel.VariableIsNull;
+            return ExceptionModel.EntityIsNull;
         if (_operationService.Collection.Find(Builders<Operation>.Filter.Eq(x => x.ID, operation.ID)).Any())
-            return ExceptionModel.OperationNotExist;
+            return ExceptionModel.EntityNotExist;
 
         _operationService.Collection.DeleteOne(x => x.ID == operation.ID);
-        return ExceptionModel.Successfully;
+        return ExceptionModel.Ok;
     }
 
     /// <summary>
@@ -104,8 +103,8 @@ internal sealed class BankContext<TUser, TCard, TBankAccount, TBank, TCredit> : 
     internal ExceptionModel BankAccountWithdraw(User? user, Bank? bank, Operation operation)
     {
         if (user.Card?.BankAccount?.Bank is null || bank is null || operation is null)
-            return ExceptionModel.VariableIsNull;
-        if (operation.OperationStatus != StatusOperationCode.Successfully)
+            return ExceptionModel.EntityIsNull;
+        if (operation.OperationStatus != StatusOperationCode.Ok)
             return (ExceptionModel)operation.OperationStatus.GetHashCode();
 
         bank.AccountAmount += operation.TransferAmount;
@@ -116,7 +115,7 @@ internal sealed class BankContext<TUser, TCard, TBankAccount, TBank, TCredit> : 
         Update(user.Card.BankAccount);
         Update(user.Card.BankAccount.Bank);
         SaveChanges();
-        return ExceptionModel.Successfully;
+        return ExceptionModel.Ok;
     }
 
     /// <summary>
@@ -129,8 +128,8 @@ internal sealed class BankContext<TUser, TCard, TBankAccount, TBank, TCredit> : 
     internal ExceptionModel BankAccountAccrual(User? user, Bank? bank, Operation operation)
     {
         if (user.Card?.BankAccount?.Bank is null || bank is null || operation is null)
-            return ExceptionModel.VariableIsNull;
-        if (operation.OperationStatus != StatusOperationCode.Successfully)
+            return ExceptionModel.EntityIsNull;
+        if (operation.OperationStatus != StatusOperationCode.Ok)
             return (ExceptionModel)operation.OperationStatus.GetHashCode();
 
         bank.AccountAmount -= operation.TransferAmount;
@@ -141,7 +140,7 @@ internal sealed class BankContext<TUser, TCard, TBankAccount, TBank, TCredit> : 
         Update(user.Card.BankAccount);
         Update(user.Card.BankAccount.Bank);
         SaveChanges();
-        return ExceptionModel.Successfully;
+        return ExceptionModel.Ok;
     }
 
     /// <summary>
@@ -153,7 +152,7 @@ internal sealed class BankContext<TUser, TCard, TBankAccount, TBank, TCredit> : 
     /// </summary>
     /// <param name="operationModel"></param>
     /// <param name="operationKind"></param>
-    /// <returns>status of operation, default - Successfully</returns>
+    /// <returns>status of operation, default - Ok or Successfully</returns>
     /// <exception cref="ArgumentNullException"></exception>
     private StatusOperationCode StatusOperation(Operation? operationModel, OperationKind operationKind)
     {

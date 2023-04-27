@@ -33,19 +33,26 @@ public class User
     public Card? Card { get; set; }
 
     [NotMapped]
-    public ExceptionModel Exception { get; set; } = ExceptionModel.Successfully;
+    public ExceptionModel Exception { get; set; } = ExceptionModel.Ok;
 }
 
 /// <summary>
-/// defines model of possible exceptions of returns of methdos
+/// defines model of possible exceptions of returns of methods
 /// </summary>
 public enum ExceptionModel
 {
-    VariableIsNull = 100,
-    Successfully = 200,
-    OperationRestricted = 300,
-    OperationFailed = 400,
-    OperationNotExist = 401
+    Ok = 1,
+    Successfully = 2,
+    Restricted = 3,
+    Error = 4,
+    EntityIsNull,
+    VariableIsNull,
+    OperationRestricted,
+    OperationFailed,
+    OperationNotExist,
+    EntityNotExist,
+    IsDefaultValue,
+    ThrewException,
 }
 
 public enum CardException

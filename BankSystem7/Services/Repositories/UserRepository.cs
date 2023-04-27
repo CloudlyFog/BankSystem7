@@ -2,7 +2,7 @@
 using BankSystem7.Models;
 using BankSystem7.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using System.Data;
+using System.Linq.Expressions;
 
 namespace BankSystem7.Services.Repositories;
 
@@ -13,10 +13,10 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
     where TBank : Bank
     where TCredit : Credit
 {
-    private BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit> _bankAccountRepository;
-    private ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit> _applicationContext;
-    private BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> _bankRepository;
-    private CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> _cardRepository;
+    private readonly BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit> _bankAccountRepository;
+    private readonly ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit> _applicationContext;
+    private readonly BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> _bankRepository;
+    private readonly CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> _cardRepository;
     private bool _disposed;
 
     public UserRepository()
@@ -65,125 +65,60 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
             _cardRepository.Dispose();
             _applicationContext.Dispose();
         }
-        _bankAccountRepository = null;
-        _bankRepository = null;
-        _cardRepository = null;
-        _applicationContext = null;
         _disposed = true;
     }
 
     public ExceptionModel Create(TUser item)
     {
-        if (item?.Card?.BankAccount?.Bank is null)
+        if (item?.Card?.BankAccount?.Bank is null || item.Equals(User.Default))
             return ExceptionModel.OperationFailed;
 
-        //if user exists method will send false
         if (Exist(x => x.ID.Equals(item.ID) || x.Name.Equals(item.Name) && x.Email.Equals(item.Email)))
             return ExceptionModel.OperationRestricted;
-        using var userCreationTransaction = _applicationContext.Database.BeginTransaction(IsolationLevel
-                                                .RepeatableRead);
 
-        var avoidDuplication = _applicationContext.AvoidDuplication(item.Card.BankAccount.Bank);
-        if (avoidDuplication != ExceptionModel.Successfully)
-        {
-            userCreationTransaction.Rollback();
-            return avoidDuplication;
-        }
-
-        Bank bank = null;
-
-        if (_bankRepository.Exist(x => x.ID == item.Card.BankAccount.Bank.ID || x.BankName == item.Card.BankAccount.Bank.BankName))
-        {
-            bank = item.Card.BankAccount.Bank;
-            item.Card.BankAccount.Bank = null;
-        }
-
-        _applicationContext.ChangeTracker.Clear();
+        UpdateBankTracker(item);
         _applicationContext.Users.Add(item);
-
-        try
-        {
-            _applicationContext.SaveChanges();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-            Console.WriteLine(ex.InnerException.Message);
-            userCreationTransaction.Rollback();
-            throw;
-        }
-
-        if (bank is null)
-        {
-            userCreationTransaction.Commit();
-            return ExceptionModel.Successfully;
-        }
-        item.Card.BankAccount.Bank ??= bank;
-
-        var updateBank = _bankRepository.Update(_bankRepository.Get(x => x.ID == item.Card.BankAccount.Bank.ID));
-        if (updateBank != ExceptionModel.Successfully)
-        {
-            userCreationTransaction.Rollback();
-            return updateBank;
-        }
-
-        userCreationTransaction.Commit();
-
-        return ExceptionModel.Successfully;
+        _applicationContext.SaveChanges();
+        return ExceptionModel.Ok;
     }
 
     public ExceptionModel Delete(TUser item)
     {
         if (!FitsConditions(item))
-            return ExceptionModel.OperationNotExist;
+            return ExceptionModel.EntityNotExist;
+
+        item.Card.BankAccount.Bank.AccountAmount +=
+            _bankRepository.CalculateBankAccountAmount(item.Card.Amount, 0);
 
         _applicationContext.ChangeTracker.Clear();
         _applicationContext.Users.Remove(item);
-        try
-        {
-            _applicationContext.SaveChanges();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-            throw;
-        }
-        return _bankAccountRepository.Delete(_bankAccountRepository.Get(x => x.ID == item.Card.BankAccount.ID));
+        _applicationContext.BankAccounts.Remove((TBankAccount)item.Card.BankAccount);
+        _applicationContext.Banks.Update((TBank)item.Card.BankAccount.Bank);
+        _applicationContext.SaveChanges();
+
+        return ExceptionModel.Ok;
     }
 
-    public bool Exist(Func<TUser, bool> predicate) =>
-        _applicationContext.Users
-            .Include(x => x.Card)
-            .ThenInclude(x => x.BankAccount)
-            .ThenInclude(x => x.Bank)
-            .AsNoTracking().Any(predicate);
+    public bool Exist(Expression<Func<TUser, bool>> predicate)
+    {
+        return All.Any(predicate);
+    }
 
     public bool FitsConditions(TUser? item)
     {
-        if (item?.Card?.BankAccount?.Bank is null)
-            return false;
-
-        if (!Exist(x => x.ID == item.ID))
-            return false;
-
-        return true;
+        return item?.Card?.BankAccount?.Bank is not null && Exist(x => x.ID == item.ID);
     }
 
-    public IEnumerable<TUser> All =>
+    public IQueryable<TUser> All =>
         _applicationContext.Users
             .Include(x => x.Card)
             .ThenInclude(x => x.BankAccount)
             .ThenInclude(x => x.Bank)
-            .AsNoTracking() ?? Enumerable.Empty<TUser>();
+            .AsNoTracking() ?? Enumerable.Empty<TUser>().AsQueryable();
 
-    public TUser Get(Func<TUser, bool> predicate)
+    public TUser Get(Expression<Func<TUser, bool>> predicate)
     {
-        return _applicationContext.Users
-            .Include(x => x.Card)
-            .ThenInclude(x => x.BankAccount)
-            .ThenInclude(x => x.Bank)
-            .AsNoTracking().AsEnumerable()
-            .FirstOrDefault(predicate) ?? (TUser)User.Default;
+        return All.FirstOrDefault(predicate) ?? (TUser)User.Default;
     }
 
     public ExceptionModel Update(TUser item)
@@ -191,31 +126,29 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;
 
-        using var userUpdateTransaction = _applicationContext.Database.BeginTransaction(IsolationLevel.RepeatableRead);
-
-        var bankAccountUpdateOperation = _bankAccountRepository
-            .Update(_bankAccountRepository.Get(x => x.ID == item.Card.BankAccount.ID));
-        if (bankAccountUpdateOperation != ExceptionModel.Successfully)
-        {
-            userUpdateTransaction.Rollback();
-            return bankAccountUpdateOperation;
-        }
-
         _applicationContext.ChangeTracker.Clear();
         _applicationContext.Users.Update(item);
-        try
-        {
-            _applicationContext.SaveChanges();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-            userUpdateTransaction.Rollback();
-            throw;
-        }
+        _applicationContext.BankAccounts.Update((TBankAccount)item.Card.BankAccount);
+        _applicationContext.SaveChanges();
+        return ExceptionModel.Ok;
+    }
 
-        userUpdateTransaction.Commit();
-        return ExceptionModel.Successfully;
+    internal ExceptionModel UpdateBankTracker(TUser user)
+    {
+        _applicationContext.ChangeTracker.Clear();
+
+        var bank = _bankRepository.Get(x => x.ID == user.Card.BankAccount.Bank.ID
+                                    || x.BankName == user.Card.BankAccount.Bank.BankName);
+
+        user.Card.BankAccount.Bank.AccountAmount = bank.AccountAmount +=
+            _bankRepository.CalculateBankAccountAmount(0, user.Card.Amount);
+
+        if (bank.Equals(Bank.Default))
+            return ExceptionModel.IsDefaultValue;
+
+        user.Card.BankAccount.Bank = null;
+        _applicationContext.Banks.Update(bank);
+        return ExceptionModel.Ok;
     }
 
     ~UserRepository()

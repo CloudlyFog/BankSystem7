@@ -7,7 +7,7 @@ public class Report
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     public DateTime ReportDate { get; set; } = DateTime.UtcNow;
-    public ExceptionModel ExceptionModel { get; set; } = ExceptionModel.Successfully;
+    public ExceptionModel ExceptionModel { get; set; } = ExceptionModel.Ok;
 }
 
 [BsonIgnoreExtraElements]

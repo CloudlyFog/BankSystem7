@@ -1,8 +1,8 @@
 # Bank system 7
 This library provides opportunities for using likeness of bank system. You can handle not only users but also other models like banks, cards and etc.
 
-### Updates in version 0.3.8
-- Removed unnecessary asynchrony from method Transfer in BankAccountRepository.
+### Updates in version 0.4.1
+- Removed possibility to use middleware and instead it You can use library services with DI. Instruction for using it wrote below.
 ****
 # Documentation
 
@@ -18,11 +18,42 @@ This library provides opportunities for using likeness of bank system. You can h
 The library provides ways to pass and use own models. For example, You can inherit Your class from base class User and pass it as type to initialized instance of `ServiceConfiguration` or `ServiceConfigurationMiddleware`
 and use own model.
 Developer can interact with library by following next steps:
-1. create instance of class `ServiceConfiguration` and pass as parameters class `ConfigurationOptions` with own settings. (or do the same steps but instead of create instance of `ServiceConfiguration`, use middleware `ServiceConfigurationMiddleware`)
+1. create instance of class `ServiceConfiguration` and pass as parameters class `ConfigurationOptions` with own settings.
 2. interact with repositories throughout public properties of instanced class `ServiceConfiguration`
+
+New feature for library is adding services to internal DI in ASP.Net application. For that You have to write something like this:
+
+1. in Program.cs
+
+        builder.Services.AddNationBankSystem<User, Card, BankAccount, Bank, Credit>(o =>
+        {
+            o.EnsureCreated = false;
+            o.EnsureDeleted = false;
+            o.DatabaseName = "Test";
+            o.OperationOptions = new OperationServiceOptions()
+            {
+                DatabaseName = "Test",
+            };
+            o.LoggerOptions = new LoggerOptions()
+            {
+                // In the example we aren't using logger
+                IsEnabled = false,
+            };
+        });
+
+2. in Your controller
+
+        private readonly IServiceConfiguration<User, Card, BankAccount, Bank, Credit> _service;
+
+        public UsersController(IServiceConfiguration<User, Card, BankAccount, Bank, Credit> service)
+        {
+            _service = service;
+        }
+
+And all will work
+
 #### Remember!
-If you'll not change connection string to database in class BankServiceOptions or directly in repository classes program may don't work correctly.
-You can catch exception like "There isn't database which has been specified." because databases which was used in developing project may doesn't exist on your machine.
+If you'll not pass options to `ServiceConfiguration` method `CreateInstance` You can get different kind of exceptions.
 
 ## API documentation
 ### AppContext
@@ -43,9 +74,8 @@ There are 2 classes context:
 1. `public static bool EnsureDeleted { get; set; }` - property for handling delete database operation
 2. `protected internal DbSet<User> Users { get; set; }` - an instance of the table `Users` in database.
 3. `protected internal DbSet<Bank> Banks { get; set; }` -an instance of the table `Banks` in database.
-4. `protected internal DbSet<Operation> Operations { get; set; }` - an instance of the table `Operations` in database.
-5. `protected internal DbSet<BankAccount> BankAccounts { get; set; }` - an instance of the table `BankAccounts` in database.
-6. `protected internal DbSet<Credit> Credits { get; set; }` - an instance of the table `Credits` in database.
+4. `protected internal DbSet<BankAccount> BankAccounts { get; set; }` - an instance of the table `BankAccounts` in database.
+5. `protected internal DbSet<Credit> Credits { get; set; }` - an instance of the table `Credits` in database.
 
 #### API BankContext
 
@@ -61,7 +91,7 @@ There are 2 classes context:
 
 1. `public  DbSet<User> Users { get; set; }` - an instance of the table `Users` in database.
 2. `public DbSet<Bank> Banks { get; set; }` -an instance of the table `Banks` in database.
-3. `public DbSet<Operation> Operations { get; set; }` - an instance of the table `Operations` in database.
+3. `public DbSet<Cards> Cards { get; set; }` - an instance of the table `Cards` in database.
 4. `public DbSet<BankAccount> BankAccounts { get; set; }` - an instance of the table `BankAccounts` in database.
 
 ### Services
@@ -86,42 +116,46 @@ Here located services for configuring library.
 ### Interfaces (and abstract classes)
 Here located interfaces which describes behavior of inherited repo-classes.
 1. Interface `IRepository<T> : IReaderService<T>, IWriterService<T>, IDisposable where T : class` - interface for implement standard library logic.
-- `bool FitsConditions(T? item);` - implements logic for checking on conditions true of passed entity.
+      - `bool FitsConditions(T? item);` - implements logic for checking on conditions true of passed entity.
 
-2. Interface `IExpressionRepository<T> : IExpressionReaderService<T>, IWriterService<T>, IDisposable where T : class` - interface for implement standard library logic with another type of parameters.
-- `bool FitsConditions(T? item);` - implements logic for checking on conditions true of passed entity.
+2. **Interface** `IReaderService<T> where T : class` - interface for implement reading data from database.
 
-3. Interface `IReaderService<T> where T : class` - interface for implement reading data from database.   
-   <br>**Methods**
-- `T Get(Func<T, bool> predicate);` - implements getting an object from database with predicate.
-- `bool Exist(Func<T, bool> predicate);` - implements checking exist object with in database predicate.
-  <br>**Properties**
-- `IEnumerable<T> All {  get; }` - implements getting a sequence of the objects from database.
+   Methods
+      - `T Get(Expression<Func<T, bool>> predicate);` - implements getting an object from database with predicate.
+      - `bool Exist(Expression<Func<T, bool>> predicate);` - implements checking exist object with in database predicate.
 
-4. Interface `IExpressionReaderService<T> where T : class` - interface for implement reading data from database with another type of parameters.
-   <br>**Methods**
-- `T Get(Expression<Func<T, bool>> predicate);` - implements getting an object from database with predicate.
-- `bool Exist(Expression<Func<T, bool>> predicate);` - implements checking exist object with in database predicate.
-  **Properties**
-- `IEnumerable<T> All {  get; }` - implements getting a sequence of the objects from database.
+   Properties
+      - `IQueryable<T> All {  get; }` - implements getting a sequence of the objects from database.
 
-5. Interface `IWriterService<in T> where T : class` - interface for implement writing, updating and deleting data in database
-   <br>**Methods**
-- `ExceptionModel  Create(T item);` - implements adding item in database.
-- `ExceptionModel  Update(T item);` - implements updating item in database.
-- `ExceptionModel  Delete(T item);` - implements deleting item from database.
+3. **Interface** `IReaderServiceWithTracking<T> where T : class` - interface for implement reading data from database with another type of parameters.
 
-6. Interface `ILogger` - interface that provides standard set for logging
-   <br>**Methods**
-- `ExceptionModel Log(Report report);` - implements logging report in database.
-- `ExceptionModel Log(IEnumerable<Report> reports);` - implements logging collection of reports in database.
-  <br>**Properties**
-- `public bool IsReused { get; set; }` - defines possibility use already initialized logger.
-- `public LoggerOptions LoggerOptions { get; set; }` - defines options for logger configuration.
+   Methods
+      - `T GetWithTracking(Expression<Expression<Func<T, bool>>> predicate);` - implements getting an object from database with predicate.
+      - `bool ExistWithTracking(Expression<Expression<Func<T, bool>>> predicate);` - implements checking exist object with in database predicate.
+   Properties
+      - `IQueryable<T> AllWithTracking {  get; }` - implements getting a sequence of the objects from database.
 
-7. Abstract class `LoggerExecutor<TOperationType> where TOperationType : Enum` - simple implementation of service for added reports to logger queue
-   <br>**Methods**
-- `virtual void Log(ExceptionModel exceptionModel, string methodName, string className, TOperationType operationType, ICollection<GeneralReport<TOperationType>> reports)` - implements standard logic of inserting log data to logger queue. Can be overrided.
+4. **Interface** `IWriterService<in T> where T : class` - interface for implement writing, updating and deleting data in database
+
+   Methods
+      - `ExceptionModel  Create(T item);` - implements adding item in database.
+      - `ExceptionModel  Update(T item);` - implements updating item in database.
+      - `ExceptionModel  Delete(T item);` - implements deleting item from database.
+
+5. **Interface** `ILogger` - interface that provides standard set for logging
+
+   Methods
+      - `ExceptionModel Log(Report report);` - implements logging report in database.
+      - `ExceptionModel Log(IEnumerable<Report> reports);` - implements logging collection of reports in database.
+
+   Properties
+      - `public bool IsReused { get; set; }` - defines possibility use already initialized logger.
+      - `public LoggerOptions LoggerOptions { get; set; }` - defines options for logger configuration.
+
+6. **Abstract class** `LoggerExecutor<TOperationType> where TOperationType : Enum` - simple implementation of service for added reports to logger queue
+
+   Methods
+      - `virtual void Log(ExceptionModel exceptionModel, string methodName, string className, TOperationType operationType, ICollection<GeneralReport<TOperationType>> reports)` - implements standard logic of inserting log data to logger queue. Can be overrided.
 
 ### Repositories
 Repositories are implementation of various interfaces and working with context classes for interact with database.

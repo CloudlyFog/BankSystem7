@@ -26,6 +26,22 @@ public class Bank
 
     [Precision(18, 2)]
     public decimal AccountAmount { get; set; }
+
+    public override bool Equals(object? obj)
+    {
+        var item = obj as Bank;
+
+        if (item is null)
+            return false;
+
+        foreach (var thisProp in GetType().GetProperties())
+        {
+            var objProp = item.GetType().GetProperty(thisProp.Name);
+            if (!thisProp.GetValue(this).Equals(objProp?.GetValue(obj)))
+                return false;
+        }
+        return true;
+    }
 }
 
 [BsonIgnoreExtraElements]
@@ -36,7 +52,7 @@ public class Operation
     public Guid? ReceiverID { get; set; } = Guid.NewGuid();
     public Guid? SenderID { get; set; } = Guid.NewGuid();
     public decimal TransferAmount { get; set; }
-    public StatusOperationCode OperationStatus { get; set; } = StatusOperationCode.Successfully;
+    public StatusOperationCode OperationStatus { get; set; } = StatusOperationCode.Ok;
     public OperationKind OperationKind { get; set; }
 }
 
@@ -78,7 +94,7 @@ public class Credit
     public User? User { get; set; }
 
     [NotMapped]
-    public StatusOperationCode OperationStatus { get; set; } = StatusOperationCode.Successfully;
+    public StatusOperationCode OperationStatus { get; set; } = StatusOperationCode.Ok;
 
     public decimal CalculateRepaymentAmount()
     {
@@ -239,9 +255,10 @@ public enum CardKind
 
 public enum StatusOperationCode
 {
-    Successfully = 200,
-    Restricted = 300,
-    Error = 400,
+    Ok = 1,
+    Successfully = 2,
+    Restricted = 3,
+    Error = 4,
 }
 
 public enum OperationKind
