@@ -140,7 +140,17 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         return ExceptionModel.Ok;
     }
 
-    internal ExceptionModel UpdateBankTracker(TUser user)
+    public TUser GetWithTracking(Expression<Func<TUser, bool>> predicate)
+    {
+        return AllWithTracking.FirstOrDefault(predicate) ?? (TUser)User.Default;
+    }
+
+    public bool ExistWithTracking(Expression<Func<TUser, bool>> predicate)
+    {
+        return AllWithTracking.Any(predicate);
+    }
+
+    private void UpdateBankTracker(TUser user)
     {
         _applicationContext.ChangeTracker.Clear();
 
@@ -151,21 +161,10 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
             _bankRepository.CalculateBankAccountAmount(0, user.Card.Amount);
 
         if (bank.Equals(Bank.Default))
-            return ExceptionModel.IsDefaultValue;
+            return;
 
         user.Card.BankAccount.Bank = null;
         _applicationContext.Banks.Update(bank);
-        return ExceptionModel.Ok;
-    }
-
-    public TUser GetWithTracking(Expression<Func<TUser, bool>> predicate)
-    {
-        return AllWithTracking.FirstOrDefault(predicate) ?? (TUser)User.Default;
-    }
-
-    public bool ExistWithTracking(Expression<Func<TUser, bool>> predicate)
-    {
-        return AllWithTracking.Any(predicate);
     }
 
     ~UserRepository()
