@@ -18,4 +18,14 @@ public static class ServiceConfigurationExtensions
         options?.Invoke(resultOptions);
         return services.AddSingleton<IServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>>(ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>.CreateInstance(resultOptions));
     }
+
+    public static IServiceCollection AddNationBankSystem<TUser, TCard, TBankAccount, TBank, TCredit>(this IServiceCollection services, ConfigurationOptions options)
+        where TUser : User
+        where TCard : Card
+        where TBankAccount : BankAccount
+        where TBank : Bank
+        where TCredit : Credit
+    {
+        return services.AddSingleton<IServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>>(ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>.CreateInstance(options));
+    }
 }
