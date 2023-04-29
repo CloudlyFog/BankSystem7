@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 
 namespace BankSystem7.Services.Repositories;
 
-public sealed class CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> : IRepository<TCard>
+public sealed class CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> : IRepository<TCard>, IReaderServiceWithTracking<TCard>
     where TUser : User
     where TCard : Card
     where TBankAccount : BankAccount
@@ -112,12 +112,28 @@ public sealed class CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         return All.FirstOrDefault(predicate) ?? (TCard)Card.Default;
     }
 
+    public TCard GetWithTracking(Expression<Func<TCard, bool>> predicate)
+    {
+        return AllWithTracking.FirstOrDefault(predicate) ?? (TCard)Card.Default;
+    }
+
+    public bool ExistWithTracking(Expression<Func<TCard, bool>> predicate)
+    {
+        return AllWithTracking.Any(predicate);
+    }
+
     public IQueryable<TCard> All =>
         _applicationContext.Cards
             .Include(x => x.User)
             .Include(x => x.BankAccount)
             .ThenInclude(x => x.Bank)
             .AsNoTracking() ?? Enumerable.Empty<TCard>().AsQueryable();
+
+    public IQueryable<TCard> AllWithTracking => 
+        _applicationContext.Cards
+            .Include(x => x.User)
+            .Include(x => x.BankAccount)
+            .ThenInclude(x => x.Bank) ?? Enumerable.Empty<TCard>().AsQueryable();
 
     ~CardRepository()
     {

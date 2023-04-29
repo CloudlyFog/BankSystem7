@@ -6,7 +6,8 @@ using System.Linq.Expressions;
 
 namespace BankSystem7.Services.Repositories;
 
-public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> : LoggerExecutor<OperationType>, IRepository<TUser>
+public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> : LoggerExecutor<OperationType>, 
+    IRepository<TUser>, IReaderServiceWithTracking<TUser>
     where TUser : User
     where TCard : Card
     where TBankAccount : BankAccount
@@ -116,6 +117,11 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
             .ThenInclude(x => x.Bank)
             .AsNoTracking() ?? Enumerable.Empty<TUser>().AsQueryable();
 
+    public IQueryable<TUser> AllWithTracking =>
+        _applicationContext.Users
+            .Include(x => x.Card)
+            .ThenInclude(x => x.BankAccount)
+            .ThenInclude(x => x.Bank)  ?? Enumerable.Empty<TUser>().AsQueryable();
     public TUser Get(Expression<Func<TUser, bool>> predicate)
     {
         return All.FirstOrDefault(predicate) ?? (TUser)User.Default;
@@ -149,6 +155,16 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         user.Card.BankAccount.Bank = null;
         _applicationContext.Banks.Update(bank);
         return ExceptionModel.Ok;
+    }
+
+    public TUser GetWithTracking(Expression<Func<TUser, bool>> predicate)
+    {
+        return AllWithTracking.FirstOrDefault(predicate) ?? (TUser)User.Default;
+    }
+
+    public bool ExistWithTracking(Expression<Func<TUser, bool>> predicate)
+    {
+        return AllWithTracking.Any(predicate);
     }
 
     ~UserRepository()

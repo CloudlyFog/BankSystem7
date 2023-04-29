@@ -83,15 +83,7 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         user.Card.Amount = user.Card.BankAccount.BankAccountAmount;
         _bankContext.ChangeTracker.Clear();
         _bankContext.Update(user);
-        try
-        {
-            _bankContext.SaveChanges();
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
+        _bankContext.SaveChanges();
         return ExceptionModel.Ok;
     }
 
@@ -115,15 +107,7 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         user.Card.Amount = user.Card.BankAccount.BankAccountAmount;
         _bankContext.ChangeTracker.Clear();
         _bankContext.Update(user);
-        try
-        {
-            _bankContext.SaveChanges();
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
+        _bankContext.SaveChanges();
         return ExceptionModel.Ok;
     }
 

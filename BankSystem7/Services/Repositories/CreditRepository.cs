@@ -7,7 +7,7 @@ using System.Linq.Expressions;
 
 namespace BankSystem7.Services.Repositories;
 
-public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit> : IRepository<TCredit>
+public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit> : IRepository<TCredit>, IReaderServiceWithTracking<TCredit>
     where TUser : User
     where TCard : Card
     where TBankAccount : BankAccount
@@ -74,6 +74,11 @@ public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>
         .Include(x => x.Bank)
         .Include(x => x.User)
         .AsNoTracking() ?? Enumerable.Empty<TCredit>().AsQueryable();
+
+    public IQueryable<TCredit> AllWithTracking =>
+        _applicationContext.Credits
+        .Include(x => x.Bank)
+        .Include(x => x.User) ?? Enumerable.Empty<TCredit>().AsQueryable();
 
     public TCredit Get(Expression<Func<TCredit, bool>> predicate)
     {
@@ -239,6 +244,16 @@ public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>
     {
         Dispose(true);
         GC.SuppressFinalize(this);
+    }
+
+    public TCredit GetWithTracking(Expression<Func<TCredit, bool>> predicate)
+    {
+        return AllWithTracking.FirstOrDefault(predicate) ?? (TCredit)Credit.Default;
+    }
+
+    public bool ExistWithTracking(Expression<Func<TCredit, bool>> predicate)
+    {
+        return AllWithTracking.Any(predicate);
     }
 
     ~CreditRepository()
