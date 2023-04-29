@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 
 namespace BankSystem7.Services.Repositories;
 
-public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> : LoggerExecutor<OperationType>, 
+public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> : LoggerExecutor<OperationType>,
     IRepository<TUser>, IReaderServiceWithTracking<TUser>
     where TUser : User
     where TCard : Card
@@ -121,7 +121,8 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         _applicationContext.Users
             .Include(x => x.Card)
             .ThenInclude(x => x.BankAccount)
-            .ThenInclude(x => x.Bank)  ?? Enumerable.Empty<TUser>().AsQueryable();
+            .ThenInclude(x => x.Bank) ?? Enumerable.Empty<TUser>().AsQueryable();
+
     public TUser Get(Expression<Func<TUser, bool>> predicate)
     {
         return All.FirstOrDefault(predicate) ?? (TUser)User.Default;

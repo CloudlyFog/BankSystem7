@@ -1,4 +1,5 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
+﻿using BankSystem7.Extensions;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace BankSystem7.Models;
 
@@ -8,6 +9,21 @@ public class Report
     public Guid Id { get; set; } = Guid.NewGuid();
     public DateTime ReportDate { get; set; } = DateTime.UtcNow;
     public ExceptionModel ExceptionModel { get; set; } = ExceptionModel.Ok;
+
+    public override bool Equals(object? obj)
+    {
+        return this.EqualsTo(obj as Report);
+    }
+
+    public override int GetHashCode()
+    {
+        return Id.GetHashCode();
+    }
+
+    public override string? ToString()
+    {
+        return this.ConvertToString();
+    }
 }
 
 [BsonIgnoreExtraElements]
@@ -37,6 +53,21 @@ public class GeneralReport<TOperationType> : Report
         Id = report.Id;
         ReportDate = report.ReportDate;
         ExceptionModel = report.ExceptionModel;
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return this.EqualsTo(obj as GeneralReport<TOperationType>);
+    }
+
+    public override int GetHashCode()
+    {
+        return Id.GetHashCode();
+    }
+
+    public override string? ToString()
+    {
+        return this.ConvertToString();
     }
 }
 

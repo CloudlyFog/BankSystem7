@@ -129,7 +129,7 @@ public sealed class CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
             .ThenInclude(x => x.Bank)
             .AsNoTracking() ?? Enumerable.Empty<TCard>().AsQueryable();
 
-    public IQueryable<TCard> AllWithTracking => 
+    public IQueryable<TCard> AllWithTracking =>
         _applicationContext.Cards
             .Include(x => x.User)
             .Include(x => x.BankAccount)

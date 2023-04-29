@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using BankSystem7.Extensions;
+using Microsoft.EntityFrameworkCore;
 using MongoDB.Bson.Serialization.Attributes;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -29,18 +30,17 @@ public class Bank
 
     public override bool Equals(object? obj)
     {
-        var item = obj as Bank;
+        return this.EqualsTo(obj as Bank);
+    }
 
-        if (item is null)
-            return false;
+    public override int GetHashCode()
+    {
+        return ID.GetHashCode();
+    }
 
-        foreach (var thisProp in GetType().GetProperties())
-        {
-            var objProp = item.GetType().GetProperty(thisProp.Name);
-            if (!thisProp.GetValue(this).Equals(objProp?.GetValue(obj)))
-                return false;
-        }
-        return true;
+    public override string? ToString()
+    {
+        return this.ConvertToString();
     }
 }
 
@@ -54,6 +54,21 @@ public class Operation
     public decimal TransferAmount { get; set; }
     public StatusOperationCode OperationStatus { get; set; } = StatusOperationCode.Ok;
     public OperationKind OperationKind { get; set; }
+
+    public override bool Equals(object? obj)
+    {
+        return this.EqualsTo(obj as Operation);
+    }
+
+    public override int GetHashCode()
+    {
+        return ID.GetHashCode();
+    }
+
+    public override string? ToString()
+    {
+        return this.ConvertToString();
+    }
 }
 
 public class Credit
@@ -124,6 +139,21 @@ public class Credit
         credit.RepaymentAmount = credit.CalculateRepaymentAmount();
         return credit;
     }
+
+    public override bool Equals(object? obj)
+    {
+        return this.EqualsTo(obj as Credit);
+    }
+
+    public override int GetHashCode()
+    {
+        return ID.GetHashCode();
+    }
+
+    public override string? ToString()
+    {
+        return this.ConvertToString();
+    }
 }
 
 public class BankAccount
@@ -160,6 +190,21 @@ public class BankAccount
     public string PhoneNumber { get; set; }
     public AccountType AccountType { get; set; } = AccountType.User;
     public decimal BankAccountAmount { get; set; }
+
+    public override bool Equals(object? obj)
+    {
+        return this.EqualsTo(obj as BankAccount);
+    }
+
+    public override int GetHashCode()
+    {
+        return ID.GetHashCode();
+    }
+
+    public override string? ToString()
+    {
+        return this.ConvertToString();
+    }
 }
 
 /// <summary>
@@ -243,6 +288,21 @@ public class Card
             chars = "0123456789";
         return new string(Enumerable.Repeat(chars, length)
             .Select(s => s[Random.Shared.Next(s.Length)]).ToArray());
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return this.EqualsTo(obj as Card);
+    }
+
+    public override int GetHashCode()
+    {
+        return ID.GetHashCode();
+    }
+
+    public override string? ToString()
+    {
+        return this.ConvertToString();
     }
 }
 

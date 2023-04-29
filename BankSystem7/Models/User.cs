@@ -1,3 +1,4 @@
+using BankSystem7.Extensions;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -34,6 +35,21 @@ public class User
 
     [NotMapped]
     public ExceptionModel Exception { get; set; } = ExceptionModel.Ok;
+
+    public override bool Equals(object? obj)
+    {
+        return this.EqualsTo(obj as User);
+    }
+
+    public override int GetHashCode()
+    {
+        return ID.GetHashCode();
+    }
+
+    public override string? ToString()
+    {
+        return this.ConvertToString();
+    }
 }
 
 /// <summary>
