@@ -3,15 +3,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BankSystem7.Services.Configuration;
 
-public class ModelConfiguration<TUser> where TUser : User
+public class ModelConfiguration
 {
     public virtual void Invoke(ModelBuilder modelBuilder)
     {
         ConfigureRelationships(modelBuilder);
         ConfigureDecimalColumnTypes(modelBuilder);
 
-        modelBuilder.Entity<TUser>().Ignore(user => user.Exception);
-        modelBuilder.Entity<TUser>().HasIndex(x => x.ID);
+        modelBuilder.Entity<User>().Ignore(user => user.Exception);
+        modelBuilder.Entity<User>().HasIndex(x => x.ID);
     }
 
     private static void ConfigureRelationships(ModelBuilder modelBuilder)
@@ -37,15 +37,13 @@ public class ModelConfiguration<TUser> where TUser : User
         modelBuilder.Entity<Credit>()
             .HasOne(credit => credit.Bank)
             .WithMany(bank => bank.Credits)
-            .HasForeignKey(credit => credit.BankID)
-            .OnDelete(DeleteBehavior.Cascade);
+            .HasForeignKey(credit => credit.BankID);
 
         // user
         modelBuilder.Entity<Credit>()
             .HasOne(credit => credit.User)
             .WithOne(user => user.Credit)
-            .HasForeignKey<Credit>(credit => credit.UserID)
-            .OnDelete(DeleteBehavior.Cascade);
+            .HasForeignKey<Credit>(credit => credit.UserID);
     }
 
     private static void ConfigureCardRelationships(ModelBuilder modelBuilder)
@@ -54,8 +52,7 @@ public class ModelConfiguration<TUser> where TUser : User
         modelBuilder.Entity<Card>()
             .HasOne(card => card.User)
             .WithOne(user => user.Card)
-            .HasForeignKey<Card>(card => card.UserID)
-            .OnDelete(DeleteBehavior.Cascade);
+            .HasForeignKey<Card>(card => card.UserID);
     }
 
     private static void ConfigureBankAccountRelationships(ModelBuilder modelBuilder)
@@ -71,7 +68,6 @@ public class ModelConfiguration<TUser> where TUser : User
         modelBuilder.Entity<BankAccount>()
             .HasOne(account => account.Bank)
             .WithMany(bank => bank.BankAccounts)
-            .HasForeignKey(account => account.BankID)
-            .OnDelete(DeleteBehavior.Cascade);
+            .HasForeignKey(account => account.BankID);
     }
 }
