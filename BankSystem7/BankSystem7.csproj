@@ -17,6 +17,15 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <Compile Remove="Middleware\**" />
+      <Compile Remove="Migrations\**" />
+      <EmbeddedResource Remove="Middleware\**" />
+      <EmbeddedResource Remove="Migrations\**" />
+      <None Remove="Middleware\**" />
+      <None Remove="Migrations\**" />
+    </ItemGroup>
+
+    <ItemGroup>
         <None Include="docs/README.md" Pack="true" PackagePath="/" />
     </ItemGroup>
     
@@ -36,11 +45,6 @@
       <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0-preview.2" />
       <PackageReference Include="System.Data.HashFunction.Interfaces" Version="2.0.0" />
       <PackageReference Include="System.Data.HashFunction.Jenkins" Version="2.0.0" />
-    </ItemGroup>
-    
-    <ItemGroup>
-      <Folder Include="Middleware\" />
-      <Folder Include="Migrations" />
     </ItemGroup>
 
 </Project>

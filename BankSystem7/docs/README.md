@@ -1,8 +1,11 @@
 # Bank system 7
 This library provides opportunities for using likeness of bank system. You can handle not only users but also other models like banks, cards and etc.
 
-### Updates in version 0.4.1
-- Removed possibility to use middleware and instead it You can use library services with DI. Instruction for using it wrote below.
+### Updates in version 0.4.2
+- Added implementation of interface IReaderServiceWithTracking to CardRepository, CreditRepository and UserRepository.
+- Added possibility that lies in needlessness to explicity disable logger.
+- Added new method overload for IServiceCollection extension.
+- Added overriding base methods for all models.
 ****
 # Documentation
 
@@ -25,21 +28,37 @@ New feature for library is adding services to internal DI in ASP.Net application
 
 1. in Program.cs
 
-        builder.Services.AddNationBankSystem<User, Card, BankAccount, Bank, Credit>(o =>
-        {
-            o.EnsureCreated = false;
-            o.EnsureDeleted = false;
-            o.DatabaseName = "Test";
-            o.OperationOptions = new OperationServiceOptions()
+         builder.Services.AddNationBankSystem<User, Card, BankAccount, Bank, Credit>(o =>
+         {
+               o.EnsureCreated = false;
+               o.EnsureDeleted = false;
+               o.DatabaseName = "Test";
+               o.OperationOptions = new OperationServiceOptions()
+               {
+                  DatabaseName = "Test",
+               };
+               o.LoggerOptions = new LoggerOptions()
+               {
+                  // In the example we aren't using logger
+                  IsEnabled = false,
+               };
+         });
+         //or
+         builder.Services.AddNationBankSystem<User, Card, BankAccount, Bank, Credit>(new ConfigurationOptions()
+         {
+            EnsureCreated = false,
+            EnsureDeleted = false,
+            DatabaseName = "Test",
+            OperationOptions = new OperationServiceOptions()
             {
-                DatabaseName = "Test",
-            };
-            o.LoggerOptions = new LoggerOptions()
+               DatabaseName = "Test",
+            },
+            LoggerOptions = new LoggerOptions()
             {
-                // In the example we aren't using logger
-                IsEnabled = false,
-            };
-        });
+               IsEnabled = false,
+            },
+         });
+But use only one of the above approaches to use service.
 
 2. in Your controller
 
@@ -50,7 +69,7 @@ New feature for library is adding services to internal DI in ASP.Net application
             _service = service;
         }
 
-And all will work
+And all will work fine.
 
 #### Remember!
 If you'll not pass options to `ServiceConfiguration` method `CreateInstance` You can get different kind of exceptions.
