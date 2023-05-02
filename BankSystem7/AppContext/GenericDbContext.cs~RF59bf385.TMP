@@ -48,7 +48,7 @@ public class GenericDbContext<TUser, TCard, TBankAccount, TBank, TCredit> : DbCo
     /// </summary>
     private void DatabaseHandle()
     {
-        if (!BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.InitializeAccess)
+        if (!BankServicesOptions<User, Card, BankAccount, Bank, Credit>.InitializeAccess)
             return;
         if (BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.Ensured)
             return;

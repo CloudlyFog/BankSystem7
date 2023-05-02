@@ -1,11 +1,13 @@
 # Bank system 7
 This library provides opportunities for using likeness of bank system. You can handle not only users but also other models like banks, cards and etc.
 
-### Updates in version 0.4.2
-- Added implementation of interface IReaderServiceWithTracking to CardRepository, CreditRepository and UserRepository.
-- Added possibility that lies in needlessness to explicity disable logger.
-- Added new method overload for IServiceCollection extension.
-- Added overriding base methods for all models.
+### Updates in version 0.4.3
+- Added generic DbContext class to handle all other.
+- Removed Equals overriding due to exceptions while serializing to json.
+- Updated delete behavior in model configuration and removed generic type.
+- Added names for model's tables.
+- Added Generic class which other db context classes will inherit.
+- Added possibility to configure db context classes and model configuring (relationships).
 ****
 # Documentation
 
@@ -18,9 +20,13 @@ This library provides opportunities for using likeness of bank system. You can h
 5. Folder **Repositories** is folder with all business logic of project. Only there simple developer has access.
 
 ## How to interact with library?
-The library provides ways to pass and use own models. For example, You can inherit Your class from base class User and pass it as type to initialized instance of `ServiceConfiguration` or `ServiceConfigurationMiddleware`
+The library provides ways to pass and use own models. For example, You can inherit Your class from base class User and pass it as type to initialized instance of `ServiceConfiguration`
 and use own model.
-Developer can interact with library by following next steps:
+Developer can interact with library with:
+1. `ServiceConfiguration` class.
+2. `builder.Services.AddNationBankSystem<...>()` service in ASP.NET.
+
+and by following next steps:
 1. create instance of class `ServiceConfiguration` and pass as parameters class `ConfigurationOptions` with own settings.
 2. interact with repositories throughout public properties of instanced class `ServiceConfiguration`
 
@@ -37,11 +43,6 @@ New feature for library is adding services to internal DI in ASP.Net application
                {
                   DatabaseName = "Test",
                };
-               o.LoggerOptions = new LoggerOptions()
-               {
-                  // In the example we aren't using logger
-                  IsEnabled = false,
-               };
          });
          //or
          builder.Services.AddNationBankSystem<User, Card, BankAccount, Bank, Credit>(new ConfigurationOptions()
@@ -53,14 +54,11 @@ New feature for library is adding services to internal DI in ASP.Net application
             {
                DatabaseName = "Test",
             },
-            LoggerOptions = new LoggerOptions()
-            {
-               IsEnabled = false,
-            },
          });
 But use only one of the above approaches to use service.
+Now You can don't specify LoggerOptions because by default logger is disabled.
 
-2. in Your controller
+1. in Your controller
 
         private readonly IServiceConfiguration<User, Card, BankAccount, Bank, Credit> _service;
 

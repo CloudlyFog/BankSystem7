@@ -91,7 +91,7 @@ public class ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit> : 
         if (BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.Ensured)
             return;
 
-        BankServicesOptions<User, Card, BankAccount, Bank, Credit>.InitializeAccess = true;
+        BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.InitializeAccess = true;
 
         foreach (var context in contexts)
             context.Key.GetType()?.GetConstructor(new Type[] { context.Value.GetType() })?.Invoke(new object[] { context.Value });
