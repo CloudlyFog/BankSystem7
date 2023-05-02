@@ -14,14 +14,18 @@ public class GenericDbContext<TUser, TCard, TBankAccount, TBank, TCredit> : DbCo
 {
     public GenericDbContext()
     {
-        if (ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>.Options is null)
-            return;
         DatabaseHandle();
     }
 
     public GenericDbContext(string connection)
     {
         ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>.SetConnection(connection);
+        DatabaseHandle();
+    }
+
+    public GenericDbContext(ModelConfiguration modelConfiguration)
+    {
+        BankServicesOptions<User, Card, BankAccount, Bank, Credit>.ModelConfiguration = modelConfiguration ?? new ModelConfiguration();
         DatabaseHandle();
     }
 
@@ -34,7 +38,7 @@ public class GenericDbContext<TUser, TCard, TBankAccount, TBank, TCredit> : DbCo
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        new ModelConfiguration<TUser>().Invoke(modelBuilder);
+        BankServicesOptions<User, Card, BankAccount, Bank, Credit>.ModelConfiguration.Invoke(modelBuilder);
 
         base.OnModelCreating(modelBuilder);
     }
@@ -44,6 +48,8 @@ public class GenericDbContext<TUser, TCard, TBankAccount, TBank, TCredit> : DbCo
     /// </summary>
     private void DatabaseHandle()
     {
+        if (!BankServicesOptions<User, Card, BankAccount, Bank, Credit>.InitializeAccess)
+            return;
         if (BankServicesOptions<User, Card, BankAccount, Bank, Credit>.Ensured)
             return;
         if (BankServicesOptions<User, Card, BankAccount, Bank, Credit>.EnsureDeleted)
@@ -51,5 +57,6 @@ public class GenericDbContext<TUser, TCard, TBankAccount, TBank, TCredit> : DbCo
         if (BankServicesOptions<User, Card, BankAccount, Bank, Credit>.EnsureCreated)
             Database.EnsureCreated();
         BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.Ensured = true;
+        BankServicesOptions<User, Card, BankAccount, Bank, Credit>.InitializeAccess = false;
     }
 }
