@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BankSystem7.Models;
 
+[Table("Banks")]
 public class Bank
 {
     [NotMapped]
@@ -61,6 +62,7 @@ public class Operation
     }
 }
 
+[Table("Credits")]
 public class Credit
 {
     [NotMapped]
@@ -141,6 +143,7 @@ public class Credit
     }
 }
 
+[Table("BankAccounts")]
 public class BankAccount
 {
     [NotMapped]
@@ -187,6 +190,8 @@ public class BankAccount
     }
 }
 
+
+[Table("Cards")]
 /// <summary>
 /// Describes debit/credit card.
 /// Necessarily:

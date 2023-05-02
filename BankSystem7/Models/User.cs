@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BankSystem7.Models;
 
+[Table("Users")]
 public class User
 {
     [NotMapped]
