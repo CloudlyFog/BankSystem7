@@ -1,4 +1,6 @@
-﻿namespace BankSystem7.Services.Configuration;
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace BankSystem7.Services.Configuration;
 
 public sealed class ConfigurationOptions
 {
@@ -13,4 +15,6 @@ public sealed class ConfigurationOptions
     };
 
     public OperationServiceOptions? OperationOptions { get; set; }
+
+    public DbContext[]? Contexts { get; set; }
 }

@@ -28,11 +28,6 @@ public class Bank
     [Precision(18, 2)]
     public decimal AccountAmount { get; set; }
 
-    public override bool Equals(object? obj)
-    {
-        return this.EqualsTo(obj as Bank);
-    }
-
     public override int GetHashCode()
     {
         return ID.GetHashCode();
@@ -54,11 +49,6 @@ public class Operation
     public decimal TransferAmount { get; set; }
     public StatusOperationCode OperationStatus { get; set; } = StatusOperationCode.Ok;
     public OperationKind OperationKind { get; set; }
-
-    public override bool Equals(object? obj)
-    {
-        return this.EqualsTo(obj as Operation);
-    }
 
     public override int GetHashCode()
     {
@@ -140,11 +130,6 @@ public class Credit
         return credit;
     }
 
-    public override bool Equals(object? obj)
-    {
-        return this.EqualsTo(obj as Credit);
-    }
-
     public override int GetHashCode()
     {
         return ID.GetHashCode();
@@ -190,11 +175,6 @@ public class BankAccount
     public string PhoneNumber { get; set; }
     public AccountType AccountType { get; set; } = AccountType.User;
     public decimal BankAccountAmount { get; set; }
-
-    public override bool Equals(object? obj)
-    {
-        return this.EqualsTo(obj as BankAccount);
-    }
 
     public override int GetHashCode()
     {
@@ -288,11 +268,6 @@ public class Card
             chars = "0123456789";
         return new string(Enumerable.Repeat(chars, length)
             .Select(s => s[Random.Shared.Next(s.Length)]).ToArray());
-    }
-
-    public override bool Equals(object? obj)
-    {
-        return this.EqualsTo(obj as Card);
     }
 
     public override int GetHashCode()

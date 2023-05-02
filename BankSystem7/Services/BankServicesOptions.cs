@@ -11,6 +11,10 @@ public sealed class BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCred
     where TBank : Bank
     where TCredit : Credit
 {
+    private BankServicesOptions()
+    {
+        
+    }
     public static bool EnsureCreated { get; set; }
     public static bool EnsureDeleted { get; set; }
     public static string? Connection { get; set; }

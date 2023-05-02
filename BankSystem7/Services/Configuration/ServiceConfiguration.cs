@@ -3,6 +3,7 @@ using BankSystem7.Models;
 using BankSystem7.Services.Interfaces;
 using BankSystem7.Services.Repositories;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 
 namespace BankSystem7.Services.Configuration;
 
@@ -46,12 +47,7 @@ public class ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit> : 
     public LoggerRepository? LoggerRepository { get; }
     public OperationRepository<TUser, TCard, TBankAccount, TBank, TCredit>? OperationRepository { get; }
     public ILogger? Logger { get; }
-    protected internal static ConfigurationOptions Options { get; set; }
-
-    public ServiceConfiguration(RequestDelegate next, ConfigurationOptions options)
-    {
-        CreateInstance(options);
-    }
+    protected internal static ConfigurationOptions? Options { get; set; }
 
     public static void SetConnection(string? connection = null, string? databaseName = DefaultDatabaseName, string? dataSource = DefaultDataSource)
     {
@@ -78,11 +74,21 @@ public class ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit> : 
     {
         Options = options;
         SetConnection(options.Connection, options.DatabaseName);
-        ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>.EnsureDeleted = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.EnsureDeleted = options.EnsureDeleted;
-        ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>.EnsureCreated = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.EnsureCreated = options.EnsureCreated;
+        BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.EnsureDeleted = options.EnsureDeleted;
+        BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.EnsureCreated = options.EnsureCreated;
+
+        InitDbContexts(options?.Contexts);
 
         BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ServiceConfiguration = new ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>();
         return BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ServiceConfiguration;
+    }
+
+    private static void InitDbContexts(params DbContext[] contexts)
+    {
+        if (contexts is null || contexts.Length == 0)
+            return;
+        foreach (var context in contexts)
+            context?.GetType()?.GetConstructor(Array.Empty<Type>())?.Invoke(null);
     }
 
     private void Dispose(bool disposing)

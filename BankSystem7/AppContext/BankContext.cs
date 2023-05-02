@@ -6,7 +6,7 @@ using MongoDB.Driver;
 
 namespace BankSystem7.AppContext;
 
-internal sealed class BankContext<TUser, TCard, TBankAccount, TBank, TCredit> : DbContext
+internal sealed class BankContext<TUser, TCard, TBankAccount, TBank, TCredit> : GenericDbContext<TUser, TCard, TBankAccount, TBank, TCredit>
     where TUser : User
     where TCard : Card
     where TBankAccount : BankAccount
@@ -15,43 +15,21 @@ internal sealed class BankContext<TUser, TCard, TBankAccount, TBank, TCredit> : 
 {
     private readonly OperationService<Operation> _operationService;
 
-    public BankContext()
+    public BankContext() : base()
     {
         _operationService = new OperationService<Operation>();
-        DatabaseHandle();
     }
 
-    public BankContext(string connection)
+    public BankContext(string connection) : base(connection)
     {
         ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>.SetConnection(connection);
         _operationService = new OperationService<Operation>(ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>.Options.LoggerOptions?.OperationServiceOptions?.DatabaseName ?? "CabManagementSystemReborn");
-        DatabaseHandle();
     }
 
     public DbSet<TUser> Users { get; set; } = null!;
     public DbSet<Bank> Banks { get; set; } = null!;
     public DbSet<BankAccount> BankAccounts { get; set; } = null!;
     public DbSet<Card> Cards { get; set; } = null!;
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        optionsBuilder.EnableSensitiveDataLogging();
-        optionsBuilder.UseSqlServer(ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>.Connection);
-    }
-
-    /// <summary>
-    /// handle creating and deleting database
-    /// </summary>
-    private void DatabaseHandle()
-    {
-        if (BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.Ensured)
-            return;
-        if (BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.EnsureDeleted)
-            Database.EnsureDeleted();
-        if (BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.EnsureCreated)
-            Database.EnsureCreated();
-        BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.Ensured = true;
-    }
 
     /// <summary>
     /// creates transaction operation

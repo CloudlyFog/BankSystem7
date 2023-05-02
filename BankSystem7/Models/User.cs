@@ -36,11 +36,6 @@ public class User
     [NotMapped]
     public ExceptionModel Exception { get; set; } = ExceptionModel.Ok;
 
-    public override bool Equals(object? obj)
-    {
-        return this.EqualsTo(obj as User);
-    }
-
     public override int GetHashCode()
     {
         return ID.GetHashCode();
