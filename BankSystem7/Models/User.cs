@@ -63,6 +63,7 @@ public enum ExceptionModel
     OperationFailed,
     OperationNotExist,
     EntityNotExist,
+    NotFitsConditions,
     IsDefaultValue,
     ThrewException,
 }
