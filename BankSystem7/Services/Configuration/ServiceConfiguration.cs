@@ -83,7 +83,7 @@ public class ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit> : 
         return BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ServiceConfiguration;
     }
 
-    private static void InitDbContexts(Dictionary<DbContext, object> contexts)
+    private static void InitDbContexts(Dictionary<DbContext, ModelConfiguration> contexts)
     {
         if (contexts is null || contexts.Keys.Count == 0)
             return;

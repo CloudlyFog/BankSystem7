@@ -16,5 +16,5 @@ public sealed class ConfigurationOptions
 
     public OperationServiceOptions? OperationOptions { get; set; }
 
-    public Dictionary<DbContext, object?>? Contexts { get; set; }
+    public Dictionary<DbContext, ModelConfiguration?>? Contexts { get; set; }
 }
