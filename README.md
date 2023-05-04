@@ -1,13 +1,8 @@
 # Bank system 7
 This library provides opportunities for using likeness of bank system. You can handle not only users but also other models like banks, cards and etc.
 
-### Updates in version 0.4.3
-- Added generic DbContext class to handle all other.
-- Removed Equals overriding due to exceptions while serializing to json.
-- Updated delete behavior in model configuration and removed generic type.
-- Added names for model's tables.
-- Added Generic class which other db context classes will inherit.
-- Added possibility to configure db context classes and model configuring (relationships).
+### Updates in version 0.4.4
+- Fixed bugs with bad objects initialization.
 ****
 # Documentation
 
@@ -41,7 +36,12 @@ New feature for library is adding services to internal DI in ASP.Net application
                o.DatabaseName = "Test";
                o.OperationOptions = new OperationServiceOptions()
                {
-                  DatabaseName = "Test",
+                    DatabaseName = "Test",
+               };
+               // here we add application context classes with class that inherit ModelConfiguration
+               o.Contexts = new Dictionary<DbContext, object?>
+               {
+                    { new ApplicationContext(), new ModelConfigurationTest() },
                };
          });
          //or
@@ -52,8 +52,13 @@ New feature for library is adding services to internal DI in ASP.Net application
             DatabaseName = "Test",
             OperationOptions = new OperationServiceOptions()
             {
-               DatabaseName = "Test",
+                DatabaseName = "Test",
             },
+            // here we add application context classes with class that inherit ModelConfiguration
+            Contexts = new Dictionary<DbContext, object?>
+            {
+                { new ApplicationContext(), new ModelConfigurationTest() },
+            };
          });
 But use only one of the above approaches to use service.
 Now You can don't specify LoggerOptions because by default logger is disabled.
