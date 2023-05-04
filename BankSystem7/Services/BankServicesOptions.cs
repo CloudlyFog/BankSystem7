@@ -21,8 +21,7 @@ public sealed class BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCred
     public static bool Ensured { get; set; }
     public static ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>? ServiceConfiguration { get; set; }
 
-    internal static bool InitializeAccess { get; set; } = false;
-    internal static ModelConfiguration? ModelConfiguration { get; set; }
+    internal static bool InitializeAccess { get; set; } 
     internal static BankContext<TUser, TCard, TBankAccount, TBank, TCredit>? BankContext { get; set; }
     internal static ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>? ApplicationContext { get; set; }
 }

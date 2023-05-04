@@ -5,6 +5,18 @@ namespace BankSystem7.Services.Configuration;
 
 public class ModelConfiguration
 {
+    public ModelConfiguration()
+    {
+        
+    }
+
+    public ModelConfiguration(bool initializeAccess)
+    {
+        InitializeAccess = initializeAccess;
+    }
+    
+    public bool InitializeAccess { get; }
+    
     public virtual void Invoke(ModelBuilder modelBuilder)
     {
         ConfigureRelationships(modelBuilder);

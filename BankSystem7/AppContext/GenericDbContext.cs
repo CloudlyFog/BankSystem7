@@ -23,9 +23,18 @@ public class GenericDbContext<TUser, TCard, TBankAccount, TBank, TCredit> : DbCo
         DatabaseHandle();
     }
 
-    public GenericDbContext(ModelConfiguration modelConfiguration)
+    public GenericDbContext(string connection, bool useOwnAccessConfiguration = false)
     {
-        BankServicesOptions<User, Card, BankAccount, Bank, Credit>.ModelConfiguration = modelConfiguration ?? new ModelConfiguration();
+        ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>.SetConnection(connection);
+        BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.InitializeAccess = useOwnAccessConfiguration;
+        DatabaseHandle();
+    }
+
+    public GenericDbContext(ModelConfiguration? modelConfiguration)
+    {
+        ModelCreatingOptions.ModelConfiguration = modelConfiguration ?? new ModelConfiguration();
+        BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.InitializeAccess =
+            ModelCreatingOptions.ModelConfiguration.InitializeAccess;
         DatabaseHandle();
     }
 
@@ -38,7 +47,7 @@ public class GenericDbContext<TUser, TCard, TBankAccount, TBank, TCredit> : DbCo
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        BankServicesOptions<User, Card, BankAccount, Bank, Credit>.ModelConfiguration.Invoke(modelBuilder);
+        ModelCreatingOptions.ModelConfiguration.Invoke(modelBuilder);
 
         base.OnModelCreating(modelBuilder);
     }
