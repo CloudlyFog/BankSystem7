@@ -30,9 +30,9 @@ public class GenericDbContext<TUser, TCard, TBankAccount, TBank, TCredit> : DbCo
         DatabaseHandle();
     }
 
-    public GenericDbContext(ModelConfiguration? modelConfiguration)
+    public GenericDbContext(ModelConfiguration? bankSystemModelConfiguration)
     {
-        ModelCreatingOptions.ModelConfiguration = modelConfiguration ?? new ModelConfiguration();
+        ModelCreatingOptions.ModelConfiguration = bankSystemModelConfiguration ?? new BankSystemModelConfiguration();
         BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.InitializeAccess =
             ModelCreatingOptions.ModelConfiguration.InitializeAccess;
         DatabaseHandle();
