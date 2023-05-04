@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BankSystem7.Services.Configuration;
 
-public class ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit> : IServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>
+public class ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit> : DbContextInitializer, IServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>
     where TUser : User
     where TCard : Card
     where TBankAccount : BankAccount
@@ -93,8 +93,7 @@ public class ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit> : 
 
         BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.InitializeAccess = true;
 
-        foreach (var context in contexts)
-            context.Key.GetType()?.GetConstructor(new Type[] { context.Value.GetType() })?.Invoke(new object[] { context.Value });
+        InitializeDbContexts(Options.Contexts);
     }
 
     private void Dispose(bool disposing)
