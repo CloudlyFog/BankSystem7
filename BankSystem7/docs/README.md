@@ -2,7 +2,12 @@
 This library provides opportunities for using likeness of bank system. You can handle not only users but also other models like banks, cards and etc.
 
 ### Updates in version 0.4.5
-- 
+- Added Generic class which other db context classes will inherit. 
+- Added possibility to initialize external context classes.
+- Changed TValue in dictionary of property Contexts.
+- Added possibility to inherit class ConfigurationOptions.cs for creating own settings.
+- Updated method ConvertToString in ObjectExtensions.cs. Fixed bug with stackoverflow in method ConvertToString.
+- Added new item to enum ExceptionModel.
 ****
 # Documentation
 
@@ -39,7 +44,7 @@ New feature for library is adding services to internal DI in ASP.Net application
                     DatabaseName = "Test",
                };
                // here we add application context classes with class that inherit ModelConfiguration
-               o.Contexts = new Dictionary<DbContext, object?>
+               o.Contexts = new Dictionary<DbContext, ModelConfiguration?>
                {
                     { new ApplicationContext(), new ModelConfigurationTest() },
                };
@@ -55,7 +60,7 @@ New feature for library is adding services to internal DI in ASP.Net application
                 DatabaseName = "Test",
             },
             // here we add application context classes with class that inherit ModelConfiguration
-            Contexts = new Dictionary<DbContext, object?>
+            Contexts = new Dictionary<DbContext, ModelConfiguration?>
             {
                 { new ApplicationContext(), new ModelConfigurationTest() },
             };

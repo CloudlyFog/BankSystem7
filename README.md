@@ -1,8 +1,13 @@
 # Bank system 7
 This library provides opportunities for using likeness of bank system. You can handle not only users but also other models like banks, cards and etc.
 
-### Updates in version 0.4.4
-- Fixed bugs with bad objects initialization.
+### Updates in version 0.4.5
+- Added Generic class which other db context classes will inherit.
+- Added possibility to initialize external context classes.
+- Changed TValue in dictionary of property Contexts.
+- Added possibility to inherit class ConfigurationOptions.cs for creating own settings.
+- Updated method ConvertToString in ObjectExtensions.cs. Fixed bug with stackoverflow in method ConvertToString.
+- Added new item to enum ExceptionModel.
 ****
 # Documentation
 
@@ -39,7 +44,7 @@ New feature for library is adding services to internal DI in ASP.Net application
                     DatabaseName = "Test",
                };
                // here we add application context classes with class that inherit ModelConfiguration
-               o.Contexts = new Dictionary<DbContext, object?>
+               o.Contexts = new Dictionary<DbContext, ModelConfiguration?>
                {
                     { new ApplicationContext(), new ModelConfigurationTest() },
                };
@@ -55,7 +60,7 @@ New feature for library is adding services to internal DI in ASP.Net application
                 DatabaseName = "Test",
             },
             // here we add application context classes with class that inherit ModelConfiguration
-            Contexts = new Dictionary<DbContext, object?>
+            Contexts = new Dictionary<DbContext, ModelConfiguration?>
             {
                 { new ApplicationContext(), new ModelConfigurationTest() },
             };
@@ -138,46 +143,46 @@ Here located services for configuring library.
 ### Interfaces (and abstract classes)
 Here located interfaces which describes behavior of inherited repo-classes.
 1. Interface `IRepository<T> : IReaderService<T>, IWriterService<T>, IDisposable where T : class` - interface for implement standard library logic.
-      - `bool FitsConditions(T? item);` - implements logic for checking on conditions true of passed entity.
+   - `bool FitsConditions(T? item);` - implements logic for checking on conditions true of passed entity.
 
 2. **Interface** `IReaderService<T> where T : class` - interface for implement reading data from database.
 
    Methods
-      - `T Get(Expression<Func<T, bool>> predicate);` - implements getting an object from database with predicate.
-      - `bool Exist(Expression<Func<T, bool>> predicate);` - implements checking exist object with in database predicate.
+   - `T Get(Expression<Func<T, bool>> predicate);` - implements getting an object from database with predicate.
+   - `bool Exist(Expression<Func<T, bool>> predicate);` - implements checking exist object with in database predicate.
 
    Properties
-      - `IQueryable<T> All {  get; }` - implements getting a sequence of the objects from database.
+   - `IQueryable<T> All {  get; }` - implements getting a sequence of the objects from database.
 
 3. **Interface** `IReaderServiceWithTracking<T> where T : class` - interface for implement reading data from database with another type of parameters.
 
    Methods
-      - `T GetWithTracking(Expression<Expression<Func<T, bool>>> predicate);` - implements getting an object from database with predicate.
-      - `bool ExistWithTracking(Expression<Expression<Func<T, bool>>> predicate);` - implements checking exist object with in database predicate.
-   Properties
-      - `IQueryable<T> AllWithTracking {  get; }` - implements getting a sequence of the objects from database.
+   - `T GetWithTracking(Expression<Expression<Func<T, bool>>> predicate);` - implements getting an object from database with predicate.
+   - `bool ExistWithTracking(Expression<Expression<Func<T, bool>>> predicate);` - implements checking exist object with in database predicate.
+     Properties
+   - `IQueryable<T> AllWithTracking {  get; }` - implements getting a sequence of the objects from database.
 
 4. **Interface** `IWriterService<in T> where T : class` - interface for implement writing, updating and deleting data in database
 
    Methods
-      - `ExceptionModel  Create(T item);` - implements adding item in database.
-      - `ExceptionModel  Update(T item);` - implements updating item in database.
-      - `ExceptionModel  Delete(T item);` - implements deleting item from database.
+   - `ExceptionModel  Create(T item);` - implements adding item in database.
+   - `ExceptionModel  Update(T item);` - implements updating item in database.
+   - `ExceptionModel  Delete(T item);` - implements deleting item from database.
 
 5. **Interface** `ILogger` - interface that provides standard set for logging
 
    Methods
-      - `ExceptionModel Log(Report report);` - implements logging report in database.
-      - `ExceptionModel Log(IEnumerable<Report> reports);` - implements logging collection of reports in database.
+   - `ExceptionModel Log(Report report);` - implements logging report in database.
+   - `ExceptionModel Log(IEnumerable<Report> reports);` - implements logging collection of reports in database.
 
    Properties
-      - `public bool IsReused { get; set; }` - defines possibility use already initialized logger.
-      - `public LoggerOptions LoggerOptions { get; set; }` - defines options for logger configuration.
+   - `public bool IsReused { get; set; }` - defines possibility use already initialized logger.
+   - `public LoggerOptions LoggerOptions { get; set; }` - defines options for logger configuration.
 
 6. **Abstract class** `LoggerExecutor<TOperationType> where TOperationType : Enum` - simple implementation of service for added reports to logger queue
 
    Methods
-      - `virtual void Log(ExceptionModel exceptionModel, string methodName, string className, TOperationType operationType, ICollection<GeneralReport<TOperationType>> reports)` - implements standard logic of inserting log data to logger queue. Can be overrided.
+   - `virtual void Log(ExceptionModel exceptionModel, string methodName, string className, TOperationType operationType, ICollection<GeneralReport<TOperationType>> reports)` - implements standard logic of inserting log data to logger queue. Can be overrided.
 
 ### Repositories
 Repositories are implementation of various interfaces and working with context classes for interact with database.
