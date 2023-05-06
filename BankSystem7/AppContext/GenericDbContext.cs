@@ -77,11 +77,12 @@ public class GenericDbContext<TUser, TCard, TBankAccount, TBank, TCredit> : DbCo
     /// <param name="action">action that will invoked after state of entity will be changed. Usually as action you should use method <see cref="AvoidChanges"/></param>
     /// <param name="context">context that will handle state changing</param>
     /// <typeparam name="T">type of <see cref="item"/></typeparam>
-    public void UpdateTracker<T>(T item, EntityState state, Action action, DbContext context)
+    public void UpdateTracker<T>(T item, EntityState state, Action? action, DbContext context)
     {
         context.ChangeTracker.Clear();
         context.Entry(item).State = state;
-        action.Invoke();
+        action?.Invoke();
+
     }
 
     /// <summary>
