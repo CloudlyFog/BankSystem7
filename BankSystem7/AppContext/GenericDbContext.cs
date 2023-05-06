@@ -68,4 +68,11 @@ public class GenericDbContext<TUser, TCard, TBankAccount, TBank, TCredit> : DbCo
         BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.Ensured = true;
         BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.InitializeAccess = false;
     }
+    
+    public void UpdateTracker<T>(T item, EntityState state, Action action, DbContext context)
+    {
+        context.ChangeTracker.Clear();
+        context.Entry(item).State = state;
+        action.Invoke();
+    }
 }
