@@ -1,13 +1,8 @@
 # Bank system 7
 This library provides opportunities for using likeness of bank system. You can handle not only users but also other models like banks, cards and etc.
 
-### Updates in version 0.4.5
-- Added Generic class which other db context classes will inherit.
-- Added possibility to initialize external context classes.
-- Changed TValue in dictionary of property Contexts.
-- Added possibility to inherit class ConfigurationOptions.cs for creating own settings.
-- Updated method ConvertToString in ObjectExtensions.cs. Fixed bug with stackoverflow in method ConvertToString.
-- Added new item to enum ExceptionModel.
+### Updates in version 0.4.6
+- Added method to update state of entity to the GenericContext. The method also lets invoke some logic that you possible will be needed during updating entity state.
 ****
 # Documentation
 
