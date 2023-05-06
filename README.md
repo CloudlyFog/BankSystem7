@@ -1,10 +1,8 @@
 # Bank system 7
 This library provides opportunities for using likeness of bank system. You can handle not only users but also other models like banks, cards and etc.
 
-### Updates in version 0.4.7
-- Added method to update state of entity to the GenericContext.
-- Added method that ensures avoiding changes of nested entities.
-- Also updated descriptions of methods.
+### Updates in version 0.4.8
+- Added OptionsUpdater that lets update options special for service.
 ****
 # Documentation
 
