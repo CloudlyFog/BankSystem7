@@ -61,9 +61,9 @@ public class GenericDbContext<TUser, TCard, TBankAccount, TBank, TCredit> : DbCo
             return;
         if (BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.Ensured)
             return;
-        if (BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.EnsureDeleted)
+        if (ServicesSettings.EnsureDeleted)
             Database.EnsureDeleted();
-        if (BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.EnsureCreated)
+        if (ServicesSettings.EnsureCreated)
             Database.EnsureCreated();
         BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.Ensured = true;
         BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.InitializeAccess = false;
@@ -82,14 +82,13 @@ public class GenericDbContext<TUser, TCard, TBankAccount, TBank, TCredit> : DbCo
         context.ChangeTracker.Clear();
         context.Entry(item).State = state;
         action?.Invoke();
-
     }
 
     /// <summary>
     /// Method ensures that passed entities won't be changed during call method SaveChanges() 
     /// </summary>
     /// <param name="entities">entities that shouldn't be changed</param>
-    public void AvoidChanges(object[]? entities)
+    public void AvoidChanges(object[]? entities, DbContext context)
     {
         if (entities is null || entities.Length == 0)
             return;
@@ -97,7 +96,7 @@ public class GenericDbContext<TUser, TCard, TBankAccount, TBank, TCredit> : DbCo
         foreach (var entity in entities)
         {
             if (entity is not null)
-                Entry(entity).State = EntityState.Unchanged;
+                context.Entry(entity).State = EntityState.Unchanged;
         }
     }
 }

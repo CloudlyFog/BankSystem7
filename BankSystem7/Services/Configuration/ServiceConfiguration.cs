@@ -74,8 +74,8 @@ public class ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit> : 
     {
         Options = options;
         SetConnection(options.Connection, options.DatabaseName);
-        BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.EnsureDeleted = options.EnsureDeleted;
-        BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.EnsureCreated = options.EnsureCreated;
+        ServicesSettings.EnsureDeleted = options.EnsureDeleted;
+        ServicesSettings.EnsureCreated = options.EnsureCreated;
 
         InitDbContexts(options?.Contexts);
 

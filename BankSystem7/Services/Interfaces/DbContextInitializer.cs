@@ -38,8 +38,8 @@ public abstract class OptionsUpdater<TUser, TCard, TBankAccount, TBank, TCredit>
 
     protected void UpdateEnsureOperations(bool ensureCreated, bool ensureDeleted)
     {
-        BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.EnsureCreated = ensureCreated;
-        BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.EnsureDeleted = ensureDeleted;
+        ServicesSettings.EnsureCreated = ensureCreated;
+        ServicesSettings.EnsureDeleted = ensureDeleted;
     }
 
     protected void UpdateOnModelCreating(Dictionary<DbContext, ModelConfiguration>? contexts)
