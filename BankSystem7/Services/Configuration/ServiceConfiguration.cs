@@ -91,7 +91,7 @@ public class ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit> : 
         if (ServicesSettings.Ensured)
             return;
 
-        BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.InitializeAccess = true;
+        ServicesSettings.InitializeAccess = true;
 
         InitializeDbContexts(Options.Contexts);
     }

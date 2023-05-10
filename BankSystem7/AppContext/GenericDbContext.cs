@@ -26,14 +26,14 @@ public class GenericDbContext<TUser, TCard, TBankAccount, TBank, TCredit> : DbCo
     public GenericDbContext(string connection, bool useOwnAccessConfiguration = false)
     {
         ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>.SetConnection(connection);
-        BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.InitializeAccess = useOwnAccessConfiguration;
+        ServicesSettings.InitializeAccess = useOwnAccessConfiguration;
         DatabaseHandle();
     }
 
     public GenericDbContext(ModelConfiguration? bankSystemModelConfiguration)
     {
         ModelCreatingOptions.ModelConfiguration = bankSystemModelConfiguration ?? new ModelConfiguration();
-        BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.InitializeAccess =
+        ServicesSettings.InitializeAccess =
             ModelCreatingOptions.ModelConfiguration.InitializeAccess;
         DatabaseHandle();
     }
@@ -57,7 +57,7 @@ public class GenericDbContext<TUser, TCard, TBankAccount, TBank, TCredit> : DbCo
     /// </summary>
     private void DatabaseHandle()
     {
-        if (!BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.InitializeAccess)
+        if (!ServicesSettings.InitializeAccess)
             return;
         if (ServicesSettings.Ensured)
             return;
@@ -66,7 +66,7 @@ public class GenericDbContext<TUser, TCard, TBankAccount, TBank, TCredit> : DbCo
         if (ServicesSettings.EnsureCreated)
             Database.EnsureCreated();
         ServicesSettings.Ensured = true;
-        BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.InitializeAccess = false;
+        ServicesSettings.InitializeAccess = false;
     }
     
     /// <summary>
