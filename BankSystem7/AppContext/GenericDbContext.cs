@@ -14,18 +14,21 @@ public class GenericDbContext<TUser, TCard, TBankAccount, TBank, TCredit> : DbCo
 {
     public GenericDbContext()
     {
+        ModelCreatingOptions.ModelConfiguration = new ModelConfiguration();
         DatabaseHandle();
     }
 
     public GenericDbContext(string connection)
     {
-        ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>.SetConnection(connection);
+        ServicesSettings.SetConnection(connection);
+        ModelCreatingOptions.ModelConfiguration = new ModelConfiguration();
         DatabaseHandle();
     }
 
     public GenericDbContext(string connection, bool useOwnAccessConfiguration = false)
     {
-        ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>.SetConnection(connection);
+        ServicesSettings.SetConnection(connection);
+        ModelCreatingOptions.ModelConfiguration = new ModelConfiguration();
         ServicesSettings.InitializeAccess = useOwnAccessConfiguration;
         DatabaseHandle();
     }
@@ -42,7 +45,7 @@ public class GenericDbContext<TUser, TCard, TBankAccount, TBank, TCredit> : DbCo
     {
         optionsBuilder.EnableSensitiveDataLogging();
         optionsBuilder
-            .UseSqlServer(ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>.Connection);
+            .UseSqlServer(ServicesSettings.Connection);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

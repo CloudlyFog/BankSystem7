@@ -28,12 +28,12 @@ public abstract class OptionsUpdater<TUser, TCard, TBankAccount, TBank, TCredit>
 
     protected void UpdateConnection(string connection)
     {
-        ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>.SetConnection(connection);
+        ServicesSettings.SetConnection(connection);
     }
 
     protected void UpdateDatabaseName(string databaseName)
     {
-        ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>.SetConnection(databaseName: databaseName);
+        ServicesSettings.SetConnection(databaseName: databaseName);
     }
 
     protected void UpdateEnsureOperations(bool ensureCreated, bool ensureDeleted)
