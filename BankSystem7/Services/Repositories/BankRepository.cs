@@ -3,6 +3,7 @@ using BankSystem7.Models;
 using BankSystem7.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using BankSystem7.Services.Configuration;
 
 namespace BankSystem7.Services.Repositories;
 
@@ -26,7 +27,7 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         BankContext = _bankContext;
         _applicationContext = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ApplicationContext ??
                               new ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>
-                                  (BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.Connection);
+                                  (ServicesSettings.Connection);
     }
 
     public BankRepository(string connection)

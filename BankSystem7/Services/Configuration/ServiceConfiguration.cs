@@ -54,20 +54,20 @@ public class ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit> : 
         if (connection is not null && connection != string.Empty)
         {
             Connection = connection;
-            BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.Connection = Connection;
+            ServicesSettings.Connection = Connection;
             return;
         }
 
         if (databaseName is null || dataSource is null)
         {
-            BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.Connection = Connection;
+            ServicesSettings.Connection = Connection;
             return;
         }
 
         Connection = @$"Server=localhost\\SQLEXPRESS;Data Source={dataSource};Initial Catalog={databaseName};
             Integrated Security=True;Persist Security Info=False;Pooling=False;
             MultipleActiveResultSets=False; Encrypt=False;TrustServerCertificate=False";
-        BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.Connection = Connection;
+        ServicesSettings.Connection = Connection;
     }
 
     public static ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit> CreateInstance(ConfigurationOptions options)
