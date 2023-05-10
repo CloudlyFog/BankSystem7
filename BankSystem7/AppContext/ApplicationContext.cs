@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BankSystem7.AppContext;
 
-public class ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit> : GenericDbContext<TUser, TCard, TBankAccount, TBank, TCredit>
+public class ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit> : GenericDbContext
     where TUser : User
     where TCard : Card
     where TBankAccount : BankAccount

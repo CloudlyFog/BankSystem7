@@ -16,13 +16,26 @@ public class ModelConfiguration
     
     public bool InitializeAccess { get; }
     
-    public virtual void Invoke(ModelBuilder modelBuilder)
+    public virtual void Invoke(ModelBuilder modelBuilder, List<ModelConfiguration>? modelConfigurations = null)
     {
         ConfigureRelationships(modelBuilder);
         ConfigureDecimalColumnTypes(modelBuilder);
 
         modelBuilder.Entity<User>().Ignore(user => user.Exception);
         modelBuilder.Entity<User>().HasIndex(x => x.ID);
+        
+        InitializeModelConfigurations(modelBuilder, modelConfigurations);
+    }
+
+    private void InitializeModelConfigurations(ModelBuilder modelBuilder, List<ModelConfiguration>? modelConfigurations)
+    {
+        if (modelConfigurations is null || modelConfigurations.Count == 0)
+            return;
+        foreach (var modelConfiguration in modelConfigurations)
+        {
+            var method = modelConfiguration.GetType()?.GetMethod(nameof(Invoke));
+            modelConfiguration.GetType()?.GetMethod(nameof(Invoke))?.Invoke(modelConfiguration, new object?[]{ modelBuilder, new List<ModelConfiguration>() });
+        }
     }
 
     private static void ConfigureRelationships(ModelBuilder modelBuilder)

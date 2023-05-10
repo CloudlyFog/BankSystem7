@@ -12,7 +12,7 @@ public class ServicesSettings
     public static bool EnsureCreated { get; set; } = true;
     public static string? Connection { get; set; }
     public static bool Ensured { get; set; }
-    internal static bool InitializeAccess { get; set; } 
+    internal static bool InitializeAccess { get; set; }
     
     public static void SetConnection(string? connection = null, string? databaseName = DefaultDatabaseName, string? dataSource = DefaultDataSource)
     {

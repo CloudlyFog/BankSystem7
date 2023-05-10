@@ -1,8 +1,9 @@
 # Bank system 7
 This library provides opportunities for using likeness of bank system. You can handle not only users but also other models like banks, cards and etc.
 
-### Updates in version 0.4.8
-- Added OptionsUpdater that lets update options special for service.
+### Updates in version 0.4.9
+- Moved settings from BankServiceOptions and ServiceConfiguration to ServicesSettings. It includes EnsureCreated, EnsureDeleted, Ensured, InitializeAccess, Connection and method SetConnection.
+- Changed class UpdateOptions to non-generic class.
 ****
 # Documentation
 

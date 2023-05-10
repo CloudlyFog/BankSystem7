@@ -1,4 +1,5 @@
-﻿using BankSystem7.Models;
+﻿using System.Net.Mime;
+using BankSystem7.Models;
 using BankSystem7.Services.Configuration;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,7 +10,11 @@ public abstract class DbContextInitializer
     protected static void InitializeDbContexts(Dictionary<DbContext, ModelConfiguration> contexts)
     {
         foreach (var context in contexts)
+        {
+            if (Equals(context.Key, contexts.Keys.Last()))
+                ModelCreatingOptions.LastModelConfiguration = true;
             context.Key.GetType()?.GetConstructor(new [] { context.Value.GetType() })?.Invoke(new object[] { context.Value });
+        }
     }
 }
 

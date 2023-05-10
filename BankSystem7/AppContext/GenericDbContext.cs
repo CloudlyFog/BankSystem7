@@ -5,12 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BankSystem7.AppContext;
 
-public class GenericDbContext<TUser, TCard, TBankAccount, TBank, TCredit> : DbContext
-    where TUser : User
-    where TCard : Card
-    where TBankAccount : BankAccount
-    where TBank : Bank
-    where TCredit : Credit
+public class GenericDbContext : DbContext
 {
     public GenericDbContext()
     {
@@ -33,12 +28,13 @@ public class GenericDbContext<TUser, TCard, TBankAccount, TBank, TCredit> : DbCo
         DatabaseHandle();
     }
 
-    public GenericDbContext(ModelConfiguration? bankSystemModelConfiguration)
+    public GenericDbContext(ModelConfiguration? modelConfiguration)
     {
-        ModelCreatingOptions.ModelConfiguration = bankSystemModelConfiguration ?? new ModelConfiguration();
+        ModelCreatingOptions.ModelConfigurations?.Add(modelConfiguration ?? new ModelConfiguration());
         ServicesSettings.InitializeAccess =
-            ModelCreatingOptions.ModelConfiguration.InitializeAccess;
-        DatabaseHandle();
+            modelConfiguration.InitializeAccess;
+        if (ModelCreatingOptions.LastModelConfiguration)
+            DatabaseHandle();
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -50,7 +46,7 @@ public class GenericDbContext<TUser, TCard, TBankAccount, TBank, TCredit> : DbCo
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        ModelCreatingOptions.ModelConfiguration.Invoke(modelBuilder);
+        new ModelConfiguration().Invoke(modelBuilder, ModelCreatingOptions.ModelConfigurations);
 
         base.OnModelCreating(modelBuilder);
     }
