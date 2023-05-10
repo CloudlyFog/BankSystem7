@@ -59,13 +59,13 @@ public class GenericDbContext<TUser, TCard, TBankAccount, TBank, TCredit> : DbCo
     {
         if (!BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.InitializeAccess)
             return;
-        if (BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.Ensured)
+        if (ServicesSettings.Ensured)
             return;
         if (ServicesSettings.EnsureDeleted)
             Database.EnsureDeleted();
         if (ServicesSettings.EnsureCreated)
             Database.EnsureCreated();
-        BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.Ensured = true;
+        ServicesSettings.Ensured = true;
         BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.InitializeAccess = false;
     }
     

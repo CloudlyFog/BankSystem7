@@ -16,7 +16,6 @@ public sealed class BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCred
         
     }
     public static string? Connection { get; set; }
-    public static bool Ensured { get; set; }
     public static ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>? ServiceConfiguration { get; set; }
 
     internal static bool InitializeAccess { get; set; } 

@@ -88,7 +88,7 @@ public class ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit> : 
         if (contexts is null || contexts.Keys.Count == 0)
             return;
 
-        if (BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.Ensured)
+        if (ServicesSettings.Ensured)
             return;
 
         BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.InitializeAccess = true;
