@@ -13,12 +13,7 @@ public abstract class DbContextInitializer
     }
 }
 
-public abstract class OptionsUpdater<TUser, TCard, TBankAccount, TBank, TCredit> : DbContextInitializer
-    where TUser : User
-    where TCard : Card
-    where TBankAccount : BankAccount
-    where TBank : Bank
-    where TCredit : Credit 
+public abstract class OptionsUpdater : DbContextInitializer
 {
     protected virtual void UpdateOptions(ConfigurationOptions options)
     {
