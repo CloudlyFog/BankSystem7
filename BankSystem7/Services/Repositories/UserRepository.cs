@@ -7,7 +7,7 @@ using BankSystem7.Services.Configuration;
 
 namespace BankSystem7.Services.Repositories;
 
-public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> : LoggerExecutor<OperationType>,
+public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> : LoggerExecutor<OperationType>, 
     IRepository<TUser>, IReaderServiceWithTracking<TUser>
     where TUser : User
     where TCard : Card
@@ -50,25 +50,19 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
             (ServicesSettings.Connection);
     }
 
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
+    public IQueryable<TUser> All =>
+        _applicationContext.Users
+            .Include(x => x.Card)
+            .ThenInclude(x => x.BankAccount)
+            .ThenInclude(x => x.Bank)
+            .AsNoTracking() ?? Enumerable.Empty<TUser>().AsQueryable();
 
-    private void Dispose(bool disposing)
-    {
-        if (_disposed)
-            return;
-        if (disposing)
-        {
-            _bankAccountRepository.Dispose();
-            _bankRepository.Dispose();
-            _cardRepository.Dispose();
-            _applicationContext.Dispose();
-        }
-        _disposed = true;
-    }
+    public IQueryable<TUser> AllWithTracking =>
+        _applicationContext.Users
+            .Include(x => x.Card)
+            .ThenInclude(x => x.BankAccount)
+            .ThenInclude(x => x.Bank) ?? Enumerable.Empty<TUser>().AsQueryable();
+
 
     public ExceptionModel Create(TUser item)
     {
@@ -80,6 +74,18 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
 
         UpdateBankTracker(item);
         _applicationContext.Users.Add(item);
+        _applicationContext.SaveChanges();
+        return ExceptionModel.Ok;
+    }
+
+    public ExceptionModel Update(TUser item)
+    {
+        if (!FitsConditions(item))
+            return ExceptionModel.OperationFailed;
+
+        _applicationContext.ChangeTracker.Clear();
+        _applicationContext.Users.Update(item);
+        _applicationContext.BankAccounts.Update((TBankAccount)item.Card.BankAccount);
         _applicationContext.SaveChanges();
         return ExceptionModel.Ok;
     }
@@ -105,50 +111,24 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
     {
         return All.Any(predicate);
     }
+    public bool ExistWithTracking(Expression<Func<TUser, bool>> predicate)
+    {
+        return AllWithTracking.Any(predicate);
+    }
 
     public bool FitsConditions(TUser? item)
     {
         return item?.Card?.BankAccount?.Bank is not null && Exist(x => x.ID == item.ID);
     }
-
-    public IQueryable<TUser> All =>
-        _applicationContext.Users
-            .Include(x => x.Card)
-            .ThenInclude(x => x.BankAccount)
-            .ThenInclude(x => x.Bank)
-            .AsNoTracking() ?? Enumerable.Empty<TUser>().AsQueryable();
-
-    public IQueryable<TUser> AllWithTracking =>
-        _applicationContext.Users
-            .Include(x => x.Card)
-            .ThenInclude(x => x.BankAccount)
-            .ThenInclude(x => x.Bank) ?? Enumerable.Empty<TUser>().AsQueryable();
-
+    
     public TUser Get(Expression<Func<TUser, bool>> predicate)
     {
         return All.FirstOrDefault(predicate) ?? (TUser)User.Default;
     }
-
-    public ExceptionModel Update(TUser item)
-    {
-        if (!FitsConditions(item))
-            return ExceptionModel.OperationFailed;
-
-        _applicationContext.ChangeTracker.Clear();
-        _applicationContext.Users.Update(item);
-        _applicationContext.BankAccounts.Update((TBankAccount)item.Card.BankAccount);
-        _applicationContext.SaveChanges();
-        return ExceptionModel.Ok;
-    }
-
+    
     public TUser GetWithTracking(Expression<Func<TUser, bool>> predicate)
     {
         return AllWithTracking.FirstOrDefault(predicate) ?? (TUser)User.Default;
-    }
-
-    public bool ExistWithTracking(Expression<Func<TUser, bool>> predicate)
-    {
-        return AllWithTracking.Any(predicate);
     }
 
     private void UpdateBankTracker(TUser user)
@@ -168,6 +148,26 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         _applicationContext.Banks.Update(bank);
     }
 
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    private void Dispose(bool disposing)
+    {
+        if (_disposed)
+            return;
+        if (disposing)
+        {
+            _bankAccountRepository.Dispose();
+            _bankRepository.Dispose();
+            _cardRepository.Dispose();
+            _applicationContext.Dispose();
+        }
+        _disposed = true;
+    }
+    
     ~UserRepository()
     {
         Dispose(false);

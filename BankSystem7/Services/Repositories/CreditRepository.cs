@@ -33,69 +33,17 @@ public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>
                               new ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>(connection);
     }
 
-    public ExceptionModel Create(TCredit item)
-    {
-        if (item is null)
-            return ExceptionModel.EntityIsNull;
-
-        if (Exist(x => x.ID == item.ID))
-            return ExceptionModel.OperationFailed;
-
-        item.User = null;
-        item.Bank = null;
-        _applicationContext.Credits.Add(item);
-        _applicationContext.SaveChanges();
-        return ExceptionModel.Ok;
-    }
-
-    public ExceptionModel Update(TCredit item)
-    {
-        if (!FitsConditions(item))
-            return ExceptionModel.OperationFailed;
-
-        _applicationContext.ChangeTracker.Clear();
-        _applicationContext.Credits.Update(item);
-        _applicationContext.SaveChanges();
-        return ExceptionModel.Ok;
-    }
-
-    public ExceptionModel Delete(TCredit item)
-    {
-        if (!FitsConditions(item))
-            return ExceptionModel.OperationFailed;
-
-        _applicationContext.ChangeTracker.Clear();
-        _applicationContext.Credits.Remove(item);
-        _applicationContext.SaveChanges();
-        return ExceptionModel.Ok;
-    }
-
     public IQueryable<TCredit> All =>
         _applicationContext.Credits
-        .Include(x => x.Bank)
-        .Include(x => x.User)
-        .AsNoTracking() ?? Enumerable.Empty<TCredit>().AsQueryable();
+            .Include(x => x.Bank)
+            .Include(x => x.User)
+            .AsNoTracking() ?? Enumerable.Empty<TCredit>().AsQueryable();
 
     public IQueryable<TCredit> AllWithTracking =>
         _applicationContext.Credits
-        .Include(x => x.Bank)
-        .Include(x => x.User) ?? Enumerable.Empty<TCredit>().AsQueryable();
-
-    public TCredit Get(Expression<Func<TCredit, bool>> predicate)
-    {
-        return All.FirstOrDefault(predicate) ?? (TCredit)Credit.Default;
-    }
-
-    public bool Exist(Expression<Func<TCredit, bool>> predicate)
-    {
-        return All.Any(predicate);
-    }
-
-    public bool FitsConditions(TCredit? item)
-    {
-        return item is not null && Exist(x => x.ID == item.ID);
-    }
-
+            .Include(x => x.Bank)
+            .Include(x => x.User) ?? Enumerable.Empty<TCredit>().AsQueryable();
+    
     /// <summary>
     /// gives to user credit with the definite amount of money
     /// adds to the table field with credit's data of user
@@ -176,6 +124,67 @@ public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>
 
         return ExceptionModel.Ok;
     }
+    public ExceptionModel Create(TCredit item)
+    {
+        if (item is null)
+            return ExceptionModel.EntityIsNull;
+
+        if (Exist(x => x.ID == item.ID))
+            return ExceptionModel.OperationFailed;
+
+        item.User = null;
+        item.Bank = null;
+        _applicationContext.Credits.Add(item);
+        _applicationContext.SaveChanges();
+        return ExceptionModel.Ok;
+    }
+
+    public ExceptionModel Update(TCredit item)
+    {
+        if (!FitsConditions(item))
+            return ExceptionModel.OperationFailed;
+
+        _applicationContext.ChangeTracker.Clear();
+        _applicationContext.Credits.Update(item);
+        _applicationContext.SaveChanges();
+        return ExceptionModel.Ok;
+    }
+
+    public ExceptionModel Delete(TCredit item)
+    {
+        if (!FitsConditions(item))
+            return ExceptionModel.OperationFailed;
+
+        _applicationContext.ChangeTracker.Clear();
+        _applicationContext.Credits.Remove(item);
+        _applicationContext.SaveChanges();
+        return ExceptionModel.Ok;
+    }
+
+    public TCredit Get(Expression<Func<TCredit, bool>> predicate)
+    {
+        return All.FirstOrDefault(predicate) ?? (TCredit)Credit.Default;
+    }
+
+    public TCredit GetWithTracking(Expression<Func<TCredit, bool>> predicate)
+    {
+        return AllWithTracking.FirstOrDefault(predicate) ?? (TCredit)Credit.Default;
+    }
+
+    public bool Exist(Expression<Func<TCredit, bool>> predicate)
+    {
+        return All.Any(predicate);
+    }
+
+    public bool ExistWithTracking(Expression<Func<TCredit, bool>> predicate)
+    {
+        return AllWithTracking.Any(predicate);
+    }
+
+    public bool FitsConditions(TCredit? item)
+    {
+        return item is not null && Exist(x => x.ID == item.ID);
+    }
 
     private ExceptionModel UpdateCreditStateAfterPayCredit(TCredit credit, Operation operationWithdrawFromUserAccount)
     {
@@ -245,16 +254,6 @@ public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>
     {
         Dispose(true);
         GC.SuppressFinalize(this);
-    }
-
-    public TCredit GetWithTracking(Expression<Func<TCredit, bool>> predicate)
-    {
-        return AllWithTracking.FirstOrDefault(predicate) ?? (TCredit)Credit.Default;
-    }
-
-    public bool ExistWithTracking(Expression<Func<TCredit, bool>> predicate)
-    {
-        return AllWithTracking.Any(predicate);
     }
 
     ~CreditRepository()
