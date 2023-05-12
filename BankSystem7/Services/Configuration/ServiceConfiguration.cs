@@ -28,7 +28,7 @@ public class ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit> : 
             LoggerRepository = new LoggerRepository(Options.LoggerOptions);
             Logger = new Logger<TUser, TCard, TBankAccount, TBank, TCredit>(LoggerRepository, Options.LoggerOptions);
         }
-        OperationRepository = new OperationRepository<TUser, TCard, TBankAccount, TBank, TCredit>(Options.OperationOptions);
+        OperationRepository = new OperationRepository(Options.OperationOptions);
     }
     
     public BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit>? BankAccountRepository { get; }
@@ -37,7 +37,7 @@ public class ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit> : 
     public UserRepository<TUser, TCard, TBankAccount, TBank, TCredit>? UserRepository { get; }
     public CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>? CreditRepository { get; }
     public LoggerRepository? LoggerRepository { get; }
-    public OperationRepository<TUser, TCard, TBankAccount, TBank, TCredit>? OperationRepository { get; }
+    public OperationRepository? OperationRepository { get; }
     public ILogger? Logger { get; }
     protected internal static ConfigurationOptions? Options { get; set; }
 
