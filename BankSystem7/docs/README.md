@@ -2,8 +2,10 @@
 This library provides opportunities for using likeness of bank system. You can handle not only users but also other models like banks, cards and etc.
 
 ### Updates in version 0.4.9
+- Fixed a bug with the configuration of several models. In older versions, not all model configurations were applied, and therefore, if you passed more than 1 ModelConfiguration object to the Contexts property in the ConfigurationOptions class, you could get bad model configurations in that not all models were configured correctly.
 - Moved settings from BankServiceOptions and ServiceConfiguration to ServicesSettings. It includes EnsureCreated, EnsureDeleted, Ensured, InitializeAccess, Connection and method SetConnection.
 - Changed class UpdateOptions to non-generic class.
+- Removed generic types from OperationRepository class.
 ****
 # Documentation
 

@@ -2,6 +2,7 @@
 using BankSystem7.Services;
 using BankSystem7.Services.Configuration;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace BankSystem7.AppContext;
 

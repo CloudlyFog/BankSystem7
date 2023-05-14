@@ -7,8 +7,7 @@ using BankSystem7.Services.Configuration;
 
 namespace BankSystem7.Services.Repositories;
 
-public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> : LoggerExecutor<OperationType>, 
-    IRepository<TUser>, IReaderServiceWithTracking<TUser>
+public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> : IRepository<TUser>, IRepositoryAsync<TUser>
     where TUser : User
     where TCard : Card
     where TBankAccount : BankAccount
@@ -63,7 +62,6 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
             .ThenInclude(x => x.BankAccount)
             .ThenInclude(x => x.Bank) ?? Enumerable.Empty<TUser>().AsQueryable();
 
-
     public ExceptionModel Create(TUser item)
     {
         if (item?.Card?.BankAccount?.Bank is null || item.Equals(User.Default))
@@ -78,6 +76,20 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         return ExceptionModel.Ok;
     }
 
+    public async Task<ExceptionModel> CreateAsync(TUser item)
+    {
+        if (item?.Card?.BankAccount?.Bank is null || item.Equals(User.Default))
+            return ExceptionModel.OperationFailed;
+
+        if (Exist(x => x.ID.Equals(item.ID) || x.Name.Equals(item.Name) && x.Email.Equals(item.Email)))
+            return ExceptionModel.OperationRestricted;
+
+        UpdateBankTracker(item);
+        _applicationContext.Users.Add(item);
+        await _applicationContext.SaveChangesAsync();
+        return ExceptionModel.Ok;
+    }
+    
     public ExceptionModel Update(TUser item)
     {
         if (!FitsConditions(item))
@@ -87,6 +99,18 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         _applicationContext.Users.Update(item);
         _applicationContext.BankAccounts.Update((TBankAccount)item.Card.BankAccount);
         _applicationContext.SaveChanges();
+        return ExceptionModel.Ok;
+    }
+
+    public async Task<ExceptionModel> UpdateAsync(TUser item)
+    {
+        if (!FitsConditions(item))
+            return ExceptionModel.OperationFailed;
+
+        _applicationContext.ChangeTracker.Clear();
+        _applicationContext.Users.Update(item);
+        _applicationContext.BankAccounts.Update((TBankAccount)item.Card.BankAccount);
+        await _applicationContext.SaveChangesAsync();
         return ExceptionModel.Ok;
     }
 
@@ -107,28 +131,51 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         return ExceptionModel.Ok;
     }
 
+    public async Task<ExceptionModel> DeleteAsync(TUser item)
+    {
+        if (!FitsConditions(item))
+            return ExceptionModel.EntityNotExist;
+
+        item.Card.BankAccount.Bank.AccountAmount +=
+            _bankRepository.CalculateBankAccountAmount(item.Card.Amount, 0);
+
+        _applicationContext.ChangeTracker.Clear();
+        _applicationContext.Users.Remove(item);
+        _applicationContext.BankAccounts.Remove((TBankAccount)item.Card.BankAccount);
+        _applicationContext.Banks.Update((TBank)item.Card.BankAccount.Bank);
+        await _applicationContext.SaveChangesAsync();
+
+        return ExceptionModel.Ok;
+    }
+
     public bool Exist(Expression<Func<TUser, bool>> predicate)
     {
         return All.Any(predicate);
     }
-    public bool ExistWithTracking(Expression<Func<TUser, bool>> predicate)
+
+    public async Task<bool> ExistAsync(Expression<Func<TUser, bool>> predicate)
     {
-        return AllWithTracking.Any(predicate);
+        return await All.AnyAsync(predicate);
     }
 
     public bool FitsConditions(TUser? item)
     {
         return item?.Card?.BankAccount?.Bank is not null && Exist(x => x.ID == item.ID);
     }
-    
+
+    public async Task<bool> FitsConditionsAsync(TUser? item)
+    {
+        return item?.Card?.BankAccount?.Bank is not null && await ExistAsync(x => x.ID == item.ID);
+    }
+
     public TUser Get(Expression<Func<TUser, bool>> predicate)
     {
         return All.FirstOrDefault(predicate) ?? (TUser)User.Default;
     }
-    
-    public TUser GetWithTracking(Expression<Func<TUser, bool>> predicate)
+
+    public async Task<TUser> GetAsync(Expression<Func<TUser, bool>> predicate)
     {
-        return AllWithTracking.FirstOrDefault(predicate) ?? (TUser)User.Default;
+        return await All.FirstOrDefaultAsync(predicate) ?? (TUser)User.Default;
     }
 
     private void UpdateBankTracker(TUser user)
@@ -167,7 +214,7 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         }
         _disposed = true;
     }
-    
+
     ~UserRepository()
     {
         Dispose(false);
