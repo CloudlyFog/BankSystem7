@@ -1,12 +1,8 @@
 # Bank system 7
 This library provides opportunities for using likeness of bank system. You can handle not only users but also other models like banks, cards and etc.
 
-### Updates in version 0.4.9
-- Fixed a bug with the configuration of several models. In older versions, not all model configurations were applied, and therefore, if you passed more than 1 ModelConfiguration object to the Contexts property in the ConfigurationOptions class, you could get bad model configurations in that not all models were configured correctly.
-- Moved settings from BankServiceOptions and ServiceConfiguration to ServicesSettings. It includes EnsureCreated, EnsureDeleted, Ensured, InitializeAccess, Connection and method SetConnection.
-- Changed class UpdateOptions to non-generic class.
-- Removed generic types from OperationRepository class.
-- Implemented async overloads for UserRepository methods. Also added diagrams in Excel where You can look at performance difference of async and sync methods.
+### Updates in version 0.5.0
+- 
 ****
 # Documentation
 
@@ -225,7 +221,7 @@ You'll write something like this
 ````
 3. You use methods incorrectly.
    **Example**:
-   You want to delete operation therefore You have to use method `DeleteOperation(...)` but You use method `CreateOperation(...)`  and of course You'll get an exception because method `CreateOperation(...)`has return type `ExceptionModel` and it'll returns `ExceptionModel.OperationFailed` because same operation already exist in the database which You are using.
+   You want to delete operation therefore You have to use method `DeleteOperation(...)` but You use method `CreateOperation(...)`  and of course You'll get an exception because method `CreateOperation(...)`has return type `ExceptionModel` and it'll returns `ExceptionModel.OperationFailed` because the same operation already exist in the database which You are using.
 
 #### **Remember!**
 Always change connection string either directly in context class, repository classes or use class BankServiceOptions for configuration.
