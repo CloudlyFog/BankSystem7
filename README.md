@@ -1,18 +1,25 @@
 # Bank system 7
 This library provides opportunities for using likeness of bank system. You can handle not only users but also other models like banks, cards and etc.
 
-### Updates in version 0.4.8
-- Added OptionsUpdater that lets update options special for service.
+### Updates in version 0.4.9
+- Fixed a bug with the configuration of several models. In older versions, not all model configurations were applied, and therefore, if you passed more than 1 ModelConfiguration object to the Contexts property in the ConfigurationOptions class, you could get bad model configurations in that not all models were configured correctly.
+- Moved settings from BankServiceOptions and ServiceConfiguration to ServicesSettings. It includes EnsureCreated, EnsureDeleted, Ensured, InitializeAccess, Connection and method SetConnection.
+- Changed class UpdateOptions to non-generic class.
+- Removed generic types from OperationRepository class.
+- Implemented async overloads for UserRepository methods. Also added diagrams in Excel where You can look at performance difference of async and sync methods.
 ****
 # Documentation
 
 ## Structure of project
 
 1. Folder **AppContext** is folder where contains context classes for interaction with database without business logic.
-2. Folder **Middleware** is folder where contains middleware.
-3. Folder **Services** contains 2 sub folders: **Interfaces** and **Repositories**.
-4. Folder **Interfaces** contains interfaces which describes structure of inherited classes.
-5. Folder **Repositories** is folder with all business logic of project. Only there simple developer has access.
+2. Folder **docs** contains files for documentation.
+3. Folder **Extensions** contains extension classes for different types.
+4. Folder **Models** contains models for library.
+5. Folder **Services** contains 3 sub folders: **Configuration**, **Interfaces** and **Repositories**.
+6. Folder **Configuration** contains classes for configuration library.
+7. Folder **Interfaces** contains interfaces which describes structure of inherited classes.
+8. Folder **Repositories** is folder with all business logic of project. Only there simple developer has access.
 
 ## How to interact with library?
 The library provides ways to pass and use own models. For example, You can inherit Your class from base class User and pass it as type to initialized instance of `ServiceConfiguration`
@@ -38,10 +45,11 @@ New feature for library is adding services to internal DI in ASP.Net application
                {
                     DatabaseName = "Test",
                };
-               // here we add application context classes with class that inherit ModelConfiguration
+               // here we add database context classes with class that inherit ModelConfiguration
                o.Contexts = new Dictionary<DbContext, ModelConfiguration?>
                {
                     { new ApplicationContext(), new ModelConfigurationTest() },
+                    { new NewApplicationContext(), new NewModelConfigurationTest() },
                };
          });
          //or
@@ -54,10 +62,11 @@ New feature for library is adding services to internal DI in ASP.Net application
             {
                 DatabaseName = "Test",
             },
-            // here we add application context classes with class that inherit ModelConfiguration
+            // here we add database context classes with class that inherit ModelConfiguration
             Contexts = new Dictionary<DbContext, ModelConfiguration?>
             {
                 { new ApplicationContext(), new ModelConfigurationTest() },
+                { new NewApplicationContext(), new NewModelConfigurationTest() },
             };
          });
 But use only one of the above approaches to use service.
@@ -79,25 +88,29 @@ If you'll not pass options to `ServiceConfiguration` method `CreateInstance` You
 
 ## API documentation
 ### AppContext
-There are 2 classes context:
+There are 3 classes context:
 
-1. **ApplicationContext** - is responsible for all operations in the database.
-2. **BankContext** - is responsible for handling operations when use ApplicationContext is impossible.
+1. **GenericDbContext** - main db context class that handles all needed operations.
+2. **ApplicationContext** - configures GenericDbContext to context class for this library.
+3. **BankContext** - is responsible for handling operations when use ApplicationContext is impossible.
+
+#### API GenericDbContext
+**Methods:**
+1. `private void DatabaseHandle()` - implements handling creating and deleting database.
+2. `public void UpdateTracker<T>(T item, EntityState state, Action? action, DbContext context)` - updates states of entity. You should use this method with method `AvoidChanges(object[]? entities, DbContext context)` for the best state tracking of entities.
+3. `public void AvoidChanges(object[]? entities, DbContext context)` - ensures that passed entities won't be changed during call method `SaveChanges()`.
 
 #### API ApplicationContext
 
 **Methods:**
 1. `internal ExceptionModel AvoidDuplication(Bank item)` - implements function for avoiding duplication in table Banks in the database.
-2. `private void DatabaseHandle()` - implements handling creating and deleting database.
 
 **Properties:**
 
-1. `public static bool EnsureCreated { get; set; }` - property for handling create database operation
-1. `public static bool EnsureDeleted { get; set; }` - property for handling delete database operation
-2. `protected internal DbSet<User> Users { get; set; }` - an instance of the table `Users` in database.
-3. `protected internal DbSet<Bank> Banks { get; set; }` -an instance of the table `Banks` in database.
-4. `protected internal DbSet<BankAccount> BankAccounts { get; set; }` - an instance of the table `BankAccounts` in database.
-5. `protected internal DbSet<Credit> Credits { get; set; }` - an instance of the table `Credits` in database.
+1. `protected internal DbSet<User> Users { get; set; }` - an instance of the table `Users` in database.
+2. `protected internal DbSet<Bank> Banks { get; set; }` -an instance of the table `Banks` in database.
+3. `protected internal DbSet<BankAccount> BankAccounts { get; set; }` - an instance of the table `BankAccounts` in database.
+4. `protected internal DbSet<Credit> Credits { get; set; }` - an instance of the table `Credits` in database.
 
 #### API BankContext
 
@@ -107,7 +120,6 @@ There are 2 classes context:
 3. `public ExceptionModel BankAccountWithdraw(User user, Bank bank, Operation operation)` - withdraws money from user bank account and accrual to bank's account.
 4. `private ExceptionModel BankAccountAccrual(User user, Bank bank, Operation operation)` - accruals money to user bank account from bank's account.
 5. `private StatusOperationCode StatusOperation(Operation operation, OperationKind operationKind)` - returns status of operation for next handling of operation.
-6. `private void DatabaseHandle()` - implements handling creating and deleting database.
 
 **Properties:**
 
@@ -218,6 +230,12 @@ You'll write something like this
 #### **Remember!**
 Always change connection string either directly in context class, repository classes or use class BankServiceOptions for configuration.
 In any situations when Your program, OS or something else was broken, **only You is responsible for it**. Please, be more intelligent. :>
+
+## Conclusion
+
+Downloading and next using this package is your responsible and only You decide use it or not. All exceptions and crashes of your projects is responsible on You. We was tested our product in many tests and have a conclusion in which says that all methods and logic of project are working correctly. So, we wish You luck.
+
+**Sincerely, hayako.** Your program, OS or something else was broken, **only You is responsible for it**. Please, be more intelligent. :>
 
 ## Conclusion
 
