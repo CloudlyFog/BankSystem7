@@ -16,6 +16,6 @@ public interface IServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredi
     public UserRepository<TUser, TCard, TBankAccount, TBank, TCredit>? UserRepository { get; }
     public CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>? CreditRepository { get; }
     public LoggerRepository? LoggerRepository { get; }
-    public OperationRepository<TUser, TCard, TBankAccount, TBank, TCredit>? OperationRepository { get; }
+    public OperationRepository? OperationRepository { get; }
     public ILogger? Logger { get; }
 }

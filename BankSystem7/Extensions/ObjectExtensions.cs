@@ -24,7 +24,12 @@ namespace BankSystem7.Extensions
                 return "Passed item is null.";
             var sb = new StringBuilder();
             foreach (var prop in item.GetType().GetProperties())
+            {
+                if (prop.PropertyType.IsClass 
+                        && !prop.PropertyType.FullName.StartsWith("System."))
+                    continue;
                 sb.AppendLine($"{prop.Name}: {prop.GetValue(item)}");
+            }
             return sb.ToString();
         }
     }

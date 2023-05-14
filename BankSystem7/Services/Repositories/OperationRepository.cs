@@ -5,12 +5,7 @@ using System.Linq.Expressions;
 
 namespace BankSystem7.Services.Repositories;
 
-public sealed class OperationRepository<TUser, TCard, TBankAccount, TBank, TCredit> : LoggerExecutor<OperationType>, IRepository<Operation>
-    where TUser : User
-    where TCard : Card
-    where TBankAccount : BankAccount
-    where TBank : Bank
-    where TCredit : Credit
+public sealed class OperationRepository : LoggerExecutor<OperationType>, IRepository<Operation>
 {
     private OperationService<Operation> _operationService;
 
@@ -23,7 +18,9 @@ public sealed class OperationRepository<TUser, TCard, TBankAccount, TBank, TCred
     {
         _operationService = new OperationService<Operation>(options);
     }
-
+    
+    public IQueryable<Operation> All => _operationService.Collection.Find(_ => true).ToList().AsQueryable();
+    
     public void Dispose()
     {
         _operationService = null;
@@ -62,8 +59,6 @@ public sealed class OperationRepository<TUser, TCard, TBankAccount, TBank, TCred
         _operationService.Collection.DeleteOne(filter);
         return ExceptionModel.Ok;
     }
-
-    public IQueryable<Operation> All => _operationService.Collection.Find(_ => true).ToList().AsQueryable();
 
     public Operation Get(Expression<Func<Operation, bool>> predicate)
     {

@@ -3,6 +3,7 @@ using BankSystem7.Models;
 using BankSystem7.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using BankSystem7.Services.Configuration;
 
 namespace BankSystem7.Services.Repositories;
 
@@ -26,7 +27,7 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         BankContext = _bankContext;
         _applicationContext = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ApplicationContext ??
                               new ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>
-                                  (BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.Connection);
+                                  (ServicesSettings.Connection);
     }
 
     public BankRepository(string connection)
@@ -36,29 +37,17 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         _applicationContext = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ApplicationContext ??
                               new ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>(connection);
     }
+    
+    public IQueryable<TBank> All =>
+        _applicationContext.Banks
+            .Include(x => x.BankAccounts)
+            .Include(x => x.Credits)
+            .AsNoTracking() ?? Enumerable.Empty<TBank>().AsQueryable();
 
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    // Protected implementation of Dispose pattern.
-    private void Dispose(bool disposing)
-    {
-        if (_disposedValue)
-            return;
-        if (disposing)
-        {
-            if (BankContext is null)
-                return;
-            _bankContext.Dispose();
-            BankContext.Dispose();
-            _applicationContext.Dispose();
-        }
-        BankContext = null;
-        _disposedValue = true;
-    }
+    public IQueryable<TBank> AllWithTracking =>
+        _applicationContext.Banks
+            .Include(x => x.BankAccounts)
+            .Include(x => x.Credits) ?? Enumerable.Empty<TBank>().AsQueryable();
 
     /// <summary>
     /// accrual money to user bank account from bank's account
@@ -136,36 +125,6 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         return ExceptionModel.Ok;
     }
 
-    public bool Exist(Expression<Func<TBank, bool>> predicate)
-    {
-        return All.Any(predicate);
-    }
-
-    public bool FitsConditions(TBank? item)
-    {
-        return item is not null && Exist(x => x.ID == item.ID);
-    }
-
-    public IQueryable<TBank> All =>
-        _applicationContext.Banks
-        .Include(x => x.BankAccounts)
-        .Include(x => x.Credits)
-        .AsNoTracking() ?? Enumerable.Empty<TBank>().AsQueryable();
-
-    public IQueryable<TBank> AllWithTracking =>
-        _applicationContext.Banks
-        .Include(x => x.BankAccounts)
-        .Include(x => x.Credits) ?? Enumerable.Empty<TBank>().AsQueryable();
-
-    public TBank Get(Expression<Func<TBank, bool>> predicate)
-    {
-        return _applicationContext.Banks
-        .Include(x => x.BankAccounts)
-        .Include(x => x.Credits)
-        .AsNoTracking()
-        .FirstOrDefault(predicate) ?? (TBank)Bank.Default;
-    }
-
     public ExceptionModel Update(TBank item)
     {
         if (!FitsConditions(item))
@@ -177,9 +136,13 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         return ExceptionModel.Ok;
     }
 
-    internal decimal CalculateBankAccountAmount(decimal oldValue, decimal newValue)
+    public TBank Get(Expression<Func<TBank, bool>> predicate)
     {
-        return newValue - oldValue;
+        return _applicationContext.Banks
+            .Include(x => x.BankAccounts)
+            .Include(x => x.Credits)
+            .AsNoTracking()
+            .FirstOrDefault(predicate) ?? (TBank)Bank.Default;
     }
 
     public TBank GetWithTracking(Expression<Func<TBank, bool>> predicate)
@@ -187,11 +150,49 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         return AllWithTracking.FirstOrDefault(predicate) ?? (TBank)Bank.Default;
     }
 
+    public bool Exist(Expression<Func<TBank, bool>> predicate)
+    {
+        return All.Any(predicate);
+    }
+
     public bool ExistWithTracking(Expression<Func<TBank, bool>> predicate)
     {
         return AllWithTracking.Any(predicate);
     }
+    
+    public bool FitsConditions(TBank? item)
+    {
+        return item is not null && Exist(x => x.ID == item.ID);
+    }
 
+    internal decimal CalculateBankAccountAmount(decimal oldValue, decimal newValue)
+    {
+        return newValue - oldValue;
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    // Protected implementation of Dispose pattern.
+    private void Dispose(bool disposing)
+    {
+        if (_disposedValue)
+            return;
+        if (disposing)
+        {
+            if (BankContext is null)
+                return;
+            _bankContext.Dispose();
+            BankContext.Dispose();
+            _applicationContext.Dispose();
+        }
+        BankContext = null;
+        _disposedValue = true;
+    }
+    
     ~BankRepository()
     {
         Dispose(false);

@@ -4,6 +4,7 @@ using BankSystem7.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 using System.Linq.Expressions;
+using BankSystem7.Services.Configuration;
 
 namespace BankSystem7.Services.Repositories;
 
@@ -23,7 +24,7 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
     public BankAccountRepository()
     {
         _applicationContext = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ApplicationContext ??
-                              new ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>(BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.Connection);
+                              new ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>(ServicesSettings.Connection);
         _bankContext = _bankRepository.BankContext;
         SetBankServicesOptions();
         _bankRepository = new BankRepository<TUser, TCard, TBankAccount, TBank, TCredit>(ConnectionString);
@@ -33,7 +34,7 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
     {
         _bankRepository = bankRepository;
         _applicationContext = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ApplicationContext ??
-                              new ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>(BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.Connection);
+                              new ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>(ServicesSettings.Connection);
         _bankContext = _bankRepository.BankContext;
         SetBankServicesOptions();
     }
@@ -47,26 +48,18 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
         _bankRepository = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ServiceConfiguration?.BankRepository ?? new BankRepository<TUser, TCard, TBankAccount, TBank, TCredit>(connection);
     }
 
-    // Public implementation of Dispose pattern callable by consumers.
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
+    public IQueryable<TBankAccount> All =>
+        _applicationContext.BankAccounts
+            .Include(x => x.Bank)
+            .Include(x => x.User)
+            .ThenInclude(x => x.Card)
+            .AsNoTracking() ?? Enumerable.Empty<TBankAccount>().AsQueryable();
 
-    // Protected implementation of Dispose pattern.
-    private void Dispose(bool disposing)
-    {
-        if (_disposedValue)
-            return;
-        if (disposing)
-        {
-            _bankContext.Dispose();
-            _bankRepository.Dispose();
-            _applicationContext.Dispose();
-        }
-        _disposedValue = true;
-    }
+    public IQueryable<TBankAccount> AllWithTracking =>
+        _applicationContext.BankAccounts
+            .Include(x => x.Bank)
+            .Include(x => x.User)
+            .ThenInclude(x => x.Card) ?? Enumerable.Empty<TBankAccount>().AsQueryable();
 
     public ExceptionModel Transfer(TUser? from, TUser? to, decimal transferAmount)
     {
@@ -157,7 +150,6 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
             return withdraw;
         return ExceptionModel.Ok;
     }
-
     public ExceptionModel Create(TBankAccount item)
     {
         if (item is null || Exist(x => x.ID == item.ID) || item.Bank is null)
@@ -165,24 +157,6 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
         _bankContext.BankAccounts.Add(item);
         _bankContext.SaveChanges();
         return ExceptionModel.Ok;
-    }
-
-    public IQueryable<TBankAccount> All =>
-        _applicationContext.BankAccounts
-        .Include(x => x.Bank)
-        .Include(x => x.User)
-        .ThenInclude(x => x.Card)
-        .AsNoTracking() ?? Enumerable.Empty<TBankAccount>().AsQueryable();
-
-    public IQueryable<TBankAccount> AllWithTracking =>
-        _applicationContext.BankAccounts
-        .Include(x => x.Bank)
-        .Include(x => x.User)
-        .ThenInclude(x => x.Card) ?? Enumerable.Empty<TBankAccount>().AsQueryable();
-
-    public TBankAccount Get(Expression<Func<TBankAccount, bool>> predicate)
-    {
-        return All.FirstOrDefault(predicate) ?? (TBankAccount)BankAccount.Default;
     }
 
     /// <summary>
@@ -214,12 +188,27 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
         _applicationContext.SaveChanges();
         return ExceptionModel.Ok;
     }
-
+    
+    public TBankAccount Get(Expression<Func<TBankAccount, bool>> predicate)
+    {
+        return All.FirstOrDefault(predicate) ?? (TBankAccount)BankAccount.Default;
+    }
+    
+    public TBankAccount GetWithTracking(Expression<Func<TBankAccount, bool>> predicate)
+    {
+        return AllWithTracking.FirstOrDefault(predicate) ?? (TBankAccount)BankAccount.Default;
+    }
+    
     public bool Exist(Expression<Func<TBankAccount, bool>> predicate)
     {
         return All.Any(predicate);
     }
 
+    public bool ExistWithTracking(Expression<Func<TBankAccount, bool>> predicate)
+    {
+        return AllWithTracking.Any(predicate);
+    }
+    
     public bool FitsConditions(TBankAccount? item)
     {
         return item is not null && Exist(x => x.ID == item.ID) && item.Bank is not null;
@@ -236,28 +225,39 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
         if (!Exist(x => x.ID == item.ID))
             throw new Exception($"Doesn't exist bank with id {{{item.ID}}}");
     }
-
-    private bool AnotherBankTransactionOperation(TUser from, TUser to)
-    {
-        return from.Card.BankAccount.Bank != to.Card.BankAccount.Bank;
-    }
-
+    
     private void SetBankServicesOptions()
     {
         BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.BankContext = _bankContext;
         BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ApplicationContext = _applicationContext;
     }
 
-    public TBankAccount GetWithTracking(Expression<Func<TBankAccount, bool>> predicate)
+    private bool AnotherBankTransactionOperation(TUser from, TUser to)
     {
-        return AllWithTracking.FirstOrDefault(predicate);
+        return from.Card.BankAccount.Bank != to.Card.BankAccount.Bank;
     }
 
-    public bool ExistWithTracking(Expression<Func<TBankAccount, bool>> predicate)
+    // Public implementation of Dispose pattern callable by consumers.
+    public void Dispose()
     {
-        return AllWithTracking.Any(predicate);
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
 
+    // Protected implementation of Dispose pattern.
+    private void Dispose(bool disposing)
+    {
+        if (_disposedValue)
+            return;
+        if (disposing)
+        {
+            _bankContext.Dispose();
+            _bankRepository.Dispose();
+            _applicationContext.Dispose();
+        }
+        _disposedValue = true;
+    }
+    
     ~BankAccountRepository()
     {
         Dispose(false);

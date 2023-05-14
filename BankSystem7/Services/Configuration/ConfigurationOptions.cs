@@ -2,7 +2,7 @@
 
 namespace BankSystem7.Services.Configuration;
 
-public sealed class ConfigurationOptions
+public class ConfigurationOptions
 {
     public bool EnsureDeleted { get; set; }
     public bool EnsureCreated { get; set; } = true;
@@ -16,5 +16,5 @@ public sealed class ConfigurationOptions
 
     public OperationServiceOptions? OperationOptions { get; set; }
 
-    public DbContext[]? Contexts { get; set; }
+    public Dictionary<DbContext, ModelConfiguration?>? Contexts { get; set; }
 }
