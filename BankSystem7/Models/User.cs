@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BankSystem7.Models;
 
+[Table("Users")]
 public class User
 {
     [NotMapped]
@@ -62,6 +63,7 @@ public enum ExceptionModel
     OperationFailed,
     OperationNotExist,
     EntityNotExist,
+    NotFitsConditions,
     IsDefaultValue,
     ThrewException,
 }

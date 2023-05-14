@@ -6,7 +6,7 @@ using MongoDB.Driver;
 
 namespace BankSystem7.AppContext;
 
-internal sealed class BankContext<TUser, TCard, TBankAccount, TBank, TCredit> : GenericDbContext<TUser, TCard, TBankAccount, TBank, TCredit>
+internal sealed class BankContext<TUser, TCard, TBankAccount, TBank, TCredit> : GenericDbContext
     where TUser : User
     where TCard : Card
     where TBankAccount : BankAccount
@@ -22,7 +22,7 @@ internal sealed class BankContext<TUser, TCard, TBankAccount, TBank, TCredit> : 
 
     public BankContext(string connection) : base(connection)
     {
-        ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>.SetConnection(connection);
+        ServicesSettings.SetConnection(connection);
         _operationService = new OperationService<Operation>(ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>.Options.LoggerOptions?.OperationServiceOptions?.DatabaseName ?? "CabManagementSystemReborn");
     }
 

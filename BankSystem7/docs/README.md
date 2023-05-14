@@ -1,11 +1,11 @@
 # Bank system 7
 This library provides opportunities for using likeness of bank system. You can handle not only users but also other models like banks, cards and etc.
 
-### Updates in version 0.4.2
-- Added implementation of interface IReaderServiceWithTracking to CardRepository, CreditRepository and UserRepository.
-- Added possibility that lies in needlessness to explicity disable logger.
-- Added new method overload for IServiceCollection extension.
-- Added overriding base methods for all models.
+### Updates in version 0.4.9
+- Fixed a bug with the configuration of several models. In older versions, not all model configurations were applied, and therefore, if you passed more than 1 ModelConfiguration object to the Contexts property in the ConfigurationOptions class, you could get bad model configurations in that not all models were configured correctly.
+- Moved settings from BankServiceOptions and ServiceConfiguration to ServicesSettings. It includes EnsureCreated, EnsureDeleted, Ensured, InitializeAccess, Connection and method SetConnection.
+- Changed class UpdateOptions to non-generic class.
+- Removed generic types from OperationRepository class.
 ****
 # Documentation
 
@@ -18,9 +18,13 @@ This library provides opportunities for using likeness of bank system. You can h
 5. Folder **Repositories** is folder with all business logic of project. Only there simple developer has access.
 
 ## How to interact with library?
-The library provides ways to pass and use own models. For example, You can inherit Your class from base class User and pass it as type to initialized instance of `ServiceConfiguration` or `ServiceConfigurationMiddleware`
+The library provides ways to pass and use own models. For example, You can inherit Your class from base class User and pass it as type to initialized instance of `ServiceConfiguration`
 and use own model.
-Developer can interact with library by following next steps:
+Developer can interact with library with:
+1. `ServiceConfiguration` class.
+2. `builder.Services.AddNationBankSystem<...>()` service in ASP.NET.
+
+and by following next steps:
 1. create instance of class `ServiceConfiguration` and pass as parameters class `ConfigurationOptions` with own settings.
 2. interact with repositories throughout public properties of instanced class `ServiceConfiguration`
 
@@ -35,12 +39,12 @@ New feature for library is adding services to internal DI in ASP.Net application
                o.DatabaseName = "Test";
                o.OperationOptions = new OperationServiceOptions()
                {
-                  DatabaseName = "Test",
+                    DatabaseName = "Test",
                };
-               o.LoggerOptions = new LoggerOptions()
+               // here we add application context classes with class that inherit ModelConfiguration
+               o.Contexts = new Dictionary<DbContext, ModelConfiguration?>
                {
-                  // In the example we aren't using logger
-                  IsEnabled = false,
+                    { new ApplicationContext(), new ModelConfigurationTest() },
                };
          });
          //or
@@ -51,16 +55,18 @@ New feature for library is adding services to internal DI in ASP.Net application
             DatabaseName = "Test",
             OperationOptions = new OperationServiceOptions()
             {
-               DatabaseName = "Test",
+                DatabaseName = "Test",
             },
-            LoggerOptions = new LoggerOptions()
+            // here we add application context classes with class that inherit ModelConfiguration
+            Contexts = new Dictionary<DbContext, ModelConfiguration?>
             {
-               IsEnabled = false,
-            },
+                { new ApplicationContext(), new ModelConfigurationTest() },
+            };
          });
 But use only one of the above approaches to use service.
+Now You can don't specify LoggerOptions because by default logger is disabled.
 
-2. in Your controller
+1. in Your controller
 
         private readonly IServiceConfiguration<User, Card, BankAccount, Bank, Credit> _service;
 

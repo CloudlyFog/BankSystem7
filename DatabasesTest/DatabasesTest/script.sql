@@ -9,8 +9,8 @@ use Test
 
 
 
-select * from Users
-select * from Cards
-select * from BankAccounts
-select * from Banks
-select * from Credits
+select * from [User]
+select * from [Card]
+select * from [BankAccount]
+select * from [Bank]
+select * from [Credit]

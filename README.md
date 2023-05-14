@@ -1,11 +1,8 @@
 # Bank system 7
 This library provides opportunities for using likeness of bank system. You can handle not only users but also other models like banks, cards and etc.
 
-### Updates in version 0.4.2
-- Added implementation of interface IReaderServiceWithTracking to CardRepository, CreditRepository and UserRepository.
-- Added possibility that lies in neednessless to explicity disable logger.
-- Added new method overload for IServiceCollection extension.
-- Added overriding base methods for all models.
+### Updates in version 0.4.8
+- Added OptionsUpdater that lets update options special for service.
 ****
 # Documentation
 
@@ -18,9 +15,13 @@ This library provides opportunities for using likeness of bank system. You can h
 5. Folder **Repositories** is folder with all business logic of project. Only there simple developer has access.
 
 ## How to interact with library?
-The library provides ways to pass and use own models. For example, You can inherit Your class from base class User and pass it as type to initialized instance of `ServiceConfiguration` or `ServiceConfigurationMiddleware`
+The library provides ways to pass and use own models. For example, You can inherit Your class from base class User and pass it as type to initialized instance of `ServiceConfiguration`
 and use own model.
-Developer can interact with library by following next steps:
+Developer can interact with library with:
+1. `ServiceConfiguration` class.
+2. `builder.Services.AddNationBankSystem<...>()` service in ASP.NET.
+
+and by following next steps:
 1. create instance of class `ServiceConfiguration` and pass as parameters class `ConfigurationOptions` with own settings.
 2. interact with repositories throughout public properties of instanced class `ServiceConfiguration`
 
@@ -35,12 +36,12 @@ New feature for library is adding services to internal DI in ASP.Net application
                o.DatabaseName = "Test";
                o.OperationOptions = new OperationServiceOptions()
                {
-                  DatabaseName = "Test",
+                    DatabaseName = "Test",
                };
-               o.LoggerOptions = new LoggerOptions()
+               // here we add application context classes with class that inherit ModelConfiguration
+               o.Contexts = new Dictionary<DbContext, ModelConfiguration?>
                {
-                  // In the example we aren't using logger
-                  IsEnabled = false,
+                    { new ApplicationContext(), new ModelConfigurationTest() },
                };
          });
          //or
@@ -51,16 +52,18 @@ New feature for library is adding services to internal DI in ASP.Net application
             DatabaseName = "Test",
             OperationOptions = new OperationServiceOptions()
             {
-               DatabaseName = "Test",
+                DatabaseName = "Test",
             },
-            LoggerOptions = new LoggerOptions()
+            // here we add application context classes with class that inherit ModelConfiguration
+            Contexts = new Dictionary<DbContext, ModelConfiguration?>
             {
-               IsEnabled = false,
-            },
+                { new ApplicationContext(), new ModelConfigurationTest() },
+            };
          });
 But use only one of the above approaches to use service.
+Now You can don't specify LoggerOptions because by default logger is disabled.
 
-2. in Your controller
+1. in Your controller
 
         private readonly IServiceConfiguration<User, Card, BankAccount, Bank, Credit> _service;
 
@@ -135,46 +138,46 @@ Here located services for configuring library.
 ### Interfaces (and abstract classes)
 Here located interfaces which describes behavior of inherited repo-classes.
 1. Interface `IRepository<T> : IReaderService<T>, IWriterService<T>, IDisposable where T : class` - interface for implement standard library logic.
-      - `bool FitsConditions(T? item);` - implements logic for checking on conditions true of passed entity.
+   - `bool FitsConditions(T? item);` - implements logic for checking on conditions true of passed entity.
 
 2. **Interface** `IReaderService<T> where T : class` - interface for implement reading data from database.
 
    Methods
-      - `T Get(Expression<Func<T, bool>> predicate);` - implements getting an object from database with predicate.
-      - `bool Exist(Expression<Func<T, bool>> predicate);` - implements checking exist object with in database predicate.
+   - `T Get(Expression<Func<T, bool>> predicate);` - implements getting an object from database with predicate.
+   - `bool Exist(Expression<Func<T, bool>> predicate);` - implements checking exist object with in database predicate.
 
    Properties
-      - `IQueryable<T> All {  get; }` - implements getting a sequence of the objects from database.
+   - `IQueryable<T> All {  get; }` - implements getting a sequence of the objects from database.
 
 3. **Interface** `IReaderServiceWithTracking<T> where T : class` - interface for implement reading data from database with another type of parameters.
 
    Methods
-      - `T GetWithTracking(Expression<Expression<Func<T, bool>>> predicate);` - implements getting an object from database with predicate.
-      - `bool ExistWithTracking(Expression<Expression<Func<T, bool>>> predicate);` - implements checking exist object with in database predicate.
-   Properties
-      - `IQueryable<T> AllWithTracking {  get; }` - implements getting a sequence of the objects from database.
+   - `T GetWithTracking(Expression<Expression<Func<T, bool>>> predicate);` - implements getting an object from database with predicate.
+   - `bool ExistWithTracking(Expression<Expression<Func<T, bool>>> predicate);` - implements checking exist object with in database predicate.
+     Properties
+   - `IQueryable<T> AllWithTracking {  get; }` - implements getting a sequence of the objects from database.
 
 4. **Interface** `IWriterService<in T> where T : class` - interface for implement writing, updating and deleting data in database
 
    Methods
-      - `ExceptionModel  Create(T item);` - implements adding item in database.
-      - `ExceptionModel  Update(T item);` - implements updating item in database.
-      - `ExceptionModel  Delete(T item);` - implements deleting item from database.
+   - `ExceptionModel  Create(T item);` - implements adding item in database.
+   - `ExceptionModel  Update(T item);` - implements updating item in database.
+   - `ExceptionModel  Delete(T item);` - implements deleting item from database.
 
 5. **Interface** `ILogger` - interface that provides standard set for logging
 
    Methods
-      - `ExceptionModel Log(Report report);` - implements logging report in database.
-      - `ExceptionModel Log(IEnumerable<Report> reports);` - implements logging collection of reports in database.
+   - `ExceptionModel Log(Report report);` - implements logging report in database.
+   - `ExceptionModel Log(IEnumerable<Report> reports);` - implements logging collection of reports in database.
 
    Properties
-      - `public bool IsReused { get; set; }` - defines possibility use already initialized logger.
-      - `public LoggerOptions LoggerOptions { get; set; }` - defines options for logger configuration.
+   - `public bool IsReused { get; set; }` - defines possibility use already initialized logger.
+   - `public LoggerOptions LoggerOptions { get; set; }` - defines options for logger configuration.
 
 6. **Abstract class** `LoggerExecutor<TOperationType> where TOperationType : Enum` - simple implementation of service for added reports to logger queue
 
    Methods
-      - `virtual void Log(ExceptionModel exceptionModel, string methodName, string className, TOperationType operationType, ICollection<GeneralReport<TOperationType>> reports)` - implements standard logic of inserting log data to logger queue. Can be overrided.
+   - `virtual void Log(ExceptionModel exceptionModel, string methodName, string className, TOperationType operationType, ICollection<GeneralReport<TOperationType>> reports)` - implements standard logic of inserting log data to logger queue. Can be overrided.
 
 ### Repositories
 Repositories are implementation of various interfaces and working with context classes for interact with database.
