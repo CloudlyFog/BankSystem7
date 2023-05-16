@@ -2,8 +2,7 @@
 
 public class ServicesSettings
 {
-    public static string DefaultConnection { get; } =
-        @"Server=localhost\\SQLEXPRESS;Data Source=maxim;Initial Catalog=Test;
+    public const string DefaultConnection = @"Server=localhost\\SQLEXPRESS;Data Source=maxim;Initial Catalog=Test;
             Integrated Security=True;Persist Security Info=False;Pooling=False;
             MultipleActiveResultSets=False; Encrypt=False;TrustServerCertificate=False";
 
