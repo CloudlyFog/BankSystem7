@@ -85,6 +85,7 @@ public class GenericDbContext : DbContext
     /// Method ensures that passed entities won't be changed during call method SaveChanges()
     /// </summary>
     /// <param name="entities">entities that shouldn't be changed</param>
+    /// <param name="context">specifies what's context will handle operation</param>
     public void AvoidChanges(object[]? entities, DbContext context)
     {
         if (entities is null || entities.Length == 0)
