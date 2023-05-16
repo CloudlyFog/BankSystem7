@@ -1,10 +1,10 @@
 ﻿using BankSystem7.AppContext;
 using BankSystem7.Models;
+using BankSystem7.Services.Configuration;
 using BankSystem7.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 using System.Linq.Expressions;
-using BankSystem7.Services.Configuration;
 
 namespace BankSystem7.Services.Repositories;
 
@@ -150,6 +150,7 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
             return withdraw;
         return ExceptionModel.Ok;
     }
+
     public ExceptionModel Create(TBankAccount item)
     {
         if (item is null || Exist(x => x.ID == item.ID) || item.Bank is null)
@@ -188,17 +189,17 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
         _applicationContext.SaveChanges();
         return ExceptionModel.Ok;
     }
-    
+
     public TBankAccount Get(Expression<Func<TBankAccount, bool>> predicate)
     {
         return All.FirstOrDefault(predicate) ?? (TBankAccount)BankAccount.Default;
     }
-    
+
     public TBankAccount GetWithTracking(Expression<Func<TBankAccount, bool>> predicate)
     {
         return AllWithTracking.FirstOrDefault(predicate) ?? (TBankAccount)BankAccount.Default;
     }
-    
+
     public bool Exist(Expression<Func<TBankAccount, bool>> predicate)
     {
         return All.Any(predicate);
@@ -208,7 +209,7 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
     {
         return AllWithTracking.Any(predicate);
     }
-    
+
     public bool FitsConditions(TBankAccount? item)
     {
         return item is not null && Exist(x => x.ID == item.ID) && item.Bank is not null;
@@ -225,7 +226,7 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
         if (!Exist(x => x.ID == item.ID))
             throw new Exception($"Doesn't exist bank with id {{{item.ID}}}");
     }
-    
+
     private void SetBankServicesOptions()
     {
         BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.BankContext = _bankContext;
@@ -257,7 +258,7 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
         }
         _disposedValue = true;
     }
-    
+
     ~BankAccountRepository()
     {
         Dispose(false);

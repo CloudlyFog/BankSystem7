@@ -1,6 +1,4 @@
-﻿using System.Net.Mime;
-using BankSystem7.Models;
-using BankSystem7.Services.Configuration;
+﻿using BankSystem7.Services.Configuration;
 using Microsoft.EntityFrameworkCore;
 
 namespace BankSystem7.Services.Interfaces;
@@ -13,7 +11,7 @@ public abstract class DbContextInitializer
         {
             if (Equals(context.Key, contexts.Keys.Last()))
                 ModelCreatingOptions.LastModelConfiguration = true;
-            context.Key.GetType()?.GetConstructor(new [] { context.Value.GetType() })?.Invoke(new object[] { context.Value });
+            context.Key.GetType()?.GetConstructor(new[] { context.Value.GetType() })?.Invoke(new object[] { context.Value });
         }
     }
 }

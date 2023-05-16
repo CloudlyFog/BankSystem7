@@ -1,8 +1,5 @@
-﻿using BankSystem7.Models;
-using BankSystem7.Services;
-using BankSystem7.Services.Configuration;
+﻿using BankSystem7.Services.Configuration;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace BankSystem7.AppContext;
 
@@ -68,7 +65,7 @@ public class GenericDbContext : DbContext
         ServicesSettings.Ensured = true;
         ServicesSettings.InitializeAccess = false;
     }
-    
+
     /// <summary>
     /// Method updates states of entity. You should use this method with method <see cref="AvoidChanges"/> for the best state tracking of entities
     /// </summary>
@@ -85,14 +82,14 @@ public class GenericDbContext : DbContext
     }
 
     /// <summary>
-    /// Method ensures that passed entities won't be changed during call method SaveChanges() 
+    /// Method ensures that passed entities won't be changed during call method SaveChanges()
     /// </summary>
     /// <param name="entities">entities that shouldn't be changed</param>
     public void AvoidChanges(object[]? entities, DbContext context)
     {
         if (entities is null || entities.Length == 0)
             return;
-        
+
         foreach (var entity in entities)
         {
             if (entity is not null)

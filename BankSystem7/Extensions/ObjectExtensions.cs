@@ -25,7 +25,7 @@ namespace BankSystem7.Extensions
             var sb = new StringBuilder();
             foreach (var prop in item.GetType().GetProperties())
             {
-                if (prop.PropertyType.IsClass 
+                if (prop.PropertyType.IsClass
                         && !prop.PropertyType.FullName.StartsWith("System."))
                     continue;
                 sb.AppendLine($"{prop.Name}: {prop.GetValue(item)}");

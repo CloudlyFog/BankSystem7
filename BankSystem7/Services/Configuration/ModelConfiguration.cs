@@ -8,14 +8,14 @@ public class ModelConfiguration
     public ModelConfiguration()
     {
     }
+
     public ModelConfiguration(bool initializeAccess)
     {
         InitializeAccess = initializeAccess;
     }
-    
-    
+
     public bool InitializeAccess { get; }
-    
+
     public virtual void Invoke(ModelBuilder modelBuilder, List<ModelConfiguration>? modelConfigurations = null)
     {
         ConfigureRelationships(modelBuilder);
@@ -23,7 +23,7 @@ public class ModelConfiguration
 
         modelBuilder.Entity<User>().Ignore(user => user.Exception);
         modelBuilder.Entity<User>().HasIndex(x => x.ID);
-        
+
         InitializeModelConfigurations(modelBuilder, modelConfigurations);
     }
 
@@ -34,7 +34,7 @@ public class ModelConfiguration
         foreach (var modelConfiguration in modelConfigurations)
         {
             var method = modelConfiguration.GetType()?.GetMethod(nameof(Invoke));
-            modelConfiguration.GetType()?.GetMethod(nameof(Invoke))?.Invoke(modelConfiguration, new object?[]{ modelBuilder, new List<ModelConfiguration>() });
+            modelConfiguration.GetType()?.GetMethod(nameof(Invoke))?.Invoke(modelConfiguration, new object?[] { modelBuilder, new List<ModelConfiguration>() });
         }
     }
 

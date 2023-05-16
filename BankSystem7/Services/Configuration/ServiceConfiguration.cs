@@ -1,8 +1,6 @@
-﻿using BankSystem7.AppContext;
-using BankSystem7.Models;
+﻿using BankSystem7.Models;
 using BankSystem7.Services.Interfaces;
 using BankSystem7.Services.Repositories;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace BankSystem7.Services.Configuration;
@@ -30,7 +28,7 @@ public class ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit> : 
         }
         OperationRepository = new OperationRepository(Options.OperationOptions);
     }
-    
+
     public BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit>? BankAccountRepository { get; }
     public BankRepository<TUser, TCard, TBankAccount, TBank, TCredit>? BankRepository { get; }
     public CardRepository<TUser, TCard, TBankAccount, TBank, TCredit>? CardRepository { get; }

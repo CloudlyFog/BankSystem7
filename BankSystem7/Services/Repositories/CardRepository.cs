@@ -1,9 +1,9 @@
 ﻿using BankSystem7.AppContext;
 using BankSystem7.Models;
+using BankSystem7.Services.Configuration;
 using BankSystem7.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using BankSystem7.Services.Configuration;
 
 namespace BankSystem7.Services.Repositories;
 
@@ -53,7 +53,6 @@ public sealed class CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
             .Include(x => x.BankAccount)
             .ThenInclude(x => x.Bank) ?? Enumerable.Empty<TCard>().AsQueryable();
 
-
     /// <summary>
     /// use this method only for creating new card.
     /// if you'll try to use this method in designing card you'll get big bug which 'll force you program work wrong.
@@ -81,7 +80,7 @@ public sealed class CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         _applicationContext.SaveChanges();
         return ExceptionModel.Ok;
     }
-    
+
     public ExceptionModel Update(TCard item)
     {
         if (!FitsConditions(item))

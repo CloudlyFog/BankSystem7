@@ -2,7 +2,7 @@
 This library provides opportunities for using likeness of bank system. You can handle not only users but also other models like banks, cards and etc.
 
 ### Updates in version 0.5.0
-- 
+-
 ****
 # Documentation
 
