@@ -11,7 +11,7 @@ public class ConfigurationOptions
     /// <summary>
     /// Manages database deletion during initializing library
     /// </summary>
-    public bool EnsureDeleted { get; set; }
+    public bool EnsureDeleted { get; init; }
     
     /// <summary>
     /// Manages database creation during initializing library 

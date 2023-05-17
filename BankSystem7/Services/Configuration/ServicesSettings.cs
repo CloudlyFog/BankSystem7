@@ -1,6 +1,6 @@
 ﻿namespace BankSystem7.Services.Configuration;
 
-public class ServicesSettings
+internal static class ServicesSettings
 {
     public const string DefaultConnection = @"Server=localhost\\SQLEXPRESS;Data Source=maxim;Initial Catalog=Test;
             Integrated Security=True;Persist Security Info=False;Pooling=False;
