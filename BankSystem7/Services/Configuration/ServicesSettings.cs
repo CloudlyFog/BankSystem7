@@ -102,7 +102,9 @@ internal static class ServicesSettings
             }
             case DatabaseManagementSystemType.MySql:
             {
-                Connection = $"";
+                var mysqlCredentials = (MySqlCredentials)credentials;
+                var mysqlConnectionConfiguration = (MySqlConnectionConfiguration)connectionConfiguration;
+                Connection = $"Server={mysqlConnectionConfiguration.Server};Port={mysqlConnectionConfiguration.Port};Database={mysqlConnectionConfiguration.DatabaseName};Uid={mysqlCredentials.Username};Pwd={mysqlCredentials.Password};SslMode={mysqlConnectionConfiguration.SslMode};";
                 break;
             }
             default:
