@@ -97,8 +97,6 @@ internal static class ServicesSettings
                 var npgsqlCredentials = (NpgsqlCredentials)credentials;
                 var npgsqlConnectionConfiguration = (NpgsqlConnectionConfiguration)connectionConfiguration;
                 Connection =
-                    $"postgres://{npgsqlCredentials.Username}:{npgsqlCredentials.Password}@{npgsqlConnectionConfiguration.Host}:{npgsqlConnectionConfiguration.Port}/{npgsqlConnectionConfiguration.DatabaseName}";
-                Connection =
                     $"Server={npgsqlConnectionConfiguration.Host};Port={npgsqlConnectionConfiguration.Port};Database={npgsqlConnectionConfiguration.DatabaseName};User Id={npgsqlCredentials.Username};Password={npgsqlCredentials.Password}";
                 break;
             }
