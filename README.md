@@ -2,7 +2,9 @@
 This library provides opportunities for using likeness of bank system. You can handle not only users but also other models like banks, cards and etc.
 
 ### Updates in version 0.5.0
-- 
+- Added support for PostgreSQL.
+- Added comments to code.
+- Changed visibility of ServicesSettings class to internal.
 ****
 # Documentation
 
@@ -34,9 +36,20 @@ New feature for library is adding services to internal DI in ASP.Net application
 
          builder.Services.AddNationBankSystem<User, Card, BankAccount, Bank, Credit>(o =>
          {
-               o.EnsureCreated = false;
-               o.EnsureDeleted = false;
-               o.DatabaseName = "Test";
+               o.ConnectionConfiguration = new NpgsqlConnectionConfiguration()
+               {
+                   EnsureCreated = false,
+                   EnsureDeleted = false,
+                   DatabaseName = "Test",
+                   DatabaseManagementSystemType = DatabaseManagementSystemType.PostgreSql,
+                   Host = "localhost",
+                   Port = "5432",
+               },
+               o.Credentials = new NpgsqlCredentials()
+               {
+                   Username = "postgres",
+                   Password = "secret"
+               },
                o.OperationOptions = new OperationServiceOptions()
                {
                     DatabaseName = "Test",
@@ -51,9 +64,20 @@ New feature for library is adding services to internal DI in ASP.Net application
          //or
          builder.Services.AddNationBankSystem<User, Card, BankAccount, Bank, Credit>(new ConfigurationOptions()
          {
-            EnsureCreated = false,
-            EnsureDeleted = false,
-            DatabaseName = "Test",
+            ConnectionConfiguration = new NpgsqlConnectionConfiguration()
+            {
+                EnsureCreated = false,
+                EnsureDeleted = false,
+                DatabaseName = "Test",
+                DatabaseManagementSystemType = DatabaseManagementSystemType.PostgreSql,
+                Host = "localhost",
+                Port = "5432",
+            },
+            Credentials = new NpgsqlCredentials()
+            {
+                Username = "postgres",
+                Password = "secret"
+            },
             OperationOptions = new OperationServiceOptions()
             {
                 DatabaseName = "Test",

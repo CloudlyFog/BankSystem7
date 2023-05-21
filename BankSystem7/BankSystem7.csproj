@@ -14,6 +14,8 @@
         <PackageTags>bank;account;banksystem;credit;transfer;money;bankaccount</PackageTags>
         <RepositoryUrl>https://github.com/CloudlyFog/BankSystem7</RepositoryUrl>
         <AnalysisLevel>none</AnalysisLevel>
+        <PackageReleaseNotes>Check README file before update to newer version.</PackageReleaseNotes>
+        <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
