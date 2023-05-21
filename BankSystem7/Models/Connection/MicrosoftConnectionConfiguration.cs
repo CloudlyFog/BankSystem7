@@ -11,10 +11,10 @@ public class MicrosoftConnectionConfiguration : ConnectionConfigurationBase
     }
 
     public bool Pooling { get; set; } = false;
-    public bool Encrypt { get; set; } = false;
+    public bool Encrypt { get; set; } = true;
     public string? Server { get; set; } = ServicesSettings.DefaultServer;
     public string? DataSource { get; set; } = ServicesSettings.DefaultDataSource;
-    public bool IntegratedSecurity { get; set; } = true;
+    public bool IntegratedSecurity { get; set; } = false;
     public bool PersistSecurityInfo { get; set; } = false;
-    public bool TrustServerCertificate { get; set; } = false;
+    public bool TrustServerCertificate { get; set; } = true;
 }
