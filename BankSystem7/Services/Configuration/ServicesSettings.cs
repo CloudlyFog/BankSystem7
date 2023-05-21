@@ -83,9 +83,9 @@ internal static class ServicesSettings
                 var microsoftConnectionConfiguration = (MicrosoftConnectionConfiguration)connectionConfiguration;
                 Connection =
                     @$"Server={microsoftConnectionConfiguration.Server};Data Source={microsoftConnectionConfiguration.DataSource};
-                        InitialCatalog={microsoftConnectionConfiguration.DatabaseName};Integrated Security={microsoftConnectionConfiguration.IntegratedSecurity}
-                        Persist Security Info={microsoftConnectionConfiguration.PersistSecurityInfo};Pooling={microsoftConnectionConfiguration.Pooling}
-                        Encrypt={microsoftConnectionConfiguration.Encrypt};TrustServerCertificate={microsoftConnectionConfiguration.TrustServerCertificate}
+                        Initial Catalog={microsoftConnectionConfiguration.DatabaseName};Integrated Security={microsoftConnectionConfiguration.IntegratedSecurity};
+                        Persist Security Info={microsoftConnectionConfiguration.PersistSecurityInfo};Pooling={microsoftConnectionConfiguration.Pooling};
+                        Encrypt={microsoftConnectionConfiguration.Encrypt};TrustServerCertificate={microsoftConnectionConfiguration.TrustServerCertificate};
                         User id={microsoftCredentials.Username};Password={microsoftCredentials.Password}";
                 break;
             }
