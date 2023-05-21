@@ -9,6 +9,14 @@ public class NpgsqlConnectionConfiguration : ConnectionConfigurationBase
     {
         Credentials = new NpgsqlCredentials();
     }
+    
+    /// <summary>
+    /// Takes name of host for establishing connection with database
+    /// </summary>
     public string? Host { get; set; } = ServicesSettings.DefaultHost;
+    
+    /// <summary>
+    /// Takes port for establishing connection with database
+    /// </summary>
     public string? Port { get; set; } = ServicesSettings.DefaultPort;
 }

@@ -14,7 +14,7 @@ internal static class ServicesSettings
     public const string DefaultDatabaseName = "Test";
     public const string DefaultHost = "localhost";
     public const string DefaultPort = "5432";
-    public const string DefaultServer = @"localhost\\SQLEXPRESS";
+    public const string DefaultServer = "maxim";
     public static bool EnsureDeleted { get; set; }
     public static bool EnsureCreated { get; set; } = true;
     public static string? Connection { get; private set; }
@@ -84,8 +84,8 @@ internal static class ServicesSettings
                 var microsoftConnectionConfiguration = (MicrosoftConnectionConfiguration)connectionConfiguration;
                 var connection = new StringBuilder();
                 connection.Append(
-                    $"Server={microsoftConnectionConfiguration.DataSource};Trusted_Connection={microsoftConnectionConfiguration.TrustedConnection};");
-                connection.Append($"Database={microsoftConnectionConfiguration.DatabaseName};Integrated Security={microsoftConnectionConfiguration.IntegratedSecurity};");
+                    $"Server={microsoftConnectionConfiguration.Server};Database={microsoftConnectionConfiguration.DatabaseName};");
+                connection.Append($"Integrated Security={microsoftConnectionConfiguration.IntegratedSecurity};");
                 connection.Append($"Persist Security Info={microsoftConnectionConfiguration.PersistSecurityInfo};Pooling={microsoftConnectionConfiguration.Pooling};");
                 connection.Append($"Encrypt={microsoftConnectionConfiguration.Encrypt};TrustServerCertificate={microsoftConnectionConfiguration.TrustServerCertificate};");
                 connection.Append($"User Id={microsoftCredentials.Username};Password={microsoftCredentials.Password};");
