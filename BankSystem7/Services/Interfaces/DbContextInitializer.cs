@@ -20,7 +20,7 @@ public abstract class OptionsUpdater : DbContextInitializer
 {
     protected virtual void UpdateOptions(ConfigurationOptions options)
     {
-        UpdateEnsureOperations(options.EnsureCreated, options.EnsureDeleted);
+        UpdateEnsureOperations(options.ConnectionConfiguration.EnsureCreated, options.ConnectionConfiguration.EnsureDeleted);
         UpdateOnModelCreating(options.Contexts);
     }
 
