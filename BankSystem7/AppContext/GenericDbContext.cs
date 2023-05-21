@@ -1,5 +1,7 @@
 ﻿using BankSystem7.Services.Configuration;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 namespace BankSystem7.AppContext;
 
@@ -38,8 +40,7 @@ public class GenericDbContext : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.EnableSensitiveDataLogging();
-        optionsBuilder
-            .UseSqlServer(ServicesSettings.Connection);
+        SetDatabaseManagementSystemType(optionsBuilder, ServicesSettings.DatabaseManagementSystemType);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -64,6 +65,24 @@ public class GenericDbContext : DbContext
             Database.EnsureCreated();
         ServicesSettings.Ensured = true;
         ServicesSettings.InitializeAccess = false;
+    }
+
+    private void SetDatabaseManagementSystemType(DbContextOptionsBuilder optionsBuilder, DatabaseManagementSystemType dbmsType)
+    {
+        switch (dbmsType)
+        {
+            case DatabaseManagementSystemType.MicrosoftSqlServer:
+                optionsBuilder.UseSqlServer(ServicesSettings.Connection);
+                break;
+            case DatabaseManagementSystemType.PostgreSql:
+                optionsBuilder.UseNpgsql(ServicesSettings.Connection);
+                break;
+            case DatabaseManagementSystemType.MySql:
+                optionsBuilder.UseMySQL(ServicesSettings.Connection);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(dbmsType), dbmsType, null);
+        }
     }
 
     /// <summary>
