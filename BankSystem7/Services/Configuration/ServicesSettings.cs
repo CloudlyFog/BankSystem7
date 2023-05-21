@@ -84,7 +84,7 @@ internal static class ServicesSettings
                 var microsoftConnectionConfiguration = (MicrosoftConnectionConfiguration)connectionConfiguration;
                 var connection = new StringBuilder();
                 connection.Append(
-                    $"Server={microsoftConnectionConfiguration.DataSource};");
+                    $"Server={microsoftConnectionConfiguration.DataSource};Trusted_Connection={microsoftConnectionConfiguration.TrustedConnection};");
                 connection.Append($"Database={microsoftConnectionConfiguration.DatabaseName};Integrated Security={microsoftConnectionConfiguration.IntegratedSecurity};");
                 connection.Append($"Persist Security Info={microsoftConnectionConfiguration.PersistSecurityInfo};Pooling={microsoftConnectionConfiguration.Pooling};");
                 connection.Append($"Encrypt={microsoftConnectionConfiguration.Encrypt};TrustServerCertificate={microsoftConnectionConfiguration.TrustServerCertificate};");

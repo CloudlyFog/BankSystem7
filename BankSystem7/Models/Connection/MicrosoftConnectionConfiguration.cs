@@ -17,4 +17,5 @@ public class MicrosoftConnectionConfiguration : ConnectionConfigurationBase
     public bool IntegratedSecurity { get; set; } = false;
     public bool PersistSecurityInfo { get; set; } = false;
     public bool TrustServerCertificate { get; set; } = true;
+    public bool TrustedConnection { get; set; } = false;
 }
