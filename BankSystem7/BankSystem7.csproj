@@ -16,6 +16,10 @@
         <AnalysisLevel>none</AnalysisLevel>
     </PropertyGroup>
 
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+      <WarningLevel>1</WarningLevel>
+    </PropertyGroup>
+
     <ItemGroup>
       <Compile Remove="Middleware\**" />
       <Compile Remove="Migrations\**" />
