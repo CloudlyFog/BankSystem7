@@ -1,4 +1,5 @@
-﻿using BankSystem7.Models.Connection;
+﻿using System.Text;
+using BankSystem7.Models.Connection;
 using BankSystem7.Models.Credentials;
 
 namespace BankSystem7.Services.Configuration;
@@ -13,7 +14,7 @@ internal static class ServicesSettings
     public const string DefaultDatabaseName = "Test";
     public const string DefaultHost = "localhost";
     public const string DefaultPort = "5432";
-    public const string DefaultServer = "localhost\\SQLEXPRESS";
+    public const string DefaultServer = @"localhost\\SQLEXPRESS";
     public static bool EnsureDeleted { get; set; }
     public static bool EnsureCreated { get; set; } = true;
     public static string? Connection { get; private set; }
@@ -81,12 +82,14 @@ internal static class ServicesSettings
             {
                 var microsoftCredentials = (MicrosoftCredentials)credentials;
                 var microsoftConnectionConfiguration = (MicrosoftConnectionConfiguration)connectionConfiguration;
-                Connection =
-                    @$"Server={microsoftConnectionConfiguration.Server};Data Source={microsoftConnectionConfiguration.DataSource};
-                        Initial Catalog={microsoftConnectionConfiguration.DatabaseName};Integrated Security={microsoftConnectionConfiguration.IntegratedSecurity};
-                        Persist Security Info={microsoftConnectionConfiguration.PersistSecurityInfo};Pooling={microsoftConnectionConfiguration.Pooling};
-                        Encrypt={microsoftConnectionConfiguration.Encrypt};TrustServerCertificate={microsoftConnectionConfiguration.TrustServerCertificate};
-                        User id={microsoftCredentials.Username};Password={microsoftCredentials.Password}";
+                var connection = new StringBuilder();
+                connection.Append(
+                    $"Server={microsoftConnectionConfiguration.DataSource};");
+                connection.Append($"Database={microsoftConnectionConfiguration.DatabaseName};Integrated Security={microsoftConnectionConfiguration.IntegratedSecurity};");
+                connection.Append($"Persist Security Info={microsoftConnectionConfiguration.PersistSecurityInfo};Pooling={microsoftConnectionConfiguration.Pooling};");
+                connection.Append($"Encrypt={microsoftConnectionConfiguration.Encrypt};TrustServerCertificate={microsoftConnectionConfiguration.TrustServerCertificate};");
+                connection.Append($"User Id={microsoftCredentials.Username};Password={microsoftCredentials.Password};");
+                Connection = connection.ToString();
                 break;
             }
             case DatabaseManagementSystemType.PostgreSql:
