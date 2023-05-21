@@ -1,7 +1,5 @@
 ﻿using BankSystem7.Services.Configuration;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Npgsql;
 
 namespace BankSystem7.AppContext;
 
@@ -72,13 +70,13 @@ public class GenericDbContext : DbContext
         switch (dbmsType)
         {
             case DatabaseManagementSystemType.MicrosoftSqlServer:
-                optionsBuilder.UseSqlServer(ServicesSettings.Connection);
+                optionsBuilder.UseSqlServer(ServicesSettings.Connection, o => o.CommandTimeout(20));
                 break;
             case DatabaseManagementSystemType.PostgreSql:
-                optionsBuilder.UseNpgsql(ServicesSettings.Connection);
+                optionsBuilder.UseNpgsql(ServicesSettings.Connection, o => o.CommandTimeout(20));
                 break;
             case DatabaseManagementSystemType.MySql:
-                optionsBuilder.UseMySQL(ServicesSettings.Connection);
+                optionsBuilder.UseMySQL(ServicesSettings.Connection, o => o.CommandTimeout(20));
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(dbmsType), dbmsType, null);
