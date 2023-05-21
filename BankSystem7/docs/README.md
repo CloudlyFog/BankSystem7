@@ -44,12 +44,12 @@ New feature for library is adding services to internal DI in ASP.Net application
                    DatabaseManagementSystemType = DatabaseManagementSystemType.PostgreSql,
                    Host = "localhost",
                    Port = "5432",
-               },
+               };
                o.Credentials = new NpgsqlCredentials()
                {
                    Username = "postgres",
                    Password = "secret"
-               },
+               };
                o.OperationOptions = new OperationServiceOptions()
                {
                     DatabaseName = "Test",
