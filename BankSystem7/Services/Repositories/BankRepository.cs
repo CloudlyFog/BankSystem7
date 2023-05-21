@@ -1,9 +1,9 @@
 ﻿using BankSystem7.AppContext;
 using BankSystem7.Models;
+using BankSystem7.Services.Configuration;
 using BankSystem7.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using BankSystem7.Services.Configuration;
 
 namespace BankSystem7.Services.Repositories;
 
@@ -37,7 +37,7 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         _applicationContext = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ApplicationContext ??
                               new ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>(connection);
     }
-    
+
     public IQueryable<TBank> All =>
         _applicationContext.Banks
             .Include(x => x.BankAccounts)
@@ -159,7 +159,7 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
     {
         return AllWithTracking.Any(predicate);
     }
-    
+
     public bool FitsConditions(TBank? item)
     {
         return item is not null && Exist(x => x.ID == item.ID);
@@ -192,7 +192,7 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         BankContext = null;
         _disposedValue = true;
     }
-    
+
     ~BankRepository()
     {
         Dispose(false);

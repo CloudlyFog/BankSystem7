@@ -28,7 +28,7 @@
     <ItemGroup>
         <None Include="docs/README.md" Pack="true" PackagePath="/" />
     </ItemGroup>
-    
+
     <ItemGroup>
       <PackageReference Include="Microsoft.AspNetCore.Cryptography.KeyDerivation" Version="8.0.0-preview.2.23153.2" />
       <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
@@ -46,5 +46,4 @@
       <PackageReference Include="System.Data.HashFunction.Interfaces" Version="2.0.0" />
       <PackageReference Include="System.Data.HashFunction.Jenkins" Version="2.0.0" />
     </ItemGroup>
-
 </Project>

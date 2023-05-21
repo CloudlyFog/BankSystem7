@@ -21,7 +21,6 @@ public interface IRepositoryAsync<T> : IReaderServiceAsync<T>, IWriterServiceAsy
 
 public interface IReaderService<T> where T : class
 {
-
     /// <summary>
     /// returns entity with specified predicate from database
     /// </summary>
@@ -113,6 +112,7 @@ public interface IWriterService<in T> where T : class
     /// <returns></returns>
     ExceptionModel Delete(T item);
 }
+
 public interface IWriterServiceAsync<in T> where T : class
 {
     /// <summary>

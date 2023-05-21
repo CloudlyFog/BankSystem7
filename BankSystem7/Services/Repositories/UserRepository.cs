@@ -1,9 +1,9 @@
 ﻿using BankSystem7.AppContext;
 using BankSystem7.Models;
+using BankSystem7.Services.Configuration;
 using BankSystem7.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using BankSystem7.Services.Configuration;
 
 namespace BankSystem7.Services.Repositories;
 
@@ -89,7 +89,7 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         await _applicationContext.SaveChangesAsync();
         return ExceptionModel.Ok;
     }
-    
+
     public ExceptionModel Update(TUser item)
     {
         if (!FitsConditions(item))

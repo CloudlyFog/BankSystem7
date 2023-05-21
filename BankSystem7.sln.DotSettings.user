@@ -1,2 +1,20 @@
 ﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
-	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=D_003A_005CStandart7_005CStandart7_005Cbin_005CRelease_005Cnet7_002E0_005CStandart7_002Edll/@EntryIndexedValue">True</s:Boolean></wpf:ResourceDictionary>
+	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=D_003A_005CStandart7_005CStandart7_005Cbin_005CRelease_005Cnet7_002E0_005CStandart7_002Edll/@EntryIndexedValue">True</s:Boolean>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=2db767b5_002Df53e_002D4295_002D9a93_002Ddfa215f1e676/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="Session" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;Or&gt;&#xD;
+    &lt;And&gt;&#xD;
+      &lt;TestAncestor&gt;&#xD;
+        &lt;TestId&gt;NUnit3x::038D4430-12CB-4339-9C57-FF145876D1E4::net7.0::TestBankSystem.Tests.SetupDatabase&lt;/TestId&gt;&#xD;
+      &lt;/TestAncestor&gt;&#xD;
+      &lt;Project Location="G:\TestBankSystem\TestBankSystem" Presentation="&amp;lt;TestBankSystem&amp;gt;" /&gt;&#xD;
+      &lt;Namespace&gt;TestBankSystem&lt;/Namespace&gt;&#xD;
+    &lt;/And&gt;&#xD;
+    &lt;And&gt;&#xD;
+      &lt;TestAncestor&gt;&#xD;
+        &lt;TestId&gt;NUnit3x::038D4430-12CB-4339-9C57-FF145876D1E4::net7.0::TestBankSystem.Tests.SetupDatabaseVersion2&lt;/TestId&gt;&#xD;
+      &lt;/TestAncestor&gt;&#xD;
+      &lt;Project Location="G:\TestBankSystem\TestBankSystem" Presentation="&amp;lt;TestBankSystem&amp;gt;" /&gt;&#xD;
+      &lt;Namespace&gt;TestBankSystem&lt;/Namespace&gt;&#xD;
+    &lt;/And&gt;&#xD;
+  &lt;/Or&gt;&#xD;
+&lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

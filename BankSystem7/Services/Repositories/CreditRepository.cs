@@ -1,10 +1,10 @@
 ﻿using BankSystem7.AppContext;
 using BankSystem7.Models;
+using BankSystem7.Services.Configuration;
 using BankSystem7.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 using System.Linq.Expressions;
-using BankSystem7.Services.Configuration;
 
 namespace BankSystem7.Services.Repositories;
 
@@ -43,7 +43,7 @@ public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>
         _applicationContext.Credits
             .Include(x => x.Bank)
             .Include(x => x.User) ?? Enumerable.Empty<TCredit>().AsQueryable();
-    
+
     /// <summary>
     /// gives to user credit with the definite amount of money
     /// adds to the table field with credit's data of user
@@ -124,6 +124,7 @@ public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>
 
         return ExceptionModel.Ok;
     }
+
     public ExceptionModel Create(TCredit item)
     {
         if (item is null)

@@ -18,9 +18,9 @@ public sealed class OperationRepository : LoggerExecutor<OperationType>, IReposi
     {
         _operationService = new OperationService<Operation>(options);
     }
-    
+
     public IQueryable<Operation> All => _operationService.Collection.Find(_ => true).ToList().AsQueryable();
-    
+
     public void Dispose()
     {
         _operationService = null;

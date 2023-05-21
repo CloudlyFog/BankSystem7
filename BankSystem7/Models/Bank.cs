@@ -190,14 +190,7 @@ public class BankAccount
     }
 }
 
-
 [Table("Cards")]
-/// <summary>
-/// Describes debit/credit card.
-/// Necessarily:
-/// 1) Check property <see cref="Exception"/> because it will changed in constructor if any condititon will violated
-/// 2) Set value for <see cref="CVV"/> and <see cref="Age"/>
-/// </summary>
 public class Card
 {
     public static readonly Card Default = new()
