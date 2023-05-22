@@ -76,42 +76,55 @@ internal static class ServicesSettings
     private static string GetConnectionByDbmsType(DatabaseManagementSystemType type,
         ConnectionConfigurationBase connectionConfiguration, CredentialsBase credentials)
     {
-        switch (type)
+        Connection = type switch
         {
-            case DatabaseManagementSystemType.MicrosoftSqlServer:
-            {
-                var microsoftCredentials = (MicrosoftCredentials)credentials;
-                var microsoftConnectionConfiguration = (MicrosoftConnectionConfiguration)connectionConfiguration;
-                var connection = new StringBuilder();
-                connection.Append(
-                    $"Server={microsoftConnectionConfiguration.Server};Database={microsoftConnectionConfiguration.DatabaseName};");
-                connection.Append($"Integrated Security={microsoftConnectionConfiguration.IntegratedSecurity};");
-                connection.Append($"Persist Security Info={microsoftConnectionConfiguration.PersistSecurityInfo};Pooling={microsoftConnectionConfiguration.Pooling};");
-                connection.Append($"Encrypt={microsoftConnectionConfiguration.Encrypt};TrustServerCertificate={microsoftConnectionConfiguration.TrustServerCertificate};");
-                connection.Append($"User Id={microsoftCredentials.Username};Password={microsoftCredentials.Password};");
-                Connection = connection.ToString();
-                break;
-            }
-            case DatabaseManagementSystemType.PostgreSql:
-            {
-                var npgsqlCredentials = (NpgsqlCredentials)credentials;
-                var npgsqlConnectionConfiguration = (NpgsqlConnectionConfiguration)connectionConfiguration;
-                Connection =
-                    $"Server={npgsqlConnectionConfiguration.Host};Port={npgsqlConnectionConfiguration.Port};Database={npgsqlConnectionConfiguration.DatabaseName};User Id={npgsqlCredentials.Username};Password={npgsqlCredentials.Password}";
-                break;
-            }
-            case DatabaseManagementSystemType.MySql:
-            {
-                Connection = $"";
-                break;
-            }
-            default:
-            {
-                Connection = DefaultMicrosoftSqlServerConnection;
-                break;
-            }
-        }
+            DatabaseManagementSystemType.MicrosoftSqlServer => GetMicrosoftSqlServerConnectionString(
+                connectionConfiguration, credentials),
+            DatabaseManagementSystemType.PostgreSql => GetNpgsqlConnectionString(connectionConfiguration, credentials),
+            DatabaseManagementSystemType.MySql => GetMySqlConnectionString(connectionConfiguration, credentials),
+            _ => DefaultMicrosoftSqlServerConnection
+        };
 
         return Connection;
+    }
+
+    private static string GetMicrosoftSqlServerConnectionString(ConnectionConfigurationBase connectionConfiguration,
+        CredentialsBase credentials)
+    {
+        var microsoftCredentials = (MicrosoftCredentials)credentials;
+        var microsoftConnectionConfiguration = (MicrosoftConnectionConfiguration)connectionConfiguration;
+        var connection = new StringBuilder();
+        connection.Append(
+            $"Server={microsoftConnectionConfiguration.Server};Database={microsoftConnectionConfiguration.DatabaseName};");
+        connection.Append($"Integrated Security={microsoftConnectionConfiguration.IntegratedSecurity};");
+        connection.Append(
+            $"Persist Security Info={microsoftConnectionConfiguration.PersistSecurityInfo};Pooling={microsoftConnectionConfiguration.Pooling};");
+        connection.Append(
+            $"Encrypt={microsoftConnectionConfiguration.Encrypt};TrustServerCertificate={microsoftConnectionConfiguration.TrustServerCertificate};");
+        connection.Append($"User Id={microsoftCredentials.Username};Password={microsoftCredentials.Password};");
+        return connection.ToString();
+    }
+
+    private static string GetNpgsqlConnectionString(ConnectionConfigurationBase connectionConfiguration,
+        CredentialsBase credentials)
+    {
+        var npgsqlCredentials = (NpgsqlCredentials)credentials;
+        var npgsqlConnectionConfiguration = (NpgsqlConnectionConfiguration)connectionConfiguration;
+        var connection = new StringBuilder();
+        connection.Append($"Server={npgsqlConnectionConfiguration.Host};Port={npgsqlConnectionConfiguration.Port};");
+        connection.Append($"Database={npgsqlConnectionConfiguration.DatabaseName};User Id={npgsqlCredentials.Username};Password={npgsqlCredentials.Password}");
+        return connection.ToString();
+    }
+
+    private static string GetMySqlConnectionString(ConnectionConfigurationBase connectionConfiguration,
+        CredentialsBase credentials)
+    {
+        var mysqlCredentials = (MySqlCredentials)credentials;
+        var mysqlConnectionConfiguration = (MySqlConnectionConfiguration)connectionConfiguration;
+        var connection = new StringBuilder();
+        connection.Append($"Server={mysqlConnectionConfiguration.Server};Port={mysqlConnectionConfiguration.Port};");
+        connection.Append($"Database={mysqlConnectionConfiguration.DatabaseName};Uid={mysqlCredentials.Username};Pwd={mysqlCredentials.Password};");
+        connection.Append($"SslMode={mysqlConnectionConfiguration.SslMode};");
+        return connection.ToString();
     }
 }
