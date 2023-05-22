@@ -1,10 +1,8 @@
 # Bank system 7
 This library provides opportunities for using likeness of bank system. You can handle not only users but also other models like banks, cards and etc.
 
-### Updates in version 0.5.0
-- Added support for PostgreSQL.
-- Added comments to code.
-- Changed visibility of ServicesSettings class to internal.
+### Updates in version 0.5.1
+- Added support for MySQL.
 ****
 # Documentation
 
