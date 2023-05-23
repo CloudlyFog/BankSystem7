@@ -53,9 +53,7 @@ public class GenericDbContext : DbContext
     /// </summary>
     private void DatabaseHandle()
     {
-        if (!ServicesSettings.InitializeAccess)
-            return;
-        if (ServicesSettings.Ensured)
+        if (!ServicesSettings.InitializeAccess || ServicesSettings.Ensured)
             return;
         if (ServicesSettings.EnsureDeleted)
             Database.EnsureDeleted();
@@ -93,7 +91,6 @@ public class GenericDbContext : DbContext
     /// <typeparam name="T">type of <see cref="item"/></typeparam>
     public void UpdateTracker<T>(T item, EntityState state, Action? action, DbContext context)
     {
-        context.ChangeTracker.Clear();
         context.Entry(item).State = state;
         action?.Invoke();
     }
@@ -105,7 +102,7 @@ public class GenericDbContext : DbContext
     /// <param name="context">specifies what's context will handle operation</param>
     public void AvoidChanges(object[]? entities, DbContext context)
     {
-        if (entities is null || entities.Length == 0)
+        if (entities?.Length == 0)
             return;
 
         foreach (var entity in entities)
