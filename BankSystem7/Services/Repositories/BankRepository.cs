@@ -7,7 +7,8 @@ using System.Linq.Expressions;
 
 namespace BankSystem7.Services.Repositories;
 
-public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> : IRepository<TBank>, IReaderServiceWithTracking<TBank>
+public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> : IRepository<TBank>, 
+    IReaderServiceWithTracking<TBank>, IRepositoryAsync<TBank>
     where TUser : User
     where TCard : Card
     where TBankAccount : BankAccount
@@ -59,6 +60,7 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
     {
         if (user?.Card?.BankAccount?.Bank is null || !Exist(x => x.ID == user.Card.BankAccount.Bank.ID))
             return ExceptionModel.EntityIsNull;
+
         if (operation.OperationStatus != StatusOperationCode.Ok)
             return (ExceptionModel)operation.OperationStatus.GetHashCode();
 
@@ -70,7 +72,7 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
 
         user.Card.BankAccount.BankAccountAmount += operation.TransferAmount;
         user.Card.Amount = user.Card.BankAccount.BankAccountAmount;
-        _bankContext.ChangeTracker.Clear();
+
         _bankContext.Update(user);
         _bankContext.SaveChanges();
         return ExceptionModel.Ok;
@@ -105,7 +107,6 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         if (item is null)
             return ExceptionModel.EntityIsNull;
 
-        _applicationContext.ChangeTracker.Clear();
         if (Exist(x => x.ID == item.ID))
             return Update(item);
 
@@ -114,14 +115,36 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         return ExceptionModel.Ok;
     }
 
+    public async Task<ExceptionModel> CreateAsync(TBank item)
+    {
+        if (item is null)
+            return ExceptionModel.EntityIsNull;
+
+        if (Exist(x => x.ID == item.ID))
+            return Update(item);
+
+        _applicationContext.Add(item);
+        await _applicationContext.SaveChangesAsync();
+        return ExceptionModel.Ok;
+    }
+
     public ExceptionModel Delete(TBank item)
     {
         if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;
 
-        _applicationContext.ChangeTracker.Clear();
         _applicationContext.Remove(item);
         _applicationContext.SaveChanges();
+        return ExceptionModel.Ok;
+    }
+
+    public async Task<ExceptionModel> DeleteAsync(TBank item)
+    {
+        if (!FitsConditions(item))
+            return ExceptionModel.OperationFailed;
+
+        _applicationContext.Remove(item);
+        await _applicationContext.SaveChangesAsync();
         return ExceptionModel.Ok;
     }
 
@@ -130,15 +153,29 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;
 
-        _applicationContext.ChangeTracker.Clear();
         _applicationContext.Banks.Update(item);
         _applicationContext.SaveChanges();
+        return ExceptionModel.Ok;
+    }
+
+    public async Task<ExceptionModel> UpdateAsync(TBank item)
+    {
+        if (!FitsConditions(item))
+            return ExceptionModel.OperationFailed;
+
+        _applicationContext.Banks.Update(item);
+        await _applicationContext.SaveChangesAsync();
         return ExceptionModel.Ok;
     }
 
     public TBank Get(Expression<Func<TBank, bool>> predicate)
     {
         return All.FirstOrDefault(predicate) ?? (TBank)Bank.Default;
+    }
+
+    public async Task<TBank> GetAsync(Expression<Func<TBank, bool>> predicate)
+    {
+        return await All.FirstOrDefaultAsync(predicate) ?? (TBank)Bank.Default;
     }
 
     public TBank GetWithTracking(Expression<Func<TBank, bool>> predicate)
@@ -151,6 +188,11 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         return All.Any(predicate);
     }
 
+    public async Task<bool> ExistAsync(Expression<Func<TBank, bool>> predicate)
+    {
+        return await All.AnyAsync(predicate);
+    }
+
     public bool ExistWithTracking(Expression<Func<TBank, bool>> predicate)
     {
         return AllWithTracking.Any(predicate);
@@ -159,6 +201,11 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
     public bool FitsConditions(TBank? item)
     {
         return item is not null && Exist(x => x.ID == item.ID);
+    }
+
+    public async Task<bool> FitsConditionsAsync(TBank? item)
+    {
+        return item is not null && await ExistAsync(x => x.ID == item.ID);
     }
 
     internal decimal CalculateBankAccountAmount(decimal oldValue, decimal newValue)
