@@ -63,8 +63,7 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
 
     public ExceptionModel Transfer(TUser? from, TUser? to, decimal transferAmount)
     {
-        if (from is null || to is null || from.Card is null || to.Card is null || from.Card.BankAccount is null ||
-            to.Card.BankAccount is null || transferAmount <= 0)
+        if (from?.Card?.BankAccount is null || to?.Card?.BankAccount is null || transferAmount <= 0)
             return ExceptionModel.OperationFailed;
 
         if (!Exist(x => x.ID == from.Card.BankAccount.ID) || !Exist(x => x.ID == to.Card.BankAccount.ID))

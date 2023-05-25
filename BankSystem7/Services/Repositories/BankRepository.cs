@@ -42,12 +42,12 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         _applicationContext.Banks
             .Include(x => x.BankAccounts)
             .Include(x => x.Credits)
-            .AsNoTracking() ?? Enumerable.Empty<TBank>().AsQueryable();
+            .AsNoTracking();
 
     public IQueryable<TBank> AllWithTracking =>
         _applicationContext.Banks
             .Include(x => x.BankAccounts)
-            .Include(x => x.Credits) ?? Enumerable.Empty<TBank>().AsQueryable();
+            .Include(x => x.Credits);
 
     /// <summary>
     /// accrual money to user bank account from bank's account

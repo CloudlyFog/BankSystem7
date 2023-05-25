@@ -51,16 +51,12 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
 
     public IQueryable<TUser> All =>
         _applicationContext.Users
-            .Include(x => x.Card)
-            .ThenInclude(x => x.BankAccount)
-            .ThenInclude(x => x.Bank)
-            .AsNoTracking() ?? Enumerable.Empty<TUser>().AsQueryable();
+            .Include(x => x.Card.BankAccount.Bank)
+            .AsNoTracking();
 
     public IQueryable<TUser> AllWithTracking =>
         _applicationContext.Users
-            .Include(x => x.Card)
-            .ThenInclude(x => x.BankAccount)
-            .ThenInclude(x => x.Bank) ?? Enumerable.Empty<TUser>().AsQueryable();
+            .Include(x => x.Card.BankAccount.Bank);
 
     public ExceptionModel Create(TUser item)
     {
@@ -95,9 +91,7 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;
 
-        _applicationContext.ChangeTracker.Clear();
-        _applicationContext.Users.Update(item);
-        _applicationContext.BankAccounts.Update((TBankAccount)item.Card.BankAccount);
+        _applicationContext.UpdateRange(item, item.Card.BankAccount);
         _applicationContext.SaveChanges();
         return ExceptionModel.Ok;
     }
@@ -107,9 +101,7 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;
 
-        _applicationContext.ChangeTracker.Clear();
-        _applicationContext.Users.Update(item);
-        _applicationContext.BankAccounts.Update((TBankAccount)item.Card.BankAccount);
+        _applicationContext.UpdateRange(item, item.Card.BankAccount);
         await _applicationContext.SaveChangesAsync();
         return ExceptionModel.Ok;
     }
@@ -122,7 +114,6 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         item.Card.BankAccount.Bank.AccountAmount +=
             _bankRepository.CalculateBankAccountAmount(item.Card.Amount, 0);
 
-        _applicationContext.ChangeTracker.Clear();
         _applicationContext.Users.Remove(item);
         _applicationContext.BankAccounts.Remove((TBankAccount)item.Card.BankAccount);
         _applicationContext.Banks.Update((TBank)item.Card.BankAccount.Bank);
@@ -139,7 +130,6 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         item.Card.BankAccount.Bank.AccountAmount +=
             _bankRepository.CalculateBankAccountAmount(item.Card.Amount, 0);
 
-        _applicationContext.ChangeTracker.Clear();
         _applicationContext.Users.Remove(item);
         _applicationContext.BankAccounts.Remove((TBankAccount)item.Card.BankAccount);
         _applicationContext.Banks.Update((TBank)item.Card.BankAccount.Bank);
