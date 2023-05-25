@@ -8,7 +8,8 @@ using System.Linq.Expressions;
 
 namespace BankSystem7.Services.Repositories;
 
-public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit> : IRepository<TBankAccount>, IReaderServiceWithTracking<TBankAccount>
+public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit> : IRepository<TBankAccount>, 
+    IReaderServiceWithTracking<TBankAccount>, IRepositoryAsync<TBankAccount>
     where TUser : User
     where TCard : Card
     where TBankAccount : BankAccount
@@ -159,6 +160,15 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
         return ExceptionModel.Ok;
     }
 
+    public async Task<ExceptionModel> CreateAsync(TBankAccount item)
+    {
+        if (item is null || Exist(x => x.ID == item.ID) || item.Bank is null)
+            return ExceptionModel.EntityIsNull;
+        _bankContext.BankAccounts.Add(item);
+        await _bankContext.SaveChangesAsync();
+        return ExceptionModel.Ok;
+    }
+
     /// <summary>
     /// updates only BankAccount. Referenced user won't be changed
     /// </summary>
@@ -168,9 +178,19 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
     {
         if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;
-        _applicationContext.ChangeTracker.Clear();
+
         _applicationContext.BankAccounts.Update(item);
         _bankContext.SaveChanges();
+        return ExceptionModel.Ok;
+    }
+
+    public async Task<ExceptionModel> UpdateAsync(TBankAccount item)
+    {
+        if (!FitsConditions(item))
+            return ExceptionModel.OperationFailed;
+
+        _applicationContext.BankAccounts.Update(item);
+        await _bankContext.SaveChangesAsync();
         return ExceptionModel.Ok;
     }
 
@@ -183,15 +203,30 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
     {
         if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;
-        _applicationContext.ChangeTracker.Clear();
+
         _applicationContext.BankAccounts.Remove(item);
         _applicationContext.SaveChanges();
+        return ExceptionModel.Ok;
+    }
+
+    public async Task<ExceptionModel> DeleteAsync(TBankAccount item)
+    {
+        if (!FitsConditions(item))
+            return ExceptionModel.OperationFailed;
+
+        _applicationContext.BankAccounts.Remove(item);
+        await _applicationContext.SaveChangesAsync();
         return ExceptionModel.Ok;
     }
 
     public TBankAccount Get(Expression<Func<TBankAccount, bool>> predicate)
     {
         return All.FirstOrDefault(predicate) ?? (TBankAccount)BankAccount.Default;
+    }
+
+    public async Task<TBankAccount> GetAsync(Expression<Func<TBankAccount, bool>> predicate)
+    {
+        return await All.FirstOrDefaultAsync(predicate) ?? (TBankAccount)BankAccount.Default;
     }
 
     public TBankAccount GetWithTracking(Expression<Func<TBankAccount, bool>> predicate)
@@ -204,6 +239,11 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
         return All.Any(predicate);
     }
 
+    public async Task<bool> ExistAsync(Expression<Func<TBankAccount, bool>> predicate)
+    {
+        return await All.AnyAsync(predicate);
+    }
+
     public bool ExistWithTracking(Expression<Func<TBankAccount, bool>> predicate)
     {
         return AllWithTracking.Any(predicate);
@@ -211,7 +251,12 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
 
     public bool FitsConditions(TBankAccount? item)
     {
-        return item is not null && Exist(x => x.ID == item.ID) && item.Bank is not null;
+        return item?.Bank is not null && Exist(x => x.ID == item.ID);
+    }
+
+    public async Task<bool> FitsConditionsAsync(TBankAccount? item)
+    {
+        return item?.Bank is not null && await ExistAsync(x => x.ID == item.ID);
     }
 
     private void CheckBankAccount(BankAccount item)

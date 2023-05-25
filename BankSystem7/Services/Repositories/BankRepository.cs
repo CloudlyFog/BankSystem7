@@ -138,11 +138,7 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
 
     public TBank Get(Expression<Func<TBank, bool>> predicate)
     {
-        return _applicationContext.Banks
-            .Include(x => x.BankAccounts)
-            .Include(x => x.Credits)
-            .AsNoTracking()
-            .FirstOrDefault(predicate) ?? (TBank)Bank.Default;
+        return All.FirstOrDefault(predicate) ?? (TBank)Bank.Default;
     }
 
     public TBank GetWithTracking(Expression<Func<TBank, bool>> predicate)
