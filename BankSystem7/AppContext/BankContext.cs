@@ -2,6 +2,7 @@ using BankSystem7.Models;
 using BankSystem7.Services;
 using BankSystem7.Services.Configuration;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using MongoDB.Driver;
 
 namespace BankSystem7.AppContext;
@@ -30,6 +31,14 @@ internal sealed class BankContext<TUser, TCard, TBankAccount, TBank, TCredit> : 
     public DbSet<Bank> Banks { get; set; } = null!;
     public DbSet<BankAccount> BankAccounts { get; set; } = null!;
     public DbSet<Card> Cards { get; set; } = null!;
+
+    public override EntityEntry<TEntity> Update<TEntity>(TEntity entity)
+    {
+        var entry = Entry(entity);
+        if (entry.State != EntityState.Modified)
+            return base.Update(entity);
+        return entry;
+    }
 
     /// <summary>
     /// creates transaction operation
