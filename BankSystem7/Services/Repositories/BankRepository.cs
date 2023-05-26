@@ -55,24 +55,79 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
     /// </summary>
     /// <param name="user">where will accrued money</param>
     /// <param name="operation">data of ongoing operation</param>
-    /// <exception cref="Exception"></exception>
     public ExceptionModel BankAccountAccrual(TUser user, Operation operation)
     {
-        if (user?.Card?.BankAccount?.Bank is null || !Exist(x => x.ID == user.Card.BankAccount.Bank.ID))
-            return ExceptionModel.EntityIsNull;
-
+        // Check if the operation status is OK.
         if (operation.OperationStatus != StatusOperationCode.Ok)
             return (ExceptionModel)operation.OperationStatus.GetHashCode();
 
-        if (user is null)
-            return ExceptionModel.EntityIsNull;
-
+        // If the transaction is with another bank, subtract the transfer amount from the user's bank account.
         if (AnotherBankTransactionOperation)
             user.Card.BankAccount.Bank.AccountAmount -= operation.TransferAmount;
 
+        // Add the transfer amount to the user's bank account.
         user.Card.BankAccount.BankAccountAmount += operation.TransferAmount;
+
+        // Update the user's card amount to reflect the new bank account amount.
         user.Card.Amount = user.Card.BankAccount.BankAccountAmount;
 
+        // Update the user's information in the database.
+        _bankContext.Update(user);
+        _bankContext.SaveChanges();
+        return ExceptionModel.Ok;
+    }
+
+    /// <summary>
+    /// accrual money to user bank account from bank's account
+    /// </summary>
+    /// <param name="user">where will accrued money</param>
+    /// <param name="operation">data of ongoing operation</param>
+    public async Task<ExceptionModel> BankAccountAccrualAsync(TUser user, Operation operation)
+    {
+        // Check if the operation status is OK.
+        if (operation.OperationStatus != StatusOperationCode.Ok)
+            return (ExceptionModel)operation.OperationStatus.GetHashCode();
+
+        // If the transaction is with another bank, subtract the transfer amount from the user's bank account.
+        if (AnotherBankTransactionOperation)
+            user.Card.BankAccount.Bank.AccountAmount -= operation.TransferAmount;
+
+        // Add the transfer amount to the user's bank account.
+        user.Card.BankAccount.BankAccountAmount += operation.TransferAmount;
+
+        // Update the user's card amount to reflect the new bank account amount.
+        user.Card.Amount = user.Card.BankAccount.BankAccountAmount;
+
+        // Update the user's information in the database.
+        _bankContext.Update(user);
+        await _bankContext.SaveChangesAsync();
+        return ExceptionModel.Ok;
+    }
+
+    /// <summary>
+    /// withdraw money from user bank account and accrual to bank's account
+    /// </summary>
+    /// <param name="user">where will accrued money</param>
+    /// <param name="operation">data of ongoing operation</param>
+    public ExceptionModel BankAccountWithdraw(TUser user, Operation operation)
+    {
+        // Check if the user's card's bank account's bank is null or if the bank ID does not exist in the database
+        if (user?.Card?.BankAccount?.Bank is null || !Exist(x => x.ID == user.Card.BankAccount.Bank.ID))
+            return ExceptionModel.EntityIsNull;
+
+        // Check if the operation status is not "Ok"
+        if (operation.OperationStatus != StatusOperationCode.Ok)
+            return (ExceptionModel)operation.OperationStatus.GetHashCode();
+
+        // If it is another bank transaction operation, add the transfer amount to the bank account amount of the user's card's bank
+        if (AnotherBankTransactionOperation)
+            user.Card.BankAccount.Bank.AccountAmount += operation.TransferAmount;
+
+        // Subtract the transfer amount from the bank account amount of the user's card's bank and update the user's card amount
+        user.Card.BankAccount.BankAccountAmount -= operation.TransferAmount;
+        user.Card.Amount = user.Card.BankAccount.BankAccountAmount;
+
+        // Update the user's information in the database and save changes
         _bankContext.Update(user);
         _bankContext.SaveChanges();
         return ExceptionModel.Ok;
@@ -83,22 +138,27 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
     /// </summary>
     /// <param name="user">where will accrued money</param>
     /// <param name="operation">data of ongoing operation</param>
-    /// <exception cref="Exception"></exception>
-    public ExceptionModel BankAccountWithdraw(TUser user, Operation operation)
+    public async Task<ExceptionModel> BankAccountWithdrawAsync(TUser user, Operation operation)
     {
+        // Check if the user's card's bank account's bank is null or if the bank ID does not exist in the database
         if (user?.Card?.BankAccount?.Bank is null || !Exist(x => x.ID == user.Card.BankAccount.Bank.ID))
             return ExceptionModel.EntityIsNull;
+
+        // Check if the operation status is not "Ok"
         if (operation.OperationStatus != StatusOperationCode.Ok)
             return (ExceptionModel)operation.OperationStatus.GetHashCode();
 
+        // If it is another bank transaction operation, add the transfer amount to the bank account amount of the user's card's bank
         if (AnotherBankTransactionOperation)
             user.Card.BankAccount.Bank.AccountAmount += operation.TransferAmount;
 
+        // Subtract the transfer amount from the bank account amount of the user's card's bank and update the user's card amount
         user.Card.BankAccount.BankAccountAmount -= operation.TransferAmount;
         user.Card.Amount = user.Card.BankAccount.BankAccountAmount;
-        _bankContext.ChangeTracker.Clear();
+
+        // Update the user's information in the database and save changes
         _bankContext.Update(user);
-        _bankContext.SaveChanges();
+        await _bankContext.SaveChangesAsync();
         return ExceptionModel.Ok;
     }
 

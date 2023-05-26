@@ -52,15 +52,13 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
     public IQueryable<TBankAccount> All =>
         _applicationContext.BankAccounts
             .Include(x => x.Bank)
-            .Include(x => x.User)
-            .ThenInclude(x => x.Card)
-            .AsNoTracking() ?? Enumerable.Empty<TBankAccount>().AsQueryable();
+            .Include(x => x.User.Card)
+            .AsNoTracking();
 
     public IQueryable<TBankAccount> AllWithTracking =>
         _applicationContext.BankAccounts
             .Include(x => x.Bank)
-            .Include(x => x.User)
-            .ThenInclude(x => x.Card) ?? Enumerable.Empty<TBankAccount>().AsQueryable();
+            .Include(x => x.User.Card);
 
     public ExceptionModel Transfer(TUser? from, TUser? to, decimal transferAmount)
     {
@@ -90,6 +88,34 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
         return ExceptionModel.Ok;
     }
 
+    public async Task<ExceptionModel> TransferAsync(TUser? from, TUser? to, decimal transferAmount)
+    {
+        if (from?.Card?.BankAccount is null || to?.Card?.BankAccount is null || transferAmount <= 0)
+            return ExceptionModel.OperationFailed;
+
+        if (!Exist(x => x.ID == from.Card.BankAccount.ID) || !Exist(x => x.ID == to.Card.BankAccount.ID))
+            return ExceptionModel.OperationFailed;
+
+        using var transaction = await _bankContext.Database.BeginTransactionAsync(IsolationLevel.RepeatableRead);
+        _bankRepository.AnotherBankTransactionOperation = AnotherBankTransactionOperation(from, to);
+
+        var withdraw = await WithdrawAsync(from, transferAmount);
+        if (withdraw != ExceptionModel.Ok)
+        {
+            await transaction.RollbackAsync();
+            return withdraw;
+        }
+
+        var accrual = await AccrualAsync(to, transferAmount);
+        if (accrual != ExceptionModel.Ok)
+        {
+            await transaction.RollbackAsync();
+            return accrual;
+        }
+        await transaction.CommitAsync();
+        return ExceptionModel.Ok;
+    }
+
     /// <summary>
     /// asynchronously accrual money on account with the same user id
     /// </summary>
@@ -98,8 +124,14 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
     /// <returns>object of <see cref="ExceptionModel"/></returns>
     private ExceptionModel Accrual(TUser? item, decimal amountAccrual)
     {
+        // Check if the user's bank account and bank exist
+        if (item?.Card?.BankAccount?.Bank is null)
+            return ExceptionModel.EntityIsNull;
+
+        // Check if the user's bank account is valid
         CheckBankAccount(item.Card.BankAccount);
 
+        // Create a new operation object with the necessary information
         var operation = new Operation
         {
             BankID = item.Card.BankAccount.Bank.ID,
@@ -108,14 +140,57 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
             TransferAmount = amountAccrual,
             OperationKind = OperationKind.Accrual
         };
+
+        // Create the operation in the database
         var createOperation = _bankContext.CreateOperation(operation, OperationKind.Accrual);
         if (createOperation != ExceptionModel.Ok)
             return createOperation;
 
+        // Perform the accrual operation on the user's bank account
         var accrualOperation = _bankRepository.BankAccountAccrual(item, operation);
         if (accrualOperation != ExceptionModel.Ok)
             return accrualOperation;
 
+        // Return success status
+        return ExceptionModel.Ok;
+    }
+
+    /// <summary>
+    /// asynchronously accrual money on account with the same user id
+    /// </summary>
+    /// <param name="item"></param>
+    /// <param name="amountAccrual"></param>
+    /// <returns>object of <see cref="ExceptionModel"/></returns>
+    private async Task<ExceptionModel> AccrualAsync(TUser? item, decimal amountAccrual)
+    {
+        // Check if the user's bank account and bank exist
+        if (item?.Card?.BankAccount?.Bank is null)
+            return ExceptionModel.EntityIsNull;
+
+        // Check if the user's bank account is valid
+        CheckBankAccount(item.Card.BankAccount);
+
+        // Create a new operation object with the necessary information
+        var operation = new Operation
+        {
+            BankID = item.Card.BankAccount.Bank.ID,
+            SenderID = item.Card.BankAccount.Bank.ID,
+            ReceiverID = item.ID,
+            TransferAmount = amountAccrual,
+            OperationKind = OperationKind.Accrual
+        };
+
+        // Create the operation in the database
+        var createOperation = _bankContext.CreateOperation(operation, OperationKind.Accrual);
+        if (createOperation != ExceptionModel.Ok)
+            return createOperation;
+
+        // Perform the accrual operation on the user's bank account
+        var accrualOperation = await _bankRepository.BankAccountAccrualAsync(item, operation);
+        if (accrualOperation != ExceptionModel.Ok)
+            return accrualOperation;
+
+        // Return success status
         return ExceptionModel.Ok;
     }
 
@@ -127,11 +202,14 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
     /// <returns>object of <see cref="ExceptionModel"/></returns>
     private ExceptionModel Withdraw(TUser? item, decimal amountAccrual)
     {
-        if (item.Card is null)
+        // Check if the bank account of the item is null using the null-conditional operator
+        if (item?.Card?.BankAccount?.Bank is null)
             return ExceptionModel.EntityIsNull;
 
+        // Call a method to check if the bank account is valid
         CheckBankAccount(item.Card.BankAccount);
 
+        // Create a new operation object with relevant information
         var operation = new Operation
         {
             BankID = item.Card.BankAccount.Bank.ID,
@@ -141,13 +219,56 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
             OperationKind = OperationKind.Withdraw
         };
 
+        // Call a method to create the operation in the bank context and check for any errors
         var createOperation = _bankContext.CreateOperation(operation, OperationKind.Withdraw);
         if (createOperation != ExceptionModel.Ok)
             return createOperation;
 
+        // Call a method to withdraw the specified amount from the bank account and check for any errors
         var withdraw = _bankRepository.BankAccountWithdraw(item, operation);
         if (withdraw != ExceptionModel.Ok)
             return withdraw;
+
+        // Return a success status if all operations were successful
+        return ExceptionModel.Ok;
+    }
+
+    /// <summary>
+    /// withdraw money from account with the same user id
+    /// </summary>
+    /// <param name="item"></param>
+    /// <param name="amountAccrual"></param>
+    /// <returns>object of <see cref="ExceptionModel"/></returns>
+    private async Task<ExceptionModel> WithdrawAsync(TUser? item, decimal amountAccrual)
+    {
+        // Check if the bank account of the item is null using the null-conditional operator
+        if (item?.Card?.BankAccount?.Bank is null)
+            return ExceptionModel.EntityIsNull;
+
+        // Call a method to check if the bank account is valid
+        CheckBankAccount(item.Card.BankAccount);
+
+        // Create a new operation object with relevant information
+        var operation = new Operation
+        {
+            BankID = item.Card.BankAccount.Bank.ID,
+            SenderID = item.ID,
+            ReceiverID = item.Card.BankAccount.Bank.ID,
+            TransferAmount = amountAccrual,
+            OperationKind = OperationKind.Withdraw
+        };
+
+        // Call a method to create the operation in the bank context and check for any errors
+        var createOperation = _bankContext.CreateOperation(operation, OperationKind.Withdraw);
+        if (createOperation != ExceptionModel.Ok)
+            return createOperation;
+
+        // Call a method to withdraw the specified amount from the bank account and check for any errors
+        var withdraw = await _bankRepository.BankAccountWithdrawAsync(item, operation);
+        if (withdraw != ExceptionModel.Ok)
+            return withdraw;
+
+        // Return a success status if all operations were successful
         return ExceptionModel.Ok;
     }
 
