@@ -35,9 +35,9 @@ internal sealed class BankContext<TUser, TCard, TBankAccount, TBank, TCredit> : 
     public override EntityEntry<TEntity> Update<TEntity>(TEntity entity)
     {
         var entry = Entry(entity);
-        if (entry.State != EntityState.Modified)
-            return base.Update(entity);
-        return entry;
+        if (entry.State == EntityState.Modified)
+            return entry;
+        return base.Update(entity);
     }
 
     /// <summary>
