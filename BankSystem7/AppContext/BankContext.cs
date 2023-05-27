@@ -4,6 +4,7 @@ using BankSystem7.Services.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using MongoDB.Driver;
+using System.Buffers;
 
 namespace BankSystem7.AppContext;
 
@@ -32,14 +33,6 @@ internal sealed class BankContext<TUser, TCard, TBankAccount, TBank, TCredit> : 
     public DbSet<BankAccount> BankAccounts { get; set; } = null!;
     public DbSet<Card> Cards { get; set; } = null!;
 
-    public override EntityEntry<TEntity> Update<TEntity>(TEntity entity)
-    {
-        var entry = Entry(entity);
-        if (entry.State == EntityState.Modified)
-            return entry;
-        return base.Update(entity);
-    }
-
     /// <summary>
     /// creates transaction operation
     /// </summary>
@@ -57,7 +50,7 @@ internal sealed class BankContext<TUser, TCard, TBankAccount, TBank, TCredit> : 
             return ExceptionModel.EntityNotExist;
 
         operation.OperationStatus = StatusOperation(operation, operationKind);
-        if (operation.OperationStatus != StatusOperationCode.Ok)
+        if (operation.OperationStatus is not StatusOperationCode.Ok or StatusOperationCode.Successfully)
             return ExceptionModel.OperationRestricted;
 
         _operationService.Collection.InsertOne(operation);
@@ -143,32 +136,30 @@ internal sealed class BankContext<TUser, TCard, TBankAccount, TBank, TCredit> : 
     /// <exception cref="ArgumentNullException"></exception>
     private StatusOperationCode StatusOperation(Operation? operationModel, OperationKind operationKind)
     {
-        if (operationModel is null)
+        if (operationModel is null || !Banks.AsNoTracking().Any(x => x.ID == operationModel.BankID))
             return StatusOperationCode.Error;
 
         if (operationKind == OperationKind.Accrual)
         {
-            // SenderID is ID of bank
-            // ReceiverID is ID of user
-            if (!Banks.AsNoTracking().Any(x => x.ID == operationModel.SenderID) || !Users.Any(x => x.ID == operationModel.ReceiverID))
-                operationModel.OperationStatus = StatusOperationCode.Error;
+            // Check if the receiver ID exists in the Users table without tracking changes
+            if (!Users.AsNoTracking().Select(x => x.ID).Any(x => x == operationModel.ReceiverID))
+                return StatusOperationCode.Error;
 
+            // Check if the sender ID exists in the Banks table and if the account amount is less than the transfer amount
             if (Banks.AsNoTracking().FirstOrDefault(x => x.ID == operationModel.SenderID)?.AccountAmount < operationModel.TransferAmount)
-                operationModel.OperationStatus = StatusOperationCode.Restricted;
+                return StatusOperationCode.Restricted;
         }
         else if (operationKind == OperationKind.Withdraw)
         {
-            // SenderID is ID of user
-            // ReceiverID is ID of bank
-            if (!Banks.AsNoTracking().Any(x => x.ID == operationModel.ReceiverID) || !Users.Any(x => x.ID == operationModel.SenderID))
-                operationModel.OperationStatus = StatusOperationCode.Error;
-            if (BankAccounts.AsNoTracking().FirstOrDefault(x => x.UserID == operationModel.SenderID)?.BankAccountAmount < operationModel.TransferAmount)
-                operationModel.OperationStatus = StatusOperationCode.Restricted;
+            // Check if the SenderID of the operationModel exists in the Users table
+            if (!Users.AsNoTracking().Select(x => x.ID).Any(x => x == operationModel.SenderID)) 
+                return StatusOperationCode.Error;
+
+            // Check if the SenderID of the operationModel has enough funds in their bank account
+            if (BankAccounts.AsNoTracking().FirstOrDefault(x => x.UserID == operationModel.SenderID)?.BankAccountAmount < operationModel.TransferAmount) 
+                return StatusOperationCode.Restricted;
         }
 
-        if (!Banks.AsNoTracking().Any(x => x.ID == operationModel.BankID))
-            operationModel.OperationStatus = StatusOperationCode.Error;
-
-        return operationModel.OperationStatus;
+        return StatusOperationCode.Ok;
     }
 }

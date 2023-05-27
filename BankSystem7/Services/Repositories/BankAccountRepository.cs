@@ -229,7 +229,7 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
         if (withdraw != ExceptionModel.Ok)
             return withdraw;
 
-        // Return a success status if all operations were successful
+        // Return a success status if all operations were Ok
         return ExceptionModel.Ok;
     }
 
@@ -268,7 +268,7 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
         if (withdraw != ExceptionModel.Ok)
             return withdraw;
 
-        // Return a success status if all operations were successful
+        // Return a success status if all operations were Ok
         return ExceptionModel.Ok;
     }
 

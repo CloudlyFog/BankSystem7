@@ -58,7 +58,7 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
     public ExceptionModel BankAccountAccrual(TUser user, Operation operation)
     {
         // Check if the operation status is OK.
-        if (operation.OperationStatus != StatusOperationCode.Ok)
+        if (operation.OperationStatus is not StatusOperationCode.Ok or StatusOperationCode.Successfully)
             return (ExceptionModel)operation.OperationStatus.GetHashCode();
 
         // If the transaction is with another bank, subtract the transfer amount from the user's bank account.
@@ -85,7 +85,7 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
     public async Task<ExceptionModel> BankAccountAccrualAsync(TUser user, Operation operation)
     {
         // Check if the operation status is OK.
-        if (operation.OperationStatus != StatusOperationCode.Ok)
+        if (operation.OperationStatus is not StatusOperationCode.Ok or StatusOperationCode.Successfully)
             return (ExceptionModel)operation.OperationStatus.GetHashCode();
 
         // If the transaction is with another bank, subtract the transfer amount from the user's bank account.
@@ -111,13 +111,13 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
     /// <param name="operation">data of ongoing operation</param>
     public ExceptionModel BankAccountWithdraw(TUser user, Operation operation)
     {
+        // Check if the operation status is OK.
+        if (operation.OperationStatus is not StatusOperationCode.Ok or StatusOperationCode.Successfully)
+            return (ExceptionModel)operation.OperationStatus.GetHashCode();
+
         // Check if the user's card's bank account's bank is null or if the bank ID does not exist in the database
         if (user?.Card?.BankAccount?.Bank is null || !Exist(x => x.ID == user.Card.BankAccount.Bank.ID))
             return ExceptionModel.EntityIsNull;
-
-        // Check if the operation status is not "Ok"
-        if (operation.OperationStatus != StatusOperationCode.Ok)
-            return (ExceptionModel)operation.OperationStatus.GetHashCode();
 
         // If it is another bank transaction operation, add the transfer amount to the bank account amount of the user's card's bank
         if (AnotherBankTransactionOperation)
@@ -140,13 +140,13 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
     /// <param name="operation">data of ongoing operation</param>
     public async Task<ExceptionModel> BankAccountWithdrawAsync(TUser user, Operation operation)
     {
+        // Check if the operation status is OK.
+        if (operation.OperationStatus is not StatusOperationCode.Ok or StatusOperationCode.Successfully)
+            return (ExceptionModel)operation.OperationStatus.GetHashCode();
+
         // Check if the user's card's bank account's bank is null or if the bank ID does not exist in the database
         if (user?.Card?.BankAccount?.Bank is null || !Exist(x => x.ID == user.Card.BankAccount.Bank.ID))
             return ExceptionModel.EntityIsNull;
-
-        // Check if the operation status is not "Ok"
-        if (operation.OperationStatus != StatusOperationCode.Ok)
-            return (ExceptionModel)operation.OperationStatus.GetHashCode();
 
         // If it is another bank transaction operation, add the transfer amount to the bank account amount of the user's card's bank
         if (AnotherBankTransactionOperation)
