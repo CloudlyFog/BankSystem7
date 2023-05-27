@@ -8,7 +8,8 @@ using System.Linq.Expressions;
 
 namespace BankSystem7.Services.Repositories;
 
-public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit> : IRepository<TCredit>, IReaderServiceWithTracking<TCredit>
+public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit> : IRepository<TCredit>, IRepositoryAsync<TCredit>,
+    IReaderServiceWithTracking<TCredit>
     where TUser : User
     where TCard : Card
     where TBankAccount : BankAccount
@@ -140,14 +141,38 @@ public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>
         return ExceptionModel.Ok;
     }
 
+    public async Task<ExceptionModel> CreateAsync(TCredit item)
+    {
+        if (item is null)
+            return ExceptionModel.EntityIsNull;
+
+        if (Exist(x => x.ID == item.ID))
+            return ExceptionModel.OperationFailed;
+
+        item.User = null;
+        item.Bank = null;
+        _applicationContext.Credits.Add(item);
+        await _applicationContext.SaveChangesAsync();
+        return ExceptionModel.Ok;
+    }
+
     public ExceptionModel Update(TCredit item)
     {
         if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;
 
-        _applicationContext.ChangeTracker.Clear();
         _applicationContext.Credits.Update(item);
         _applicationContext.SaveChanges();
+        return ExceptionModel.Ok;
+    }
+
+    public async Task<ExceptionModel> UpdateAsync(TCredit item)
+    {
+        if (!FitsConditions(item))
+            return ExceptionModel.OperationFailed;
+
+        _applicationContext.Credits.Update(item);
+        await _applicationContext.SaveChangesAsync();
         return ExceptionModel.Ok;
     }
 
@@ -156,15 +181,29 @@ public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>
         if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;
 
-        _applicationContext.ChangeTracker.Clear();
         _applicationContext.Credits.Remove(item);
         _applicationContext.SaveChanges();
+        return ExceptionModel.Ok;
+    }
+
+    public async Task<ExceptionModel> DeleteAsync(TCredit item)
+    {
+        if (!FitsConditions(item))
+            return ExceptionModel.OperationFailed;
+
+        _applicationContext.Credits.Remove(item);
+        await _applicationContext.SaveChangesAsync();
         return ExceptionModel.Ok;
     }
 
     public TCredit Get(Expression<Func<TCredit, bool>> predicate)
     {
         return All.FirstOrDefault(predicate) ?? (TCredit)Credit.Default;
+    }
+
+    public async Task<TCredit> GetAsync(Expression<Func<TCredit, bool>> predicate)
+    {
+        return await All.FirstOrDefaultAsync(predicate) ?? (TCredit)Credit.Default;
     }
 
     public TCredit GetWithTracking(Expression<Func<TCredit, bool>> predicate)
@@ -177,6 +216,11 @@ public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>
         return All.Any(predicate);
     }
 
+    public async Task<bool> ExistAsync(Expression<Func<TCredit, bool>> predicate)
+    {
+        return await All.AnyAsync(predicate);
+    }
+
     public bool ExistWithTracking(Expression<Func<TCredit, bool>> predicate)
     {
         return AllWithTracking.Any(predicate);
@@ -185,6 +229,11 @@ public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>
     public bool FitsConditions(TCredit? item)
     {
         return item is not null && Exist(x => x.ID == item.ID);
+    }
+
+    public async Task<bool> FitsConditionsAsync(TCredit? item)
+    {
+        return item is not null && await ExistAsync(x => x.ID == item.ID);
     }
 
     private ExceptionModel UpdateCreditStateAfterPayCredit(TCredit credit, Operation operationWithdrawFromUserAccount)
