@@ -76,15 +76,13 @@ public class Credit
     {
     }
 
-    private Credit(User user = null, Bank bank = null)
+    public Credit(decimal creditAmount, decimal interestRate, DateTime repaymentDate, User user = null, Bank bank = null)
     {
-        if (bank is null || user is null)
-            return;
-
-        Bank = bank;
-        BankID = bank.ID;
-        User = user;
-        UserID = user.ID;
+        ID = Guid.NewGuid();
+        CreditAmount = creditAmount;
+        InterestRate = interestRate;
+        RepaymentDate = repaymentDate;
+        RepaymentAmount = CalculateRepaymentAmount();
     }
 
     [Key]
@@ -112,24 +110,6 @@ public class Credit
         x = 1 - x;
         var monthlyPayment = CreditAmount * (InterestRate / 1200) / decimal.Parse(x.ToString());
         return monthlyPayment * repaymentDateMonth;
-    }
-
-    public static Credit CreateInstance()
-    {
-        return new Credit();
-    }
-
-    public static Credit CreateInstance(decimal creditAmount, decimal interestRate, DateTime repaymentDate, User user = null, Bank bank = null)
-    {
-        var credit = new Credit(user, bank)
-        {
-            ID = Guid.Empty,
-            CreditAmount = creditAmount,
-            InterestRate = interestRate,
-            RepaymentDate = repaymentDate,
-        };
-        credit.RepaymentAmount = credit.CalculateRepaymentAmount();
-        return credit;
     }
 
     public override int GetHashCode()
