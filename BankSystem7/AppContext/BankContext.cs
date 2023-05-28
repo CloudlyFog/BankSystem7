@@ -234,11 +234,11 @@ internal sealed class BankContext<TUser, TCard, TBankAccount, TBank, TCredit> : 
         else if (operationKind == OperationKind.Withdraw)
         {
             // Check if the SenderID of the operationModel exists in the Users table
-            if (!Users.AsNoTracking().Select(x => x.ID).Any(x => x == operationModel.SenderID)) 
+            if (!Users.AsNoTracking().Select(x => x.ID).Any(x => x == operationModel.SenderID))
                 return StatusOperationCode.Error;
 
             // Check if the SenderID of the operationModel has enough funds in their bank account
-            if (BankAccounts.AsNoTracking().FirstOrDefault(x => x.UserID == operationModel.SenderID)?.BankAccountAmount < operationModel.TransferAmount) 
+            if (BankAccounts.AsNoTracking().FirstOrDefault(x => x.UserID == operationModel.SenderID)?.BankAccountAmount < operationModel.TransferAmount)
                 return StatusOperationCode.Restricted;
         }
 

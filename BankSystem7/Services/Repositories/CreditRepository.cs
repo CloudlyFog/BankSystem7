@@ -86,6 +86,46 @@ public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>
     }
 
     /// <summary>
+    /// gives to user credit with the definite amount of money
+    /// adds to the table field with credit's data of user
+    /// </summary>
+    /// <param name="user">from what account will withdraw money</param>
+    /// <param name="credit">credit entity from database</param>
+    /// <returns></returns>
+    public async Task<ExceptionModel> TakeCreditAsync(TUser? user, TCredit? credit)
+    {
+        if (user?.Card?.BankAccount?.Bank is null || credit is null || Exist(x => x.ID == credit.ID || x.UserID == user.ID))
+            return ExceptionModel.EntityIsNull;
+
+        var operationAccrualToUserAccount = new Operation
+        {
+            BankID = credit.BankID,
+            ReceiverID = credit.UserID,
+            SenderID = credit.BankID,
+            TransferAmount = credit.CreditAmount
+        };
+        await using var transaction = await _applicationContext.Database.BeginTransactionAsync(IsolationLevel.Serializable);
+
+        var updateAccountsAfterTakeCredit = await UpdateAccountsAfterTakeCreditAsync(user, operationAccrualToUserAccount);
+        if (updateAccountsAfterTakeCredit != ExceptionModel.Ok)
+        {
+            await transaction.RollbackAsync();
+            return updateAccountsAfterTakeCredit;
+        }
+
+        var updateCreditStateAfterTakeCredit = await UpdateCreditStateAfterTakeCreditAsync(credit);
+        if (updateCreditStateAfterTakeCredit != ExceptionModel.Ok)
+        {
+            await transaction.RollbackAsync();
+            return updateCreditStateAfterTakeCredit;
+        }
+
+        await transaction.CommitAsync();
+
+        return ExceptionModel.Ok;
+    }
+
+    /// <summary>
     /// implements paying some amount of credit for full its repaying
     /// </summary>
     /// <param name="user">from what account will withdraw money</param>
@@ -122,6 +162,47 @@ public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>
         }
 
         transaction.Commit();
+
+        return ExceptionModel.Ok;
+    }
+
+    /// <summary>
+    /// implements paying some amount of credit for full its repaying
+    /// </summary>
+    /// <param name="user">from what account will withdraw money</param>
+    /// <param name="credit">credit entity from database</param>
+    /// <param name="payAmount">amount of money for paying</param>
+    /// <returns></returns>
+    public async Task<ExceptionModel> PayCreditAsync(TUser? user, TCredit credit, decimal payAmount)
+    {
+        if (user?.Card?.BankAccount?.Bank is null || credit is null || !Exist(x => x.ID == credit.ID || x.UserID == user.ID))
+            return ExceptionModel.EntityIsNull;
+
+        var operationWithdrawFromUserAccount = new Operation()
+        {
+            BankID = credit.BankID,
+            ReceiverID = credit.BankID,
+            SenderID = credit.UserID,
+            TransferAmount = payAmount
+        };
+
+        await using var transaction = await _applicationContext.Database.BeginTransactionAsync(IsolationLevel.Serializable);
+
+        var updateAccountsAfterPayCredit = await UpdateAccountsAfterPayCreditAsync(user, credit, operationWithdrawFromUserAccount, payAmount);
+        if (updateAccountsAfterPayCredit != ExceptionModel.Ok)
+        {
+            await transaction.RollbackAsync();
+            return updateAccountsAfterPayCredit;
+        }
+
+        var upd = await UpdateCreditStateAfterPayCreditAsync(credit, operationWithdrawFromUserAccount);
+        if (upd != ExceptionModel.Ok)
+        {
+            await transaction.RollbackAsync();
+            return upd;
+        }
+
+        await transaction.CommitAsync();
 
         return ExceptionModel.Ok;
     }
@@ -247,9 +328,29 @@ public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>
         }
     }
 
+    private async Task<ExceptionModel> UpdateCreditStateAfterPayCreditAsync(TCredit credit, Operation operationWithdrawFromUserAccount)
+    {
+        if (credit.RepaymentAmount == operationWithdrawFromUserAccount.TransferAmount)
+            return await DeleteAsync(credit);
+        else
+        {
+            credit.RepaymentAmount -= operationWithdrawFromUserAccount.TransferAmount;
+            return await UpdateAsync(credit);
+        }
+    }
+
     private ExceptionModel UpdateCreditStateAfterTakeCredit(TCredit credit)
     {
         var createCredit = Create(credit);
+        if (createCredit != ExceptionModel.Ok)
+            return createCredit;
+
+        return ExceptionModel.Ok;
+    }
+
+    private async Task<ExceptionModel> UpdateCreditStateAfterTakeCreditAsync(TCredit credit)
+    {
+        var createCredit = await CreateAsync(credit);
         if (createCredit != ExceptionModel.Ok)
             return createCredit;
 
@@ -271,6 +372,21 @@ public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>
         return ExceptionModel.Ok;
     }
 
+    private async Task<ExceptionModel> UpdateAccountsAfterTakeCreditAsync(TUser user, Operation operationAccrualToUserAccount)
+    {
+        // here creates operation for accrual money on user bank account
+        var createOperation = await _bankContext.CreateOperationAsync(operationAccrualToUserAccount, OperationKind.Accrual);
+        if (createOperation != ExceptionModel.Ok)
+            return createOperation;
+
+        // accrual money to user's bank account
+        var accrualOperation = await _bankContext.BankAccountAccrualAsync(user, user.Card?.BankAccount?.Bank, operationAccrualToUserAccount);
+        if (accrualOperation != ExceptionModel.Ok)
+            return accrualOperation;
+
+        return ExceptionModel.Ok;
+    }
+
     private ExceptionModel UpdateAccountsAfterPayCredit(TUser user, TCredit credit, Operation operationWithdrawFromUserAccount, decimal payAmount)
     {
         if (payAmount > credit.RepaymentAmount)
@@ -283,6 +399,23 @@ public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>
 
         // withdraw money to user's bank account
         var bankAccountWithdraw = _bankContext.BankAccountWithdraw(user, user.Card?.BankAccount?.Bank, operationWithdrawFromUserAccount);
+        if (bankAccountWithdraw != ExceptionModel.Ok)
+            return bankAccountWithdraw;
+        return ExceptionModel.Ok;
+    }
+
+    private async Task<ExceptionModel> UpdateAccountsAfterPayCreditAsync(TUser user, TCredit credit, Operation operationWithdrawFromUserAccount, decimal payAmount)
+    {
+        if (payAmount > credit.RepaymentAmount)
+            operationWithdrawFromUserAccount.TransferAmount = credit.RepaymentAmount;
+
+        // here creates operation for accrual money on user bank account
+        var createOperation = await _bankContext.CreateOperationAsync(operationWithdrawFromUserAccount, OperationKind.Withdraw);
+        if (createOperation != ExceptionModel.Ok)
+            return createOperation;
+
+        // withdraw money to user's bank account
+        var bankAccountWithdraw = await _bankContext.BankAccountWithdrawAsync(user, user.Card?.BankAccount?.Bank, operationWithdrawFromUserAccount);
         if (bankAccountWithdraw != ExceptionModel.Ok)
             return bankAccountWithdraw;
         return ExceptionModel.Ok;

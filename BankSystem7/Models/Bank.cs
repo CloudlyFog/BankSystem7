@@ -79,6 +79,8 @@ public class Credit
     public Credit(decimal creditAmount, decimal interestRate, DateTime repaymentDate, User user = null, Bank bank = null)
     {
         ID = Guid.NewGuid();
+        UserID = user.ID;
+        BankID = bank.ID;
         CreditAmount = creditAmount;
         InterestRate = interestRate;
         RepaymentDate = repaymentDate;
