@@ -121,7 +121,15 @@ public class GenericDbContext : DbContext
     /// <typeparam name="T">type of <see cref="item"/></typeparam>
     public void UpdateTracker<T>(T item, EntityState state, Action? action, DbContext context)
     {
-        context.Entry(item).State = state;
+        if (item is not null)
+            context.Entry(item).State = state;
+        action?.Invoke();
+    }
+
+    public void UpdateTrackerRange(object[] items, EntityState state, Action? action, DbContext context)
+    {
+        foreach (var item in items.Where(x => x is not null))
+            context.Entry(item).State = state;
         action?.Invoke();
     }
 

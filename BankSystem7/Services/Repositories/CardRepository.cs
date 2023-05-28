@@ -65,7 +65,7 @@ public sealed class CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         if (item.Exception == CardException.AgeRestricted)
             return ExceptionModel.OperationRestricted;
 
-        if (!FitsConditions(item))
+        if (item is not null && Exist(x => x.ID == item.ID))
             return ExceptionModel.OperationFailed;
 
         _applicationContext.Cards.Add(item);
@@ -78,7 +78,7 @@ public sealed class CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         if (item.Exception == CardException.AgeRestricted)
             return ExceptionModel.OperationRestricted;
 
-        if (!FitsConditions(item))
+        if (item is not null && Exist(x => x.ID == item.ID))
             return ExceptionModel.OperationFailed;
 
         _applicationContext.Cards.Add(item);
