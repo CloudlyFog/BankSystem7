@@ -66,8 +66,13 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         if (Exist(x => x.ID.Equals(item.ID) || x.Name.Equals(item.Name) && x.Email.Equals(item.Email)))
             return ExceptionModel.OperationRestricted;
 
-        UpdateBankTracker(item);
         _applicationContext.Users.Add(item);
+
+        _applicationContext.UpdateTracker(item.Card.BankAccount.Bank, EntityState.Modified, delegate
+        {
+            item.Card.BankAccount.Bank.AccountAmount += _bankRepository.CalculateBankAccountAmount(0, item.Card.Amount);
+        }, _applicationContext);
+
         _applicationContext.SaveChanges();
         return ExceptionModel.Ok;
     }
@@ -80,8 +85,13 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         if (Exist(x => x.ID.Equals(item.ID) || x.Name.Equals(item.Name) && x.Email.Equals(item.Email)))
             return ExceptionModel.OperationRestricted;
 
-        UpdateBankTracker(item);
         _applicationContext.Users.Add(item);
+
+        _applicationContext.UpdateTracker(item.Card.BankAccount.Bank, EntityState.Modified, delegate
+        {
+            item.Card.BankAccount.Bank.AccountAmount += _bankRepository.CalculateBankAccountAmount(0, item.Card.Amount);
+        }, _applicationContext);
+
         await _applicationContext.SaveChangesAsync();
         return ExceptionModel.Ok;
     }
@@ -166,23 +176,6 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
     public async Task<TUser> GetAsync(Expression<Func<TUser, bool>> predicate)
     {
         return await All.FirstOrDefaultAsync(predicate) ?? (TUser)User.Default;
-    }
-
-    private void UpdateBankTracker(TUser user)
-    {
-        _applicationContext.ChangeTracker.Clear();
-
-        var bank = _bankRepository.Get(x => x.ID == user.Card.BankAccount.Bank.ID
-                                    || x.BankName == user.Card.BankAccount.Bank.BankName);
-
-        user.Card.BankAccount.Bank.AccountAmount = bank.AccountAmount +=
-            _bankRepository.CalculateBankAccountAmount(0, user.Card.Amount);
-
-        if (bank.Equals(Bank.Default))
-            return;
-
-        user.Card.BankAccount.Bank = null;
-        _applicationContext.Banks.Update(bank);
     }
 
     public void Dispose()
