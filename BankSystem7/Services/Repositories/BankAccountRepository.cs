@@ -62,57 +62,85 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
 
     public ExceptionModel Transfer(TUser? from, TUser? to, decimal transferAmount)
     {
+        // Check if the sender's bank account, receiver's bank account, and transfer amount are valid. If not, return an operation failed exception.
         if (from?.Card?.BankAccount is null || to?.Card?.BankAccount is null || transferAmount <= 0)
             return ExceptionModel.OperationFailed;
 
+        // Check if the sender's bank account and receiver's bank account exist in the database. If not, return an operation failed exception.
         if (!Exist(x => x.ID == from.Card.BankAccount.ID) || !Exist(x => x.ID == to.Card.BankAccount.ID))
             return ExceptionModel.OperationFailed;
 
+        // Begin a new transaction with repeatable read isolation level.
         using var transaction = _bankContext.Database.BeginTransaction(IsolationLevel.RepeatableRead);
+
+        // Check bank where transaction was sent
         _bankRepository.AnotherBankTransactionOperation = AnotherBankTransactionOperation(from, to);
 
+        // Call the WithdrawAsync method with the sender and transfer amount as parameters and store the result in the withdraw variable.
         var withdraw = Withdraw(from, transferAmount);
+
+        // If the withdraw operation failed, rollback the transaction and return the withdraw exception
         if (withdraw != ExceptionModel.Ok)
         {
             transaction.Rollback();
             return withdraw;
         }
 
+        // Call the AccrualAsync method with the receiver and transfer amount as parameters and store the result in the accrual variable.
         var accrual = Accrual(to, transferAmount);
+
+        // If the accrual operation failed, rollback the transaction and return the withdraw exception
         if (accrual != ExceptionModel.Ok)
         {
             transaction.Rollback();
             return accrual;
         }
+
+        // Commit the transaction.
         transaction.Commit();
+        // Return an operation successful exception.
         return ExceptionModel.Ok;
     }
 
     public async Task<ExceptionModel> TransferAsync(TUser? from, TUser? to, decimal transferAmount)
     {
+        // Check if the sender's bank account, receiver's bank account, and transfer amount are valid. If not, return an operation failed exception.
         if (from?.Card?.BankAccount is null || to?.Card?.BankAccount is null || transferAmount <= 0)
             return ExceptionModel.OperationFailed;
 
+        // Check if the sender's bank account and receiver's bank account exist in the database. If not, return an operation failed exception.
         if (!Exist(x => x.ID == from.Card.BankAccount.ID) || !Exist(x => x.ID == to.Card.BankAccount.ID))
             return ExceptionModel.OperationFailed;
 
+        // Begin a new transaction with repeatable read isolation level.
         using var transaction = await _bankContext.Database.BeginTransactionAsync(IsolationLevel.RepeatableRead);
+
+        // Check bank where transaction was sent
         _bankRepository.AnotherBankTransactionOperation = AnotherBankTransactionOperation(from, to);
 
+        // Call the WithdrawAsync method with the sender and transfer amount as parameters and store the result in the withdraw variable.
         var withdraw = await WithdrawAsync(from, transferAmount);
+
+        // If the withdraw operation failed, rollback the transaction and return the withdraw exception
         if (withdraw != ExceptionModel.Ok)
         {
             await transaction.RollbackAsync();
             return withdraw;
         }
 
+        // Call the AccrualAsync method with the receiver and transfer amount as parameters and store the result in the accrual variable.
         var accrual = await AccrualAsync(to, transferAmount);
+
+        // If the accrual operation failed, rollback the transaction and return the withdraw exception
         if (accrual != ExceptionModel.Ok)
         {
             await transaction.RollbackAsync();
             return accrual;
         }
+
+        // Commit the transaction.
         await transaction.CommitAsync();
+        // Return an operation successful exception.
         return ExceptionModel.Ok;
     }
 
