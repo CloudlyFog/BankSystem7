@@ -70,7 +70,7 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
 
         _applicationContext.UpdateTracker(item.Card.BankAccount.Bank, EntityState.Modified, delegate
         {
-            item.Card.BankAccount.Bank.AccountAmount += _bankRepository.CalculateBankAccountAmount(0, item.Card.Amount);
+            item.Card.BankAccount.Bank.AccountAmount += _bankRepository.CalculateBankAccountAmount(item.Card.Amount);
         }, _applicationContext);
 
         _applicationContext.SaveChanges();
@@ -89,7 +89,7 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
 
         _applicationContext.UpdateTracker(item.Card.BankAccount.Bank, EntityState.Modified, delegate
         {
-            item.Card.BankAccount.Bank.AccountAmount += _bankRepository.CalculateBankAccountAmount(0, item.Card.Amount);
+            item.Card.BankAccount.Bank.AccountAmount += _bankRepository.CalculateBankAccountAmount(item.Card.Amount);
         }, _applicationContext);
 
         await _applicationContext.SaveChangesAsync();
@@ -120,15 +120,15 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
     {
         if (!FitsConditions(item))
             return ExceptionModel.EntityNotExist;
+        
+        _applicationContext.RemoveRange(item, (TBankAccount)item.Card.BankAccount);
+        _applicationContext.UpdateTracker(item.Card.BankAccount.Bank, EntityState.Modified, delegate
+        {
+            item.Card.BankAccount.Bank.AccountAmount -=
+                _bankRepository.CalculateBankAccountAmount(item.Card.Amount);
+        }, _applicationContext);
 
-        item.Card.BankAccount.Bank.AccountAmount +=
-            _bankRepository.CalculateBankAccountAmount(item.Card.Amount, 0);
-
-        _applicationContext.Users.Remove(item);
-        _applicationContext.BankAccounts.Remove((TBankAccount)item.Card.BankAccount);
-        _applicationContext.Banks.Update((TBank)item.Card.BankAccount.Bank);
         _applicationContext.SaveChanges();
-
         return ExceptionModel.Ok;
     }
 
@@ -137,12 +137,13 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         if (!FitsConditions(item))
             return ExceptionModel.EntityNotExist;
 
-        item.Card.BankAccount.Bank.AccountAmount +=
-            _bankRepository.CalculateBankAccountAmount(item.Card.Amount, 0);
+        _applicationContext.RemoveRange(item, (TBankAccount)item.Card.BankAccount);
+        _applicationContext.UpdateTracker(item.Card.BankAccount.Bank, EntityState.Modified, delegate
+        {
+            item.Card.BankAccount.Bank.AccountAmount -=
+                _bankRepository.CalculateBankAccountAmount(item.Card.Amount);
+        }, _applicationContext);
 
-        _applicationContext.Users.Remove(item);
-        _applicationContext.BankAccounts.Remove((TBankAccount)item.Card.BankAccount);
-        _applicationContext.Banks.Update((TBank)item.Card.BankAccount.Bank);
         await _applicationContext.SaveChangesAsync();
 
         return ExceptionModel.Ok;
