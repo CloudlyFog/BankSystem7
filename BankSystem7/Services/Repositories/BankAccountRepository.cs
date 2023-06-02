@@ -21,6 +21,9 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
     private readonly ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit> _applicationContext;
     private bool _disposedValue;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BankAccountRepository{TUser, TCard, TBankAccount, TBank, TCredit}"/> class.
+    /// </summary>
     public BankAccountRepository()
     {
         _applicationContext = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ApplicationContext ??
@@ -30,6 +33,10 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
         _bankRepository = new BankRepository<TUser, TCard, TBankAccount, TBank, TCredit>(ServicesSettings.Connection);
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BankAccountRepository{TUser, TCard, TBankAccount, TBank, TCredit}"/> class.
+    /// </summary>
+    /// <param name="bankRepository">The bank repository.</param>
     public BankAccountRepository(BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> bankRepository)
     {
         _bankRepository = bankRepository;
@@ -39,6 +46,10 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
         SetBankServicesOptions();
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BankAccountRepository{TUser, TCard, TBankAccount, TBank, TCredit}"/> class.
+    /// </summary>
+    /// <param name="connection">The connection string/</param>
     public BankAccountRepository(string connection)
     {
         _applicationContext = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ApplicationContext ??

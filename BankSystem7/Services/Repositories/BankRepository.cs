@@ -268,9 +268,14 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         return item is not null && await ExistAsync(x => x.ID == item.ID);
     }
 
-    internal decimal CalculateBankAccountAmount(decimal accountAmountVale)
+    /// <summary>
+    /// Calculates the bank account amount.
+    /// </summary>
+    /// <param name="accountAmountValue">The account amount value.</param>
+    /// <returns></returns>
+    internal decimal CalculateBankAccountAmount(decimal accountAmountValue)
     {
-        return accountAmountVale - 0;
+        return accountAmountValue - 0;
     }
 
     public void Dispose()
