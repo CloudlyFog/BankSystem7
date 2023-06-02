@@ -151,7 +151,7 @@ public class GenericDbContext : DbContext
     }
 
     /// <summary>
-    /// handle creating and deleting database
+    /// Handles creating and deleting database
     /// </summary>
     private void DatabaseHandle()
     {
@@ -165,6 +165,12 @@ public class GenericDbContext : DbContext
         ServicesSettings.InitializeAccess = false;
     }
 
+    /// <summary>
+    /// This method sets the database management system type for the given DbContextOptionsBuilder object.
+    /// </summary>
+    /// <param name="optionsBuilder">The options builder.</param>
+    /// <param name="dbmsType">Type of the DBMS.</param>
+    /// <exception cref="ArgumentOutOfRangeException">dbmsType - null</exception>
     private void SetDatabaseManagementSystemType(DbContextOptionsBuilder optionsBuilder, DatabaseManagementSystemType dbmsType)
     {
         switch (dbmsType)

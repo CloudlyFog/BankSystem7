@@ -20,7 +20,6 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
     private readonly BankContext<TUser, TCard, TBankAccount, TBank, TCredit> _bankContext;
     private readonly ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit> _applicationContext;
     private bool _disposedValue;
-    private const string ConnectionString = @"Server=localhost\\SQLEXPRESS;Data Source=maxim;Initial Catalog=Test;Integrated Security=True;Persist Security Info=False;Pooling=False;MultipleActiveResultSets=False;Encrypt=False;TrustServerCertificate=False";
 
     public BankAccountRepository()
     {
@@ -28,7 +27,7 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
                               new ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>(ServicesSettings.Connection);
         _bankContext = _bankRepository.BankContext;
         SetBankServicesOptions();
-        _bankRepository = new BankRepository<TUser, TCard, TBankAccount, TBank, TCredit>(ConnectionString);
+        _bankRepository = new BankRepository<TUser, TCard, TBankAccount, TBank, TCredit>(ServicesSettings.Connection);
     }
 
     public BankAccountRepository(BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> bankRepository)
@@ -60,6 +59,13 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
             .Include(x => x.Bank)
             .Include(x => x.User.Card);
 
+    /// <summary>
+    /// The purpose of this method is to transfer a certain amount of money from one user to another
+    /// </summary>
+    /// <param name="from">The parameter represents the user who is transferring the money</param>
+    /// <param name="to">The parameter represents the user who is receiving the money</param>
+    /// <param name="transferAmount">The parameter represents the amount of money being transferred</param>
+    /// <returns></returns>
     public ExceptionModel Transfer(TUser? from, TUser? to, decimal transferAmount)
     {
         // Check if the sender's bank account, receiver's bank account, and transfer amount are valid. If not, return an operation failed exception.
@@ -102,6 +108,13 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
         return ExceptionModel.Ok;
     }
 
+    /// <summary>
+    /// The purpose of this method is to transfer a certain amount of money from one user to another
+    /// </summary>
+    /// <param name="from">The parameter represents the user who is transferring the money</param>
+    /// <param name="to">The parameter represents the user who is receiving the money</param>
+    /// <param name="transferAmount">The parameter represents the amount of money being transferred</param>
+    /// <returns></returns>
     public async Task<ExceptionModel> TransferAsync(TUser? from, TUser? to, decimal transferAmount)
     {
         // Check if the sender's bank account, receiver's bank account, and transfer amount are valid. If not, return an operation failed exception.
@@ -408,24 +421,74 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
         return item?.Bank is not null && await ExistAsync(x => x.ID == item.ID);
     }
 
+    /// <summary>
+    /// <para>
+    /// The method checks if the BankAccount object is null and throws an exception if it is.
+    /// </para>
+    /// 
+    /// <para>
+    /// The next condition checks if the UserID property of the BankAccount object exists in the ID property of any user 
+    /// in the Users table of the database. If it doesn't exist, the method throws a KeyNotFoundException with a message indicating 
+    /// that the entity of the user with the given ID was not found.
+    /// </para>
+    /// 
+    /// <para>
+    /// The last condition checks if there exists a BankAccount object in the database with the same ID as the one passed to the method. 
+    /// If it doesn't exist, the method throws a KeyNotFoundException with a message indicating that the entity of the bank 
+    /// with the given ID was not found.
+    /// </para>
+    /// 
+    /// </summary>
+    /// <param name="item">The item.</param>
+    /// <exception cref="ArgumentNullException">Instance of BankAccount</exception>
+    /// <exception cref="KeyNotFoundException">
+    /// Entity of user with id {{{item.ID}}} wasn't found.
+    /// or
+    /// Entity of bank with id {{{item.ID}}} wasn't found
+    /// </exception>
     private void CheckBankAccount(BankAccount item)
     {
         if (item is null)
-            throw new Exception("Passed instance of BankAccount is null.");
+            throw new ArgumentNullException(nameof(item));
 
-        if (!_applicationContext.Users.AsNoTracking().Any(x => x.ID == item.UserID))
-            throw new Exception("Doesn't exist user with specified ID in the database.");
+        if (!_applicationContext.Users.AsNoTracking().Select(x => x.ID).Any(x => x == item.UserID))
+            throw new KeyNotFoundException($"Entity of user with id {{{item.ID}}} wasn't found.");
 
         if (!Exist(x => x.ID == item.ID))
-            throw new Exception($"Doesn't exist bank with id {{{item.ID}}}");
+            throw new KeyNotFoundException($"Entity of bank with id {{{item.ID}}} wasn't found");
     }
 
+    /// <summary>
+    /// It sets the bank context and application context for the bank services using the generic types 
+    /// <typeparamref name="TUser"/>
+    /// <typeparamref name="TCard"/>
+    /// <typeparamref name="TBankAccount"/>
+    /// <typeparamref name="TBank"/> and
+    /// <typeparamref name="TCredit"/>.
+    /// The bank context and application context are set to the values of the private fields 
+    /// _bankContext and _applicationContext, respectively. This method is likely called during the initialization of the bank services.
+    /// </summary>
     private void SetBankServicesOptions()
     {
         BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.BankContext = _bankContext;
         BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ApplicationContext = _applicationContext;
     }
 
+    /// <summary>
+    /// <para>
+    /// The method returns a boolean value. Inside the method, there is a single line of code that checks 
+    /// if the bank associated with the <paramref name="from"/> user's card's bank account is different from the bank associated 
+    /// with the <paramref name="to"/> user's card's bank account. 
+    /// </para>
+    /// 
+    /// <para>
+    /// If the banks are different, the method returns true. Otherwise, it returns false. 
+    /// </para>
+    /// 
+    /// </summary>
+    /// <param name="from">The parameter represents the user who is transferring the money</param>
+    /// <param name="to">The parameter represents the user who is receiving the money</param>
+    /// <returns></returns>
     private bool AnotherBankTransactionOperation(TUser from, TUser to)
     {
         return from.Card.BankAccount.Bank != to.Card.BankAccount.Bank;
