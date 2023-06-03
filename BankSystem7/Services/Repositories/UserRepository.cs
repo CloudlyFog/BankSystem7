@@ -120,7 +120,7 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
     {
         if (!FitsConditions(item))
             return ExceptionModel.EntityNotExist;
-        
+
         _applicationContext.RemoveRange(item, (TBankAccount)item.Card.BankAccount);
         _applicationContext.UpdateTracker(item.Card.BankAccount.Bank, EntityState.Modified, delegate
         {

@@ -7,7 +7,7 @@ using System.Linq.Expressions;
 
 namespace BankSystem7.Services.Repositories;
 
-public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> : IRepository<TBank>, 
+public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> : IRepository<TBank>,
     IReaderServiceWithTracking<TBank>, IRepositoryAsync<TBank>
     where TUser : User
     where TCard : Card

@@ -1,6 +1,6 @@
-﻿using System.Text;
-using BankSystem7.Models.Connection;
+﻿using BankSystem7.Models.Connection;
 using BankSystem7.Models.Credentials;
+using System.Text;
 
 namespace BankSystem7.Services.Configuration;
 
@@ -20,7 +20,7 @@ internal static class ServicesSettings
     public static string? Connection { get; private set; }
     public static bool Ensured { get; set; }
     public static bool InitializeAccess { get; set; }
-    public static DatabaseManagementSystemType DatabaseManagementSystemType { get; set; } 
+    public static DatabaseManagementSystemType DatabaseManagementSystemType { get; set; }
 
     public static void SetConnection(string? connection = null, string? databaseName = DefaultDatabaseName, string? dataSource = DefaultDataSource)
     {
@@ -80,10 +80,13 @@ internal static class ServicesSettings
         {
             case DatabaseManagementSystemType.MicrosoftSqlServer:
                 return GetMicrosoftSqlServerConnectionString(connectionConfiguration, credentials);
+
             case DatabaseManagementSystemType.PostgreSql:
                 return GetNpgsqlConnectionString(connectionConfiguration, credentials);
+
             case DatabaseManagementSystemType.MySql:
                 return GetMySqlConnectionString(connectionConfiguration, credentials);
+
             default:
                 return DefaultMicrosoftSqlServerConnection;
         }

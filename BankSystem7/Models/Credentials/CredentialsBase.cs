@@ -6,7 +6,7 @@ public abstract class CredentialsBase
     /// Takes user name/id for establishing connection with database
     /// </summary>
     public string? Username { get; set; }
-    
+
     /// <summary>
     /// Takes password of user for establishing connection with database
     /// </summary>

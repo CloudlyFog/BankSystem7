@@ -32,7 +32,7 @@ public class ConfigurationOptions
     /// <seealso cref="DbContext"/> <seealso cref="ModelBuilder"/>
     /// </summary>
     public Dictionary<DbContext, ModelConfiguration?>? Contexts { get; set; }
-    
+
     public CredentialsBase Credentials { get; set; }
     public ConnectionConfigurationBase ConnectionConfiguration { get; set; }
 }
