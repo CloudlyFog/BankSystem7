@@ -126,6 +126,13 @@ public class GenericDbContext : DbContext
         action?.Invoke();
     }
 
+    /// <summary>
+    /// Method updates states of entities. You should use this method with method <see cref="AvoidChanges"/> for the best state tracking of entities
+    /// </summary>
+    /// <param name="items">array of entities whose state will be changed</param>
+    /// <param name="state">future state of <see cref="items"/></param>
+    /// <param name="action">action that will invoked after state of entity will be changed. Usually as action you should use method <see cref="AvoidChanges"/></param>
+    /// <param name="context">context that will handle state changing</param>
     public void UpdateTrackerRange(object[] items, EntityState state, Action? action, DbContext context)
     {
         foreach (var item in items.Where(x => x is not null))
