@@ -21,11 +21,13 @@ public class ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit> : 
         CardRepository = new CardRepository<TUser, TCard, TBankAccount, TBank, TCredit>(BankAccountRepository);
         BankRepository = new BankRepository<TUser, TCard, TBankAccount, TBank, TCredit>(ServicesSettings.Connection);
         CreditRepository = new CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>(ServicesSettings.Connection);
+
         if (Options.LoggerOptions.IsEnabled)
         {
             LoggerRepository = new LoggerRepository(Options.LoggerOptions);
             Logger = new Logger<TUser, TCard, TBankAccount, TBank, TCredit>(LoggerRepository, Options.LoggerOptions);
         }
+
         OperationRepository = new OperationRepository(Options.OperationOptions);
     }
 
@@ -56,13 +58,10 @@ public class ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit> : 
 
     private static void InitDbContexts(Dictionary<DbContext, ModelConfiguration>? contexts)
     {
-        if (contexts is null || contexts.Keys.Count == 0)
-            return;
-
-        if (ServicesSettings.Ensured)
-            return;
-
-        InitializeDbContexts(Options.Contexts);
+        if (contexts is not null && contexts.Count > 0 && !ServicesSettings.Ensured)
+        {
+            InitializeDbContexts(Options.Contexts);
+        }
     }
 
     private void Dispose(bool disposing)

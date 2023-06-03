@@ -2,7 +2,9 @@ using BankSystem7.Models;
 using BankSystem7.Services;
 using BankSystem7.Services.Configuration;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using MongoDB.Driver;
+using System.Buffers;
 
 namespace BankSystem7.AppContext;
 
@@ -47,11 +49,35 @@ internal sealed class BankContext<TUser, TCard, TBankAccount, TBank, TCredit> : 
         if (_operationService.Collection.Find(Builders<Operation>.Filter.Eq(x => x.ID, operation.ID)).Any())
             return ExceptionModel.EntityNotExist;
 
-        operation.OperationStatus = StatusOperation(operation, operationKind);
-        if (operation.OperationStatus != StatusOperationCode.Ok)
+        operation.OperationStatus = GetStatusOperation(operation, operationKind);
+        if (operation.OperationStatus is not StatusOperationCode.Ok or StatusOperationCode.Successfully)
             return ExceptionModel.OperationRestricted;
 
         _operationService.Collection.InsertOne(operation);
+        return ExceptionModel.Ok;
+    }
+
+    /// <summary>
+    /// creates transaction operation
+    /// </summary>
+    /// <param name="operation"></param>
+    /// <param name="operationKind"></param>
+    public async Task<ExceptionModel> CreateOperationAsync(Operation? operation, OperationKind operationKind)
+    {
+        if (operation is null)
+            return ExceptionModel.EntityIsNull;
+
+        // Find(Builders<Operation>.Filter.Eq(predicate)).Any() equals
+        // Operations.Any(predicate)
+        // we find and in the same time check is there object in database
+        if (await _operationService.Collection.Find(Builders<Operation>.Filter.Eq(x => x.ID, operation.ID)).AnyAsync())
+            return ExceptionModel.EntityNotExist;
+
+        operation.OperationStatus = GetStatusOperation(operation, operationKind);
+        if (operation.OperationStatus is not StatusOperationCode.Ok or StatusOperationCode.Successfully)
+            return ExceptionModel.OperationRestricted;
+
+        await _operationService.Collection.InsertOneAsync(operation);
         return ExceptionModel.Ok;
     }
 
@@ -72,6 +98,22 @@ internal sealed class BankContext<TUser, TCard, TBankAccount, TBank, TCredit> : 
     }
 
     /// <summary>
+    /// delete transaction operation
+    /// </summary>
+    /// <param name="operation"></param>
+    /// <exception cref="ArgumentNullException"></exception>
+    public async Task<ExceptionModel> DeleteOperationAsync(Operation? operation)
+    {
+        if (operation is null)
+            return ExceptionModel.EntityIsNull;
+        if (await _operationService.Collection.Find(Builders<Operation>.Filter.Eq(x => x.ID, operation.ID)).AnyAsync())
+            return ExceptionModel.EntityNotExist;
+
+        await _operationService.Collection.DeleteOneAsync(x => x.ID == operation.ID);
+        return ExceptionModel.Ok;
+    }
+
+    /// <summary>
     /// withdraw money from user bank account and accrual to bank's account
     /// </summary>
     /// <param name="user"></param>
@@ -88,11 +130,32 @@ internal sealed class BankContext<TUser, TCard, TBankAccount, TBank, TCredit> : 
         bank.AccountAmount += operation.TransferAmount;
         user.Card.BankAccount.BankAccountAmount -= operation.TransferAmount;
         user.Card.Amount -= operation.TransferAmount;
-        ChangeTracker.Clear();
-        Update(user.Card);
-        Update(user.Card.BankAccount);
-        Update(user.Card.BankAccount.Bank);
+
+        UpdateRange(user.Card, user.Card.BankAccount, user.Card.BankAccount.Bank);
         SaveChanges();
+        return ExceptionModel.Ok;
+    }
+
+    /// <summary>
+    /// withdraw money from user bank account and accrual to bank's account
+    /// </summary>
+    /// <param name="user"></param>
+    /// <param name="bank"></param>
+    /// <param name="operation"></param>
+    /// <exception cref="Exception"></exception>
+    internal async Task<ExceptionModel> BankAccountWithdrawAsync(User? user, Bank? bank, Operation operation)
+    {
+        if (user.Card?.BankAccount?.Bank is null || bank is null || operation is null)
+            return ExceptionModel.EntityIsNull;
+        if (operation.OperationStatus != StatusOperationCode.Ok)
+            return (ExceptionModel)operation.OperationStatus.GetHashCode();
+
+        bank.AccountAmount += operation.TransferAmount;
+        user.Card.BankAccount.BankAccountAmount -= operation.TransferAmount;
+        user.Card.Amount -= operation.TransferAmount;
+
+        UpdateRange(user.Card, user.Card.BankAccount, user.Card.BankAccount.Bank);
+        await SaveChangesAsync();
         return ExceptionModel.Ok;
     }
 
@@ -113,11 +176,32 @@ internal sealed class BankContext<TUser, TCard, TBankAccount, TBank, TCredit> : 
         bank.AccountAmount -= operation.TransferAmount;
         user.Card.BankAccount.BankAccountAmount += operation.TransferAmount;
         user.Card.Amount += operation.TransferAmount;
-        ChangeTracker.Clear();
-        Update(user.Card);
-        Update(user.Card.BankAccount);
-        Update(user.Card.BankAccount.Bank);
+
+        UpdateRange(user.Card, user.Card.BankAccount, user.Card.BankAccount.Bank);
         SaveChanges();
+        return ExceptionModel.Ok;
+    }
+
+    /// <summary>
+    /// accrual money to user bank account from bank's account
+    /// </summary>
+    /// <param name="user"></param>
+    /// <param name="bank"></param>
+    /// <param name="operation"></param>
+    /// <exception cref="Exception"></exception>
+    internal async Task<ExceptionModel> BankAccountAccrualAsync(User? user, Bank? bank, Operation operation)
+    {
+        if (user.Card?.BankAccount?.Bank is null || bank is null || operation is null)
+            return ExceptionModel.EntityIsNull;
+        if (operation.OperationStatus != StatusOperationCode.Ok)
+            return (ExceptionModel)operation.OperationStatus.GetHashCode();
+
+        bank.AccountAmount -= operation.TransferAmount;
+        user.Card.BankAccount.BankAccountAmount += operation.TransferAmount;
+        user.Card.Amount += operation.TransferAmount;
+
+        UpdateRange(user.Card, user.Card.BankAccount, user.Card.BankAccount.Bank);
+        await SaveChangesAsync();
         return ExceptionModel.Ok;
     }
 
@@ -132,34 +216,32 @@ internal sealed class BankContext<TUser, TCard, TBankAccount, TBank, TCredit> : 
     /// <param name="operationKind"></param>
     /// <returns>status of operation, default - Ok or Successfully</returns>
     /// <exception cref="ArgumentNullException"></exception>
-    private StatusOperationCode StatusOperation(Operation? operationModel, OperationKind operationKind)
+    private StatusOperationCode GetStatusOperation(Operation? operationModel, OperationKind operationKind)
     {
-        if (operationModel is null)
+        if (operationModel is null || !Banks.AsNoTracking().Any(x => x.ID == operationModel.BankID))
             return StatusOperationCode.Error;
 
         if (operationKind == OperationKind.Accrual)
         {
-            // SenderID is ID of bank
-            // ReceiverID is ID of user
-            if (!Banks.AsNoTracking().Any(x => x.ID == operationModel.SenderID) || !Users.Any(x => x.ID == operationModel.ReceiverID))
-                operationModel.OperationStatus = StatusOperationCode.Error;
+            // Check if the receiver ID exists in the Users table without tracking changes
+            if (!Users.AsNoTracking().Select(x => x.ID).Any(x => x == operationModel.ReceiverID))
+                return StatusOperationCode.Error;
 
+            // Check if the sender ID exists in the Banks table and if the account amount is less than the transfer amount
             if (Banks.AsNoTracking().FirstOrDefault(x => x.ID == operationModel.SenderID)?.AccountAmount < operationModel.TransferAmount)
-                operationModel.OperationStatus = StatusOperationCode.Restricted;
+                return StatusOperationCode.Restricted;
         }
         else if (operationKind == OperationKind.Withdraw)
         {
-            // SenderID is ID of user
-            // ReceiverID is ID of bank
-            if (!Banks.AsNoTracking().Any(x => x.ID == operationModel.ReceiverID) || !Users.Any(x => x.ID == operationModel.SenderID))
-                operationModel.OperationStatus = StatusOperationCode.Error;
+            // Check if the SenderID of the operationModel exists in the Users table
+            if (!Users.AsNoTracking().Select(x => x.ID).Any(x => x == operationModel.SenderID))
+                return StatusOperationCode.Error;
+
+            // Check if the SenderID of the operationModel has enough funds in their bank account
             if (BankAccounts.AsNoTracking().FirstOrDefault(x => x.UserID == operationModel.SenderID)?.BankAccountAmount < operationModel.TransferAmount)
-                operationModel.OperationStatus = StatusOperationCode.Restricted;
+                return StatusOperationCode.Restricted;
         }
 
-        if (!Banks.AsNoTracking().Any(x => x.ID == operationModel.BankID))
-            operationModel.OperationStatus = StatusOperationCode.Error;
-
-        return operationModel.OperationStatus;
+        return StatusOperationCode.Ok;
     }
 }

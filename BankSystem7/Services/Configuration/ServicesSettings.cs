@@ -76,16 +76,17 @@ internal static class ServicesSettings
     private static string GetConnectionByDbmsType(DatabaseManagementSystemType type,
         ConnectionConfigurationBase connectionConfiguration, CredentialsBase credentials)
     {
-        Connection = type switch
+        switch (type)
         {
-            DatabaseManagementSystemType.MicrosoftSqlServer => GetMicrosoftSqlServerConnectionString(
-                connectionConfiguration, credentials),
-            DatabaseManagementSystemType.PostgreSql => GetNpgsqlConnectionString(connectionConfiguration, credentials),
-            DatabaseManagementSystemType.MySql => GetMySqlConnectionString(connectionConfiguration, credentials),
-            _ => DefaultMicrosoftSqlServerConnection
-        };
-
-        return Connection;
+            case DatabaseManagementSystemType.MicrosoftSqlServer:
+                return GetMicrosoftSqlServerConnectionString(connectionConfiguration, credentials);
+            case DatabaseManagementSystemType.PostgreSql:
+                return GetNpgsqlConnectionString(connectionConfiguration, credentials);
+            case DatabaseManagementSystemType.MySql:
+                return GetMySqlConnectionString(connectionConfiguration, credentials);
+            default:
+                return DefaultMicrosoftSqlServerConnection;
+        }
     }
 
     private static string GetMicrosoftSqlServerConnectionString(ConnectionConfigurationBase connectionConfiguration,

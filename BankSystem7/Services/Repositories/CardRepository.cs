@@ -7,7 +7,8 @@ using System.Linq.Expressions;
 
 namespace BankSystem7.Services.Repositories;
 
-public sealed class CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> : IRepository<TCard>, IReaderServiceWithTracking<TCard>
+public sealed class CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> : IRepository<TCard>, IRepositoryAsync<TCard>,
+    IReaderServiceWithTracking<TCard>
     where TUser : User
     where TCard : Card
     where TBankAccount : BankAccount
@@ -63,10 +64,25 @@ public sealed class CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
     {
         if (item.Exception == CardException.AgeRestricted)
             return ExceptionModel.OperationRestricted;
-        if (!FitsConditions(item))
+
+        if (item is not null && Exist(x => x.ID == item.ID))
             return ExceptionModel.OperationFailed;
+
         _applicationContext.Cards.Add(item);
         _applicationContext.SaveChanges();
+        return ExceptionModel.Ok;
+    }
+
+    public async Task<ExceptionModel> CreateAsync(TCard item)
+    {
+        if (item.Exception == CardException.AgeRestricted)
+            return ExceptionModel.OperationRestricted;
+
+        if (item is not null && Exist(x => x.ID == item.ID))
+            return ExceptionModel.OperationFailed;
+
+        _applicationContext.Cards.Add(item);
+        await _applicationContext.SaveChangesAsync();
         return ExceptionModel.Ok;
     }
 
@@ -75,9 +91,18 @@ public sealed class CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;
 
-        _applicationContext.ChangeTracker.Clear();
         _applicationContext.Cards.Remove(item);
         _applicationContext.SaveChanges();
+        return ExceptionModel.Ok;
+    }
+
+    public async Task<ExceptionModel> DeleteAsync(TCard item)
+    {
+        if (!FitsConditions(item))
+            return ExceptionModel.OperationFailed;
+
+        _applicationContext.Cards.Remove(item);
+        await _applicationContext.SaveChangesAsync();
         return ExceptionModel.Ok;
     }
 
@@ -85,15 +110,30 @@ public sealed class CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
     {
         if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;
-        _applicationContext.ChangeTracker.Clear();
+
         _applicationContext.Cards.Update(item);
         _applicationContext.SaveChanges();
+        return ExceptionModel.Ok;
+    }
+
+    public async Task<ExceptionModel> UpdateAsync(TCard item)
+    {
+        if (!FitsConditions(item))
+            return ExceptionModel.OperationFailed;
+
+        _applicationContext.Cards.Update(item);
+        await _applicationContext.SaveChangesAsync();
         return ExceptionModel.Ok;
     }
 
     public TCard Get(Expression<Func<TCard, bool>> predicate)
     {
         return All.FirstOrDefault(predicate) ?? (TCard)Card.Default;
+    }
+
+    public async Task<TCard> GetAsync(Expression<Func<TCard, bool>> predicate)
+    {
+        return await All.FirstOrDefaultAsync(predicate) ?? (TCard)Card.Default;
     }
 
     public TCard GetWithTracking(Expression<Func<TCard, bool>> predicate)
@@ -106,6 +146,11 @@ public sealed class CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         return All.Any(predicate);
     }
 
+    public async Task<bool> ExistAsync(Expression<Func<TCard, bool>> predicate)
+    {
+        return await All.AnyAsync(predicate);
+    }
+
     public bool ExistWithTracking(Expression<Func<TCard, bool>> predicate)
     {
         return AllWithTracking.Any(predicate);
@@ -114,6 +159,11 @@ public sealed class CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
     public bool FitsConditions(TCard? item)
     {
         return item is not null && Exist(x => x.ID == item.ID);
+    }
+
+    public async Task<bool> FitsConditionsAsync(TCard? item)
+    {
+        return item is not null && await ExistAsync(x => x.ID == item.ID);
     }
 
     // Public implementation of Dispose pattern callable by consumers.

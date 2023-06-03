@@ -14,7 +14,7 @@ public class ConfigurationOptions
     /// Takes settings for logger
     /// <seealso cref="Logger{TUser,TCard,TBankAccount,TBank,TCredit}"/>
     /// </summary>
-    public LoggerOptions? LoggerOptions { get; init; } = new()
+    public LoggerOptions? LoggerOptions { get; set; } = new()
     {
         IsEnabled = false,
     };
@@ -23,7 +23,7 @@ public class ConfigurationOptions
     /// Takes settings for OperationService (i.e. OperationRepository)
     /// <seealso cref="OperationService{T}"/>
     /// </summary>
-    public OperationServiceOptions? OperationOptions { get; init; }
+    public OperationServiceOptions? OperationOptions { get; set; }
 
     /// <summary>
     /// Manages models configuration.
@@ -31,7 +31,7 @@ public class ConfigurationOptions
     /// Value - <see cref="ModelConfiguration"/> class that tunes relationships between models.
     /// <seealso cref="DbContext"/> <seealso cref="ModelBuilder"/>
     /// </summary>
-    public Dictionary<DbContext, ModelConfiguration?>? Contexts { get; init; }
+    public Dictionary<DbContext, ModelConfiguration?>? Contexts { get; set; }
     
     public CredentialsBase Credentials { get; set; }
     public ConnectionConfigurationBase ConnectionConfiguration { get; set; }

@@ -1,8 +1,14 @@
 # Bank system 7
 This library provides opportunities for using likeness of bank system. You can handle not only users but also other models like banks, cards and etc.
 
-### Updates in version 0.5.1
-- Added support for MySQL.
+### Updates in version 0.5.2
+- Added async implementation for many methods in repositories and context classes.
+- Updated logic of Add, AddAsync, Update, UpdateAsync, Remove, RemoveAsync, SaveChanges, SaveChangesAsync methods for more code readability and deeper understanding methods behavior in repositories.
+- Fixed bug with bad condition in method Create and CreateAsync in CardRepository.
+- Added new method UpdateTrackerRange for updating many entities in one method call.
+- Update logic in methods Create and CreateAsync in UserRepository. Removed method and replaced by internal method UpdateTracker in GenericDbContext.
+- Updated code readability in methods Delete & DeleteAsync in UserRepository. Removed method and replaced by internal method UpdateTracker in GenericDbContext.
+- Updated comments for methods in BankAccountRepository, BankRepository and GenericDbContext.
 ****
 # Documentation
 
@@ -115,8 +121,10 @@ There are 3 classes context:
 #### API GenericDbContext
 **Methods:**
 1. `private void DatabaseHandle()` - implements handling creating and deleting database.
-2. `public void UpdateTracker<T>(T item, EntityState state, Action? action, DbContext context)` - updates states of entity. You should use this method with method `AvoidChanges(object[]? entities, DbContext context)` for the best state tracking of entities.
-3. `public void AvoidChanges(object[]? entities, DbContext context)` - ensures that passed entities won't be changed during call method `SaveChanges()`.
+2. `private void SetDatabaseManagementSystemType(DbContextOptionsBuilder optionsBuilder, DatabaseManagementSystemType dbmsType)` - method sets the database management system type for the given DbContextOptionsBuilder object.
+3. `public void UpdateTracker<T>(T item, EntityState state, Action? action, DbContext context)` - updates states of entity. You should use this method with method `AvoidChanges(object[]? entities, DbContext context)` for the best state tracking of entities.
+4. `public void UpdateTrackerRange(object[] items, EntityState state, Action? action, DbContext context)` - method updates states of entities. You should use this method with method `AvoidChanges(object[]? entities, DbContext context)` for the best state tracking of entities
+5. `public void AvoidChanges(object[]? entities, DbContext context)` - ensures that passed entities won't be changed during call method `SaveChanges()`.
 
 #### API ApplicationContext
 
@@ -134,10 +142,14 @@ There are 3 classes context:
 
 **Methods:**
 1. `public ExceptionModel CreateOperation(Operation operation, OperationKind operationKind)` - creates transaction operation.
-2. `public ExceptionModel DeleteOperation(Operation operation)` - deletes transaction operation
-3. `public ExceptionModel BankAccountWithdraw(User user, Bank bank, Operation operation)` - withdraws money from user bank account and accrual to bank's account.
-4. `private ExceptionModel BankAccountAccrual(User user, Bank bank, Operation operation)` - accruals money to user bank account from bank's account.
-5. `private StatusOperationCode StatusOperation(Operation operation, OperationKind operationKind)` - returns status of operation for next handling of operation.
+2. `public async Task<ExceptionModel> CreateOperationAsync(Operation? operation, OperationKind operationKind)` - creates transaction operation asynchronously.
+3. `public ExceptionModel DeleteOperation(Operation operation)` - deletes transaction operation
+4. `public async Task<ExceptionModel> DeleteOperationAsync(Operation? operation)` - deletes transaction operation asynchronously.
+5. `public ExceptionModel BankAccountWithdraw(User user, Bank bank, Operation operation)` - withdraws money from user bank account and accrual to bank's account.
+6. `internal async Task<ExceptionModel> BankAccountWithdrawAsync(User? user, Bank? bank, Operation operation)` - withdraws money from user bank account and accrual to bank's account asynchronously.
+7. `private ExceptionModel BankAccountAccrual(User user, Bank bank, Operation operation)` - accruals money to user bank account from bank's account.
+8. `internal async Task<ExceptionModel> BankAccountAccrualAsync(User? user, Bank? bank, Operation operation)` - accruals money to user bank account from bank's account asynchronously.
+9. `private StatusOperationCode GetStatusOperation(Operation operation, OperationKind operationKind)` - returns status of operation for next handling of operation.
 
 **Properties:**
 
@@ -167,19 +179,34 @@ Here located services for configuring library.
 
 ### Interfaces (and abstract classes)
 Here located interfaces which describes behavior of inherited repo-classes.
-1. Interface `IRepository<T> : IReaderService<T>, IWriterService<T>, IDisposable where T : class` - interface for implement standard library logic.
-   - `bool FitsConditions(T? item);` - implements logic for checking on conditions true of passed entity.
+1. **Interface** `IRepository<T> : IReaderService<T>, IWriterService<T>, IDisposable where T : class` - interface for implement standard library logic.
+   - `IQueryable<T> All {  get; }` - implements getting a sequence of the objects from database.
 
-2. **Interface** `IReaderService<T> where T : class` - interface for implement reading data from database.
+2. **Interface** `IRepositoryAsync<T> : IReaderServiceAsync<T>, IWriterServiceAsync<T> where T : class` - interface for implement standard library logic asynchronously.
+   - `IQueryable<T> All {  get; }` - implements getting a sequence of the objects from database.
+
+3. **Interface** `IReaderServiceAsync<T> where T : class` - interface for implement reading data from database asynchronously.
+
+   Methods
+   - `Task<T> GetAsync(Expression<Func<T, bool>> predicate);` - implements getting an object from database with predicate asynchronously.
+   - `Task<bool> ExistAsync(Expression<Func<T, bool>> predicate);` - implements checking exist object with in database predicate asynchronously.
+   - `Task<bool> FitsConditionsAsync(T? item);` - implements logic for checking on conditions true of passed entity asynchronously.
+
+4. **Interface** `IWriterServiceAsync<in T> where T : class` - interface for implement writing, updating and deleting data in database
+
+   Methods
+   - `Task<ExceptionModel> CreateAsync(T item);` - implements adding entity in database asynchronously.
+   - `Task<ExceptionModel> UpdateAsync(T item);` - implements updating entity in database asynchronously.
+   - `Task<ExceptionModel> DeleteAsync(T item);` - implements deleting entity from database asynchronously.
+
+5. **Interface** `IReaderService<T> where T : class` - interface for implement reading data from database.
 
    Methods
    - `T Get(Expression<Func<T, bool>> predicate);` - implements getting an object from database with predicate.
    - `bool Exist(Expression<Func<T, bool>> predicate);` - implements checking exist object with in database predicate.
+   - `bool FitsConditions(T? item);` - implements logic for checking on conditions true of passed entity.
 
-   Properties
-   - `IQueryable<T> All {  get; }` - implements getting a sequence of the objects from database.
-
-3. **Interface** `IReaderServiceWithTracking<T> where T : class` - interface for implement reading data from database with another type of parameters.
+6. **Interface** `IReaderServiceWithTracking<T> where T : class` - interface for implement reading data from database with another type of parameters.
 
    Methods
    - `T GetWithTracking(Expression<Expression<Func<T, bool>>> predicate);` - implements getting an object from database with predicate.
@@ -187,14 +214,14 @@ Here located interfaces which describes behavior of inherited repo-classes.
      Properties
    - `IQueryable<T> AllWithTracking {  get; }` - implements getting a sequence of the objects from database.
 
-4. **Interface** `IWriterService<in T> where T : class` - interface for implement writing, updating and deleting data in database
+7. **Interface** `IWriterService<in T> where T : class` - interface for implement writing, updating and deleting data in database
 
    Methods
-   - `ExceptionModel  Create(T item);` - implements adding item in database.
-   - `ExceptionModel  Update(T item);` - implements updating item in database.
-   - `ExceptionModel  Delete(T item);` - implements deleting item from database.
+   - `ExceptionModel  Create(T item);` - implements adding entity in database.
+   - `ExceptionModel  Update(T item);` - implements updating entity in database.
+   - `ExceptionModel  Delete(T item);` - implements deleting entity from database.
 
-5. **Interface** `ILogger` - interface that provides standard set for logging
+8. **Interface** `ILogger` - interface that provides standard set for logging
 
    Methods
    - `ExceptionModel Log(Report report);` - implements logging report in database.
@@ -204,7 +231,7 @@ Here located interfaces which describes behavior of inherited repo-classes.
    - `public bool IsReused { get; set; }` - defines possibility use already initialized logger.
    - `public LoggerOptions LoggerOptions { get; set; }` - defines options for logger configuration.
 
-6. **Abstract class** `LoggerExecutor<TOperationType> where TOperationType : Enum` - simple implementation of service for added reports to logger queue
+9. **Abstract class** `LoggerExecutor<TOperationType> where TOperationType : Enum` - simple implementation of service for added reports to logger queue
 
    Methods
    - `virtual void Log(ExceptionModel exceptionModel, string methodName, string className, TOperationType operationType, ICollection<GeneralReport<TOperationType>> reports)` - implements standard logic of inserting log data to logger queue. Can be overrided.
