@@ -31,7 +31,7 @@ public class ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit> : 
         OperationRepository = new OperationRepository(Options.OperationOptions);
     }
 
-    public BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit>? BankAccountRepository { get; }
+    public BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit>? BankAccountRepository { get; set; }
     public BankRepository<TUser, TCard, TBankAccount, TBank, TCredit>? BankRepository { get; }
     public CardRepository<TUser, TCard, TBankAccount, TBank, TCredit>? CardRepository { get; }
     public UserRepository<TUser, TCard, TBankAccount, TBank, TCredit>? UserRepository { get; }

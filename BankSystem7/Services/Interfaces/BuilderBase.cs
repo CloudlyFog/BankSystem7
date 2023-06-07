@@ -1,6 +1,7 @@
 ﻿using BankSystem7.Models;
 using BankSystem7.Services.Configuration;
 using BankSystem7.Services.Repositories;
+using System.Reflection;
 
 namespace BankSystem7.Services.Interfaces;
 
@@ -15,7 +16,7 @@ public abstract class BuilderBase<TUser, TCard, TBankAccount, TBank, TCredit> : 
 
     public BuilderSettings BuilderSettings { get; set; } = new();
 
-    public BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit>? BankAccountRepository { get; }
+    public BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit>? BankAccountRepository { get; set; }
 
     public BankRepository<TUser, TCard, TBankAccount, TBank, TCredit>? BankRepository { get; }
 
@@ -33,23 +34,12 @@ public abstract class BuilderBase<TUser, TCard, TBankAccount, TBank, TCredit> : 
 
     public void Build()
     {
-        var thisMethods = GetType().GetMethods();
+        var thisMethods = GetType().GetRuntimeMethods();
         foreach (var builderSettingsProperties in BuilderSettings.GetType().GetProperties())
         {
             if (thisMethods.Any(method => method.Name.Equals(builderSettingsProperties.Name)))
-            {
-                var method = thisMethods.FirstOrDefault(method => method.Name.Equals(builderSettingsProperties.Name));
                 thisMethods.FirstOrDefault(method => method.Name.Equals(builderSettingsProperties.Name))?.Invoke(this, null);
-            }
         }
-        //BuildBankAccountRepository();
-        //BuildUserRepository();
-        //BuildCardRepository();
-        //BuildBankRepository();
-        //BuildCreditRepository();
-        //BuildLoggerRepository();
-        //BuildOperationRepository();
-        //BuildLogger(); 
     }
     internal abstract void BuildBankAccountRepository();
     internal abstract void BuildUserRepository();
@@ -76,47 +66,4 @@ public abstract class BuilderBase<TUser, TCard, TBankAccount, TBank, TCredit> : 
         _disposed = true;
     }
 
-}
-
-public class Builder : BuilderBase<User, Card, BankAccount, Bank, Credit>
-{
-    internal override void BuildBankAccountRepository()
-    {
-        throw new NotImplementedException();
-    }
-
-    internal override void BuildBankRepository()
-    {
-        throw new NotImplementedException();
-    }
-
-    internal override void BuildCardRepository()
-    {
-        throw new NotImplementedException();
-    }
-
-    internal override void BuildCreditRepository()
-    {
-        throw new NotImplementedException();
-    }
-
-    internal override void BuildLogger()
-    {
-        throw new NotImplementedException();
-    }
-
-    internal override void BuildLoggerRepository()
-    {
-        throw new NotImplementedException();
-    }
-
-    internal override void BuildOperationRepository()
-    {
-        throw new NotImplementedException();
-    }
-
-    internal override void BuildUserRepository()
-    {
-        throw new NotImplementedException();
-    }
 }

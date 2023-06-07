@@ -11,11 +11,11 @@ public interface IServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredi
     where TBank : Bank
     where TCredit : Credit
 {
-    public BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit>? BankAccountRepository { get; }
-    public BankRepository<TUser, TCard, TBankAccount, TBank, TCredit>? BankRepository { get; }
-    public CardRepository<TUser, TCard, TBankAccount, TBank, TCredit>? CardRepository { get; }
-    public UserRepository<TUser, TCard, TBankAccount, TBank, TCredit>? UserRepository { get; }
-    public CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>? CreditRepository { get; }
+    public BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit>? BankAccountRepository { get; internal protected set; }
+    public BankRepository<TUser, TCard, TBankAccount, TBank, TCredit>? BankRepository { get; internal protected set; }
+    public CardRepository<TUser, TCard, TBankAccount, TBank, TCredit>? CardRepository { get; internal protected set; }
+    public UserRepository<TUser, TCard, TBankAccount, TBank, TCredit>? UserRepository { get; internal protected set; }
+    public CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>? CreditRepository { get; internal protected set; }
     public LoggerRepository? LoggerRepository { get; }
     public OperationRepository? OperationRepository { get; }
     public ILogger? Logger { get; }
