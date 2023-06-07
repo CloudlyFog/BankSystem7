@@ -1,4 +1,5 @@
 ﻿using BankSystem7.Models;
+using BankSystem7.Services.Configuration;
 using BankSystem7.Services.Repositories;
 
 namespace BankSystem7.Services.Interfaces;
@@ -18,4 +19,5 @@ public interface IServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredi
     public LoggerRepository? LoggerRepository { get; }
     public OperationRepository? OperationRepository { get; }
     public ILogger? Logger { get; }
+    protected internal static ConfigurationOptions? Options { get; set; }
 }
