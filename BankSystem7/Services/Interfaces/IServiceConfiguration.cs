@@ -11,13 +11,13 @@ public interface IServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredi
     where TBank : Bank
     where TCredit : Credit
 {
-    public BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit>? BankAccountRepository { get; internal protected set; }
-    public BankRepository<TUser, TCard, TBankAccount, TBank, TCredit>? BankRepository { get; internal protected set; }
-    public CardRepository<TUser, TCard, TBankAccount, TBank, TCredit>? CardRepository { get; internal protected set; }
-    public UserRepository<TUser, TCard, TBankAccount, TBank, TCredit>? UserRepository { get; internal protected set; }
-    public CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>? CreditRepository { get; internal protected set; }
-    public LoggerRepository? LoggerRepository { get; internal protected set; }
-    public OperationRepository? OperationRepository { get; internal protected set; }
-    public ILogger? Logger { get; internal protected set; }
-    protected internal static ConfigurationOptions? Options { get; set; }
+    public BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit>? BankAccountRepository { get; protected internal set; }
+    public BankRepository<TUser, TCard, TBankAccount, TBank, TCredit>? BankRepository { get; protected internal set; }
+    public CardRepository<TUser, TCard, TBankAccount, TBank, TCredit>? CardRepository { get; protected internal set; }
+    public UserRepository<TUser, TCard, TBankAccount, TBank, TCredit>? UserRepository { get; protected internal set; }
+    public CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>? CreditRepository { get; protected internal set; }
+    public LoggerRepository? LoggerRepository { get; protected internal set; }
+    public OperationRepository? OperationRepository { get; protected internal set; }
+    public ILogger? Logger { get; protected internal set; }
+    internal ConfigurationOptions? Options { get; set; }
 }

@@ -32,6 +32,8 @@
     </ItemGroup>
 
     <ItemGroup>
+      <None Remove="Services\Interfaces\BuilderBase.cs~RF15366b.TMP" />
+      <None Remove="Services\Interfaces\IServiceConfiguration.cs~RFca482.TMP" />
       <None Remove="Services\Repositories\BankAccountRepository.cs~RF2b5f4d6f.TMP" />
       <None Remove="Services\Repositories\CreditRepository.cs~RFb2d76ba.TMP" />
     </ItemGroup>

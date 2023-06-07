@@ -14,9 +14,10 @@ public static class ServiceConfigurationExtensions
         where TBank : Bank
         where TCredit : Credit
     {
+        var builder = new BankSystemBuilder<TUser, TCard, TBankAccount, TBank, TCredit>();
         var resultOptions = new ConfigurationOptions();
         options?.Invoke(resultOptions);
-        return services.AddSingleton<IServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>>(ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>.CreateInstance(resultOptions));
+        return services.AddSingleton<IServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>>(builder.Build());
     }
 
     public static IServiceCollection AddNationBankSystem<TUser, TCard, TBankAccount, TBank, TCredit>(this IServiceCollection services, ConfigurationOptions options)
@@ -26,6 +27,7 @@ public static class ServiceConfigurationExtensions
         where TBank : Bank
         where TCredit : Credit
     {
-        return services.AddSingleton<IServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>>(ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>.CreateInstance(options));
+        var builder = new BankSystemBuilder<TUser, TCard, TBankAccount, TBank, TCredit>();
+        return services.AddSingleton<IServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>>(builder.Build());
     }
 }

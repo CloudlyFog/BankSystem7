@@ -1,11 +1,13 @@
 ﻿using BankSystem7.Models;
 using BankSystem7.Services.Configuration;
 using BankSystem7.Services.Repositories;
+using Microsoft.Extensions.Options;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace BankSystem7.Services.Interfaces;
 
-public abstract class BuilderBase<TUser, TCard, TBankAccount, TBank, TCredit> : IServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>
+public abstract class BuilderBase<TUser, TCard, TBankAccount, TBank, TCredit>
     where TUser : User
     where TCard : Card
     where TBankAccount : BankAccount
@@ -14,56 +16,30 @@ public abstract class BuilderBase<TUser, TCard, TBankAccount, TBank, TCredit> : 
 {
     private bool _disposed;
 
-    public BuilderSettings BuilderSettings { get; set; } = new();
-
-    public BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit>? BankAccountRepository { get; set; }
-
-    public BankRepository<TUser, TCard, TBankAccount, TBank, TCredit>? BankRepository { get; set; }
-
-    public CardRepository<TUser, TCard, TBankAccount, TBank, TCredit>? CardRepository { get; set; }
-
-    public UserRepository<TUser, TCard, TBankAccount, TBank, TCredit>? UserRepository { get; set; }
-
-    public CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>? CreditRepository { get; set; }
-
-    public LoggerRepository? LoggerRepository { get; set; }
-
-    public OperationRepository? OperationRepository { get; set; }
-
-    public ILogger? Logger { get; set; }
-
-    public void Build()
+    protected BuilderBase()
     {
-        var thisMethods = GetType().GetRuntimeMethods();
-        foreach (var builderSettingsProperties in BuilderSettings.GetType().GetProperties())
-        {
-            if (thisMethods.Any(method => method.Name.Equals(builderSettingsProperties.Name)))
-                thisMethods.FirstOrDefault(method => method.Name.Equals(builderSettingsProperties.Name))?.Invoke(this, null);
-        }
+        ServiceConfiguration = new ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>();
     }
-    internal abstract void BuildBankAccountRepository();
-    internal abstract void BuildUserRepository();
-    internal abstract void BuildCardRepository();
-    internal abstract void BuildBankRepository();
-    internal abstract void BuildCreditRepository();
-    internal abstract void BuildLoggerRepository();
-    internal abstract void BuildOperationRepository();
-    internal abstract void BuildLogger();
 
+    public BuilderSettings BuilderSettings { get; set; } = new();
+    protected IServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit> ServiceConfiguration { get; }
 
+    public abstract IServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>? Build();
+    public abstract void BuildBankAccountRepository();
+    public abstract void BuildUserRepository();
+    public abstract void BuildCardRepository();
+    public abstract void BuildBankRepository();
+    public abstract void BuildCreditRepository();
+    public abstract void BuildLoggerRepository();
+    public abstract void BuildOperationRepository();
+    public abstract void BuildLogger();
     public void Dispose()
     {
         if (_disposed)
             return;
 
-        BankAccountRepository?.Dispose();
-        BankRepository?.Dispose();
-        CardRepository?.Dispose();
-        UserRepository?.Dispose();
-        CreditRepository?.Dispose();
-        OperationRepository?.Dispose();
+        ServiceConfiguration?.Dispose();
 
         _disposed = true;
     }
-
 }
