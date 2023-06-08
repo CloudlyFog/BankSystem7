@@ -42,17 +42,20 @@ internal static class ServicesSettings
     public static void SetConnection(DatabaseManagementSystemType type,
         ConnectionConfigurationBase connectionConfiguration, CredentialsBase credentials)
     {
-        if (connectionConfiguration.Connection is not null && connectionConfiguration.Connection != string.Empty)
+        if (connectionConfiguration?.Connection is not null && connectionConfiguration?.Connection != string.Empty)
         {
             Connection = connectionConfiguration.Connection;
             return;
         }
 
-        if (connectionConfiguration.DatabaseName is null)
+        if (connectionConfiguration?.DatabaseName is null)
         {
             Connection = DefaultMicrosoftSqlServerConnection;
             return;
         }
+
+        if (credentials?.Username is null || credentials?.Password is null)
+            return;
 
         Connection = GetConnectionByDbmsType(type, connectionConfiguration, credentials);
     }

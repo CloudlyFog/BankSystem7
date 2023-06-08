@@ -1,4 +1,5 @@
 ﻿using BankSystem7.Models;
+using BankSystem7.Models.Connection;
 using BankSystem7.Services.Interfaces;
 using BankSystem7.Services.Repositories;
 using Microsoft.Extensions.Options;
@@ -113,8 +114,8 @@ public class BankSystemBuilder<TUser, TCard, TBankAccount, TBank, TCredit> : Bui
 
     internal override void BuildServiceSettings()
     {
-        var options = ServiceConfiguration.Options;
-        ServicesSettings.SetConnection(options.ConnectionConfiguration.DatabaseManagementSystemType, options.ConnectionConfiguration, options.Credentials);
+        var options = ServiceConfiguration?.Options ?? throw new ArgumentNullException(nameof(ServiceConfiguration.Options));
+        ServicesSettings.SetConnection(options.ConnectionConfiguration.DatabaseManagementSystemType, options?.ConnectionConfiguration, options?.Credentials);
         ServicesSettings.EnsureDeleted = options.ConnectionConfiguration.EnsureDeleted;
         ServicesSettings.EnsureCreated = options.ConnectionConfiguration.EnsureCreated;
         ServicesSettings.InitializeAccess = true;
