@@ -1,6 +1,7 @@
 ﻿using BankSystem7.Models;
 using BankSystem7.Services.Interfaces;
 using BankSystem7.Services.Repositories;
+using Microsoft.Extensions.Options;
 using System.Reflection;
 
 namespace BankSystem7.Services.Configuration;
@@ -32,6 +33,9 @@ public class BankSystemBuilder<TUser, TCard, TBankAccount, TBank, TCredit> : Bui
         if (!BuilderSettings.BuildBankAccountRepository)
             return null;
 
+        BuildServiceSettings();
+        BuildDbContexts();
+
         var thisMethods = GetType().GetRuntimeMethods();
         foreach (var builderSettingsProperty in BuilderSettings.GetType().GetProperties())
         {
@@ -40,6 +44,8 @@ public class BankSystemBuilder<TUser, TCard, TBankAccount, TBank, TCredit> : Bui
                 && buildAccess is true)
                 thisMethods.FirstOrDefault(method => method.Name.Equals(builderSettingsProperty.Name))?.Invoke(this, null);
         }
+
+        BuildBankServiceOptions();
 
         return ServiceConfiguration;
     }
@@ -56,6 +62,12 @@ public class BankSystemBuilder<TUser, TCard, TBankAccount, TBank, TCredit> : Bui
             new BankRepository<TUser, TCard, TBankAccount, TBank, TCredit>(ServicesSettings.Connection);
     }
 
+    internal override void BuildBankServiceOptions()
+    {
+        BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ServiceConfiguration = 
+            (ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>)ServiceConfiguration;
+    }
+
     internal override void BuildCardRepository()
     {
         ServiceConfiguration.CardRepository =
@@ -66,6 +78,13 @@ public class BankSystemBuilder<TUser, TCard, TBankAccount, TBank, TCredit> : Bui
     {
         ServiceConfiguration.CreditRepository =
             new CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>(ServicesSettings.Connection);
+    }
+
+    internal override void BuildDbContexts()
+    {
+        var contexts = ServiceConfiguration.Options.Contexts;
+        if (contexts is not null && contexts.Count > 0 && !ServicesSettings.Ensured)
+            InitializeDbContexts(contexts);
     }
 
     internal override void BuildLogger()
@@ -90,6 +109,16 @@ public class BankSystemBuilder<TUser, TCard, TBankAccount, TBank, TCredit> : Bui
     internal override void BuildOperationRepository()
     {
         ServiceConfiguration.OperationRepository = new OperationRepository(ServiceConfiguration.Options.OperationOptions);
+    }
+
+    internal override void BuildServiceSettings()
+    {
+        var options = ServiceConfiguration.Options;
+        ServicesSettings.SetConnection(options.ConnectionConfiguration.DatabaseManagementSystemType, options.ConnectionConfiguration, options.Credentials);
+        ServicesSettings.EnsureDeleted = options.ConnectionConfiguration.EnsureDeleted;
+        ServicesSettings.EnsureCreated = options.ConnectionConfiguration.EnsureCreated;
+        ServicesSettings.InitializeAccess = true;
+        ServicesSettings.DatabaseManagementSystemType = options.ConnectionConfiguration.DatabaseManagementSystemType;
     }
 
     internal override void BuildUserRepository()
