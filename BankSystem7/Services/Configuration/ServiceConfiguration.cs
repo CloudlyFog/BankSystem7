@@ -11,6 +11,10 @@ public class ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit> : 
     where TBank : Bank
     where TCredit : Credit
 {
+    public static readonly IServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit> Default =
+        new ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>();
+    private bool _disposed;
+
     public BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit>? BankAccountRepository { get; set; }
 
     public BankRepository<TUser, TCard, TBankAccount, TBank, TCredit>? BankRepository { get; set; }
@@ -33,6 +37,16 @@ public class ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit> : 
 
     public void Dispose()
     {
-        throw new NotImplementedException();
+        if (_disposed)
+            return;
+
+        BankAccountRepository?.Dispose();
+        BankRepository?.Dispose();
+        CardRepository?.Dispose();
+        UserRepository?.Dispose();
+        CreditRepository?.Dispose();
+        OperationRepository?.Dispose();
+
+        _disposed = true;
     }
 }

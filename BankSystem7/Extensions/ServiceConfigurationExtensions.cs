@@ -14,9 +14,9 @@ public static class ServiceConfigurationExtensions
         where TBank : Bank
         where TCredit : Credit
     {
-        var builder = new BankSystemBuilder<TUser, TCard, TBankAccount, TBank, TCredit>();
         var resultOptions = new ConfigurationOptions();
         options?.Invoke(resultOptions);
+        var builder = new BankSystemBuilder<TUser, TCard, TBankAccount, TBank, TCredit>(resultOptions);
         return services.AddSingleton<IServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>>(builder.Build());
     }
 
@@ -27,7 +27,7 @@ public static class ServiceConfigurationExtensions
         where TBank : Bank
         where TCredit : Credit
     {
-        var builder = new BankSystemBuilder<TUser, TCard, TBankAccount, TBank, TCredit>();
+        var builder = new BankSystemBuilder<TUser, TCard, TBankAccount, TBank, TCredit>(options);
         return services.AddSingleton<IServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>>(builder.Build());
     }
 }

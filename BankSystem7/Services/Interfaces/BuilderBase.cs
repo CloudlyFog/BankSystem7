@@ -19,20 +19,43 @@ public abstract class BuilderBase<TUser, TCard, TBankAccount, TBank, TCredit>
     protected BuilderBase()
     {
         ServiceConfiguration = new ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>();
+        ServiceConfiguration.Options = new ConfigurationOptions();
+        ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>.ServiceConfigurationOptions = ServiceConfiguration.Options;
+    }
+
+    protected BuilderBase(BuilderSettings settings)
+    {
+        BuilderSettings = settings;
+        ServiceConfiguration = new ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>();
+        ServiceConfiguration.Options = new ConfigurationOptions();
+        ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>.ServiceConfigurationOptions = ServiceConfiguration.Options;
+    }
+
+    protected BuilderBase(ConfigurationOptions options)
+    {
+        ServiceConfiguration.Options = options;
+        ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>.ServiceConfigurationOptions = options;
+    }
+
+    protected BuilderBase(BuilderSettings builderSettings, ConfigurationOptions options)
+    {
+        BuilderSettings = builderSettings;
+        ServiceConfiguration.Options = options;
+        ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>.ServiceConfigurationOptions = options;
     }
 
     public BuilderSettings BuilderSettings { get; set; } = new();
     protected IServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit> ServiceConfiguration { get; }
 
     public abstract IServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>? Build();
-    public abstract void BuildBankAccountRepository();
-    public abstract void BuildUserRepository();
-    public abstract void BuildCardRepository();
-    public abstract void BuildBankRepository();
-    public abstract void BuildCreditRepository();
-    public abstract void BuildLoggerRepository();
-    public abstract void BuildOperationRepository();
-    public abstract void BuildLogger();
+    internal abstract void BuildBankAccountRepository();
+    internal abstract void BuildUserRepository();
+    internal abstract void BuildCardRepository();
+    internal abstract void BuildBankRepository();
+    internal abstract void BuildCreditRepository();
+    internal abstract void BuildLoggerRepository();
+    internal abstract void BuildOperationRepository();
+    internal abstract void BuildLogger();
     public void Dispose()
     {
         if (_disposed)

@@ -2,12 +2,12 @@
 
 public sealed class BuilderSettings
 {
-    public bool BuildBankAccountRepository { get; set; }
-    public bool BuildUserRepository { get; set; }
-    public bool BuildCardRepository { get; set; }
-    public bool BuildBankRepository { get; set; }
-    public bool BuildCreditRepository { get; set; }
-    public bool BuildLoggerRepository { get; set; }
-    public bool BuildOperationRepository { get; set; }
-    public bool BuildLogger { get; set; }
+    public bool BuildBankAccountRepository { get; set; } = true;
+    public bool BuildUserRepository { get; set; } = true;
+    public bool BuildCardRepository { get; set; } = true;
+    public bool BuildBankRepository { get; set; } = true;
+    public bool BuildCreditRepository { get; set; } = true;
+    public bool BuildLoggerRepository { get; set; } = true;
+    public bool BuildOperationRepository { get; set; } = true;
+    public bool BuildLogger { get; set; } = true;
 }
