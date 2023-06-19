@@ -85,7 +85,7 @@ public class GenericDbContext : DbContext
     public override EntityEntry<TEntity> Remove<TEntity>(TEntity entity)
     {
         var entry = Entry(entity);
-        if (entry.State == EntityState.Deleted) 
+        if (entry.State == EntityState.Deleted)
             return entry;
         return base.Remove(entity);
     }
@@ -185,12 +185,15 @@ public class GenericDbContext : DbContext
             case DatabaseManagementSystemType.MicrosoftSqlServer:
                 optionsBuilder.UseSqlServer(ServicesSettings.Connection, o => o.CommandTimeout(20));
                 break;
+
             case DatabaseManagementSystemType.PostgreSql:
                 optionsBuilder.UseNpgsql(ServicesSettings.Connection, o => o.CommandTimeout(20));
                 break;
+
             case DatabaseManagementSystemType.MySql:
                 optionsBuilder.UseMySQL(ServicesSettings.Connection, o => o.CommandTimeout(20));
                 break;
+
             default:
                 throw new ArgumentOutOfRangeException(nameof(dbmsType), dbmsType, null);
         }

@@ -1,15 +1,14 @@
 ﻿using BankSystem7.AppContext;
 using BankSystem7.Models;
 using BankSystem7.Services.Configuration;
-using BankSystem7.Services.Interfaces;
+using BankSystem7.Services.Interfaces.Base;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 using System.Linq.Expressions;
 
 namespace BankSystem7.Services.Repositories;
 
-public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit> : IRepository<TBankAccount>, 
-    IReaderServiceWithTracking<TBankAccount>, IRepositoryAsync<TBankAccount>
+public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit> : IBankAccountRepository<TBankAccount>
     where TUser : User
     where TCard : Card
     where TBankAccount : BankAccount
@@ -436,19 +435,19 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
     /// <para>
     /// The method checks if the BankAccount object is null and throws an exception if it is.
     /// </para>
-    /// 
+    ///
     /// <para>
-    /// The next condition checks if the UserID property of the BankAccount object exists in the ID property of any user 
-    /// in the Users table of the database. If it doesn't exist, the method throws a KeyNotFoundException with a message indicating 
+    /// The next condition checks if the UserID property of the BankAccount object exists in the ID property of any user
+    /// in the Users table of the database. If it doesn't exist, the method throws a KeyNotFoundException with a message indicating
     /// that the entity of the user with the given ID was not found.
     /// </para>
-    /// 
+    ///
     /// <para>
-    /// The last condition checks if there exists a BankAccount object in the database with the same ID as the one passed to the method. 
-    /// If it doesn't exist, the method throws a KeyNotFoundException with a message indicating that the entity of the bank 
+    /// The last condition checks if there exists a BankAccount object in the database with the same ID as the one passed to the method.
+    /// If it doesn't exist, the method throws a KeyNotFoundException with a message indicating that the entity of the bank
     /// with the given ID was not found.
     /// </para>
-    /// 
+    ///
     /// </summary>
     /// <param name="item">The item.</param>
     /// <exception cref="ArgumentNullException">Instance of BankAccount</exception>
@@ -470,13 +469,13 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
     }
 
     /// <summary>
-    /// It sets the bank context and application context for the bank services using the generic types 
+    /// It sets the bank context and application context for the bank services using the generic types
     /// <typeparamref name="TUser"/>
     /// <typeparamref name="TCard"/>
     /// <typeparamref name="TBankAccount"/>
     /// <typeparamref name="TBank"/> and
     /// <typeparamref name="TCredit"/>.
-    /// The bank context and application context are set to the values of the private fields 
+    /// The bank context and application context are set to the values of the private fields
     /// _bankContext and _applicationContext, respectively. This method is likely called during the initialization of the bank services.
     /// </summary>
     private void SetBankServicesOptions()
@@ -487,15 +486,15 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
 
     /// <summary>
     /// <para>
-    /// The method returns a boolean value. Inside the method, there is a single line of code that checks 
-    /// if the bank associated with the <paramref name="from"/> user's card's bank account is different from the bank associated 
-    /// with the <paramref name="to"/> user's card's bank account. 
+    /// The method returns a boolean value. Inside the method, there is a single line of code that checks
+    /// if the bank associated with the <paramref name="from"/> user's card's bank account is different from the bank associated
+    /// with the <paramref name="to"/> user's card's bank account.
     /// </para>
-    /// 
+    ///
     /// <para>
-    /// If the banks are different, the method returns true. Otherwise, it returns false. 
+    /// If the banks are different, the method returns true. Otherwise, it returns false.
     /// </para>
-    /// 
+    ///
     /// </summary>
     /// <param name="from">The parameter represents the user who is transferring the money</param>
     /// <param name="to">The parameter represents the user who is receiving the money</param>

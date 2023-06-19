@@ -2,9 +2,7 @@ using BankSystem7.Models;
 using BankSystem7.Services;
 using BankSystem7.Services.Configuration;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using MongoDB.Driver;
-using System.Buffers;
 
 namespace BankSystem7.AppContext;
 
@@ -25,7 +23,7 @@ internal sealed class BankContext<TUser, TCard, TBankAccount, TBank, TCredit> : 
     public BankContext(string connection) : base(connection)
     {
         ServicesSettings.SetConnection(connection);
-        _operationService = new OperationService<Operation>(ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>.Options.LoggerOptions?.OperationServiceOptions?.DatabaseName ?? "CabManagementSystemReborn");
+        _operationService = new OperationService<Operation>(ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>.ServiceConfigurationOptions.LoggerOptions?.OperationServiceOptions?.DatabaseName ?? "CabManagementSystemReborn");
     }
 
     public DbSet<TUser> Users { get; set; } = null!;

@@ -14,7 +14,7 @@ public class MicrosoftConnectionConfiguration : ConnectionConfigurationBase
     /// Manages connections pooling
     /// </summary>
     public bool Pooling { get; set; } = false;
-    
+
     /// <summary>
     /// Manages encrypting TCP/IP traffic
     /// </summary>
@@ -26,16 +26,16 @@ public class MicrosoftConnectionConfiguration : ConnectionConfigurationBase
     public string? Server { get; set; } = ServicesSettings.DefaultServer;
 
     /// <summary>
-    /// Manages Windows Authentication behavior 
+    /// Manages Windows Authentication behavior
     /// </summary>
     public IntegratedSecurityType IntegratedSecurity { get; set; } = IntegratedSecurityType.False;
-    
+
     /// <summary>
     /// Specifies whether the data source can persist sensitive authentication information
     /// such as a password
     /// </summary>
     public bool PersistSecurityInfo { get; set; } = false;
-    
+
     /// <summary>
     /// Manages server certificates
     /// </summary>

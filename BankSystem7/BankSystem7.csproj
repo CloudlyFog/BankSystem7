@@ -5,7 +5,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <PackageVersion>0.5.2</PackageVersion>
+        <PackageVersion>0.5.3</PackageVersion>
         <Authors>CloudlyFog</Authors>
         <Copyright>Copyright (c) CloudlyFog 2023</Copyright>
         <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -32,6 +32,9 @@
     </ItemGroup>
 
     <ItemGroup>
+      <None Remove="Services\Interfaces\BuilderBase.cs~RF15366b.TMP" />
+      <None Remove="Services\Interfaces\IServiceConfiguration.cs~RFca482.TMP" />
+      <None Remove="Services\Repositories\BankAccountRepository.cs~RF2b5f4d6f.TMP" />
       <None Remove="Services\Repositories\CreditRepository.cs~RFb2d76ba.TMP" />
     </ItemGroup>
 
@@ -53,6 +56,7 @@
       <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
       <PackageReference Include="Npgsql" Version="8.0.0-preview.2" />
       <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0-preview.2" />
+      <PackageReference Include="NUnit" Version="3.13.3" />
       <PackageReference Include="System.Data.HashFunction.Interfaces" Version="2.0.0" />
       <PackageReference Include="System.Data.HashFunction.Jenkins" Version="2.0.0" />
     </ItemGroup>
