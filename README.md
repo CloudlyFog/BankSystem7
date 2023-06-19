@@ -1,14 +1,8 @@
 # Bank system 7
 This library provides opportunities for using likeness of bank system. You can handle not only users but also other models like banks, cards and etc.
 
-### Updates in version 0.5.2
-- Added async implementation for many methods in repositories and context classes.
-- Updated logic of Add, AddAsync, Update, UpdateAsync, Remove, RemoveAsync, SaveChanges, SaveChangesAsync methods for more code readability and deeper understanding methods behavior in repositories.
-- Fixed bug with bad condition in method Create and CreateAsync in CardRepository.
-- Added new method UpdateTrackerRange for updating many entities in one method call.
-- Update logic in methods Create and CreateAsync in UserRepository. Removed method and replaced by internal method UpdateTracker in GenericDbContext.
-- Updated code readability in methods Delete & DeleteAsync in UserRepository. Removed method and replaced by internal method UpdateTracker in GenericDbContext.
-- Updated comments for methods in BankAccountRepository, BankRepository and GenericDbContext.
+### Updates in version 0.5.3
+- Implemented "Builder" design pattern to initialize library's services. Old logic has been removed. Before updating to newer version of library ensure, that after updating You won't get critical errors.
 ****
 # Documentation
 
@@ -27,12 +21,14 @@ This library provides opportunities for using likeness of bank system. You can h
 The library provides ways to pass and use own models. For example, You can inherit Your class from base class User and pass it as type to initialized instance of `ServiceConfiguration`
 and use own model.
 Developer can interact with library with:
-1. `ServiceConfiguration` class.
+1. `BankSystemBuilder` class.
 2. `builder.Services.AddNationBankSystem<...>()` service in ASP.NET.
 
-and by following next steps:
-1. create instance of class `ServiceConfiguration` and pass as parameters class `ConfigurationOptions` with own settings.
-2. interact with repositories throughout public properties of instanced class `ServiceConfiguration`
+And by following next steps:
+1. Create field of the class `ConfigurationOptions` that handles settings of services.
+2. Next initialize `BankSystemBuilder` class and pass to the constructor field of `ConfigurationOptions` as parameter.
+3. Create field of the interface `IServiceConfiguration` and assign to it value from method `Build()` of class `BankSystemBuilder`.
+4. Interact with repositories throughout public properties of the created field of the interface `IServiceConfiguration`.
 
 New feature for library is adding services to internal DI in ASP.Net application. For that You have to write something like this:
 
@@ -107,8 +103,6 @@ Now You can don't specify LoggerOptions because by default logger is disabled.
 
 And all will work fine.
 
-#### Remember!
-If you'll not pass options to `ServiceConfiguration` method `CreateInstance` You can get different kind of exceptions.
 
 ## API documentation
 ### AppContext
