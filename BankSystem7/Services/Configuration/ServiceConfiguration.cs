@@ -13,6 +13,7 @@ public class ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit> : 
 {
     public static readonly IServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit> Default =
         new ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>();
+
     private bool _disposed;
 
     public BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit>? BankAccountRepository { get; set; }

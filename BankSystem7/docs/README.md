@@ -103,7 +103,6 @@ Now You can don't specify LoggerOptions because by default logger is disabled.
 
 And all will work fine.
 
-
 ## API documentation
 ### AppContext
 There are 3 classes context:

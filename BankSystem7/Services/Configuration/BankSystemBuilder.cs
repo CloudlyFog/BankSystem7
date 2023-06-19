@@ -1,8 +1,6 @@
 ﻿using BankSystem7.Models;
-using BankSystem7.Models.Connection;
 using BankSystem7.Services.Interfaces;
 using BankSystem7.Services.Repositories;
-using Microsoft.Extensions.Options;
 using System.Reflection;
 
 namespace BankSystem7.Services.Configuration;
@@ -17,6 +15,7 @@ public class BankSystemBuilder<TUser, TCard, TBankAccount, TBank, TCredit> : Bui
     public BankSystemBuilder()
     {
     }
+
     public BankSystemBuilder(BuilderSettings settings) : base(settings)
     {
     }
@@ -80,7 +79,7 @@ public class BankSystemBuilder<TUser, TCard, TBankAccount, TBank, TCredit> : Bui
 
     internal override void BuildBankServiceOptions()
     {
-        BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ServiceConfiguration = 
+        BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ServiceConfiguration =
             (ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>)ServiceConfiguration;
     }
 
@@ -110,7 +109,6 @@ public class BankSystemBuilder<TUser, TCard, TBankAccount, TBank, TCredit> : Bui
 
         if (ServiceConfiguration.Options.LoggerOptions.IsEnabled)
             ServiceConfiguration.LoggerRepository = new LoggerRepository(ServiceConfiguration.Options.LoggerOptions);
-
     }
 
     internal override void BuildLoggerRepository()
