@@ -18,7 +18,7 @@ This library provides opportunities for using likeness of bank system. You can h
 8. Folder **Repositories** is folder with all business logic of project. Only there simple developer has access.
 
 ## How to interact with library?
-The library provides ways to pass and use own models. For example, You can inherit Your class from base class User and pass it as type to initialized instance of `ServiceConfiguration`
+The library provides ways to pass and use own models. For example, You can inherit Your class from base class User and pass it as type to an instance of `BankSystemBuilder`
 and use own model.
 Developer can interact with library with:
 1. `BankSystemBuilder` class.
@@ -102,7 +102,6 @@ Now You can don't specify LoggerOptions because by default logger is disabled.
         }
 
 And all will work fine.
-
 
 ## API documentation
 ### AppContext
