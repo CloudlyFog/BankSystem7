@@ -23,7 +23,7 @@ internal sealed class BankContext<TUser, TCard, TBankAccount, TBank, TCredit> : 
     public BankContext(string connection) : base(connection)
     {
         ServicesSettings.SetConnection(connection);
-        _operationService = new OperationService<Operation>(ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>.Options.LoggerOptions?.OperationServiceOptions?.DatabaseName ?? "CabManagementSystemReborn");
+        _operationService = new OperationService<Operation>(ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>.ServiceConfigurationOptions.LoggerOptions?.OperationServiceOptions?.DatabaseName ?? "CabManagementSystemReborn");
     }
 
     public DbSet<TUser> Users { get; set; } = null!;

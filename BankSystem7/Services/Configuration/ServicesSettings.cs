@@ -22,6 +22,7 @@ internal static class ServicesSettings
     public static bool InitializeAccess { get; set; }
     public static DatabaseManagementSystemType DatabaseManagementSystemType { get; set; }
 
+    [Obsolete("You must pass only one parameter - connection string. Logic of this method is depricated.")]
     public static void SetConnection(string? connection = null, string? databaseName = DefaultDatabaseName, string? dataSource = DefaultDataSource)
     {
         if (connection is not null && connection != string.Empty)
@@ -42,17 +43,20 @@ internal static class ServicesSettings
     public static void SetConnection(DatabaseManagementSystemType type,
         ConnectionConfigurationBase connectionConfiguration, CredentialsBase credentials)
     {
-        if (connectionConfiguration.Connection is not null && connectionConfiguration.Connection != string.Empty)
+        if (connectionConfiguration?.Connection is not null && connectionConfiguration?.Connection != string.Empty)
         {
             Connection = connectionConfiguration.Connection;
             return;
         }
 
-        if (connectionConfiguration.DatabaseName is null)
+        if (connectionConfiguration?.DatabaseName is null)
         {
             Connection = DefaultMicrosoftSqlServerConnection;
             return;
         }
+
+        if (credentials?.Username is null || credentials?.Password is null)
+            return;
 
         Connection = GetConnectionByDbmsType(type, connectionConfiguration, credentials);
     }

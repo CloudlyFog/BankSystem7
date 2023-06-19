@@ -1,93 +1,53 @@
 ﻿using BankSystem7.Models;
 using BankSystem7.Services.Interfaces;
 using BankSystem7.Services.Repositories;
-using Microsoft.EntityFrameworkCore;
 
 namespace BankSystem7.Services.Configuration;
 
-public class ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit> : DbContextInitializer, IServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>
+public class ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit> : IServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>
     where TUser : User
     where TCard : Card
     where TBankAccount : BankAccount
     where TBank : Bank
     where TCredit : Credit
 {
+    public static readonly IServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit> Default =
+        new ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>();
+
     private bool _disposed;
 
-    private ServiceConfiguration()
-    {
-        BankAccountRepository = new BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit>(ServicesSettings.Connection);
-        UserRepository = new UserRepository<TUser, TCard, TBankAccount, TBank, TCredit>(BankAccountRepository);
-        CardRepository = new CardRepository<TUser, TCard, TBankAccount, TBank, TCredit>(BankAccountRepository);
-        BankRepository = new BankRepository<TUser, TCard, TBankAccount, TBank, TCredit>(ServicesSettings.Connection);
-        CreditRepository = new CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>(ServicesSettings.Connection);
+    public BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit>? BankAccountRepository { get; set; }
 
-        if (Options.LoggerOptions.IsEnabled)
-        {
-            LoggerRepository = new LoggerRepository(Options.LoggerOptions);
-            Logger = new Logger<TUser, TCard, TBankAccount, TBank, TCredit>(LoggerRepository, Options.LoggerOptions);
-        }
+    public BankRepository<TUser, TCard, TBankAccount, TBank, TCredit>? BankRepository { get; set; }
 
-        OperationRepository = new OperationRepository(Options.OperationOptions);
-    }
+    public CardRepository<TUser, TCard, TBankAccount, TBank, TCredit>? CardRepository { get; set; }
 
-    public BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit>? BankAccountRepository { get; }
-    public BankRepository<TUser, TCard, TBankAccount, TBank, TCredit>? BankRepository { get; }
-    public CardRepository<TUser, TCard, TBankAccount, TBank, TCredit>? CardRepository { get; }
-    public UserRepository<TUser, TCard, TBankAccount, TBank, TCredit>? UserRepository { get; }
-    public CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>? CreditRepository { get; }
-    public LoggerRepository? LoggerRepository { get; }
-    public OperationRepository? OperationRepository { get; }
-    public ILogger? Logger { get; }
-    protected internal static ConfigurationOptions? Options { get; set; }
+    public UserRepository<TUser, TCard, TBankAccount, TBank, TCredit>? UserRepository { get; set; }
 
-    public static ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit> CreateInstance(ConfigurationOptions options)
-    {
-        Options = options;
-        ServicesSettings.SetConnection(Options.ConnectionConfiguration.DatabaseManagementSystemType, Options.ConnectionConfiguration, Options.Credentials);
-        ServicesSettings.EnsureDeleted = options.ConnectionConfiguration.EnsureDeleted;
-        ServicesSettings.EnsureCreated = options.ConnectionConfiguration.EnsureCreated;
-        ServicesSettings.InitializeAccess = true;
-        ServicesSettings.DatabaseManagementSystemType = options.ConnectionConfiguration.DatabaseManagementSystemType;
+    public CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>? CreditRepository { get; set; }
 
-        InitDbContexts(options?.Contexts);
+    public LoggerRepository? LoggerRepository { get; set; }
 
-        BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ServiceConfiguration = new ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>();
-        return BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ServiceConfiguration;
-    }
+    public OperationRepository? OperationRepository { get; set; }
 
-    private static void InitDbContexts(Dictionary<DbContext, ModelConfiguration>? contexts)
-    {
-        if (contexts is not null && contexts.Count > 0 && !ServicesSettings.Ensured)
-        {
-            InitializeDbContexts(Options.Contexts);
-        }
-    }
+    public ILogger? Logger { get; set; }
 
-    private void Dispose(bool disposing)
-    {
-        if (_disposed)
-            return;
-        if (disposing)
-        {
-            BankAccountRepository?.Dispose();
-            BankRepository?.Dispose();
-            CardRepository?.Dispose();
-            UserRepository?.Dispose();
-            CreditRepository?.Dispose();
-            OperationRepository?.Dispose();
-        }
-        _disposed = true;
-    }
+    public ConfigurationOptions? Options { get; set; }
+
+    internal static ConfigurationOptions? ServiceConfigurationOptions { get; set; }
 
     public void Dispose()
     {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
+        if (_disposed)
+            return;
 
-    ~ServiceConfiguration()
-    {
-        Dispose(false);
+        BankAccountRepository?.Dispose();
+        BankRepository?.Dispose();
+        CardRepository?.Dispose();
+        UserRepository?.Dispose();
+        CreditRepository?.Dispose();
+        OperationRepository?.Dispose();
+
+        _disposed = true;
     }
 }
