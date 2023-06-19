@@ -14,7 +14,7 @@ public sealed class CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
     where TBank : Bank
     where TCredit : Credit
 {
-    private readonly BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit> _bankAccountRepository;
+    private readonly IBankAccountRepository<TBankAccount> _bankAccountRepository;
     private readonly ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit> _applicationContext;
     private bool _disposedValue;
 
@@ -25,7 +25,7 @@ public sealed class CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
                               new ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>(ServicesSettings.Connection);
     }
 
-    public CardRepository(BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit> bankAccountRepository)
+    public CardRepository(IBankAccountRepository<TBankAccount> bankAccountRepository)
     {
         _bankAccountRepository = bankAccountRepository;
         _applicationContext = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ApplicationContext ??

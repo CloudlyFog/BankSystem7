@@ -23,31 +23,6 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
     /// <summary>
     /// Initializes a new instance of the <see cref="BankAccountRepository{TUser, TCard, TBankAccount, TBank, TCredit}"/> class.
     /// </summary>
-    public BankAccountRepository()
-    {
-        _applicationContext = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ApplicationContext ??
-                              new ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>(ServicesSettings.Connection);
-        _bankContext = _bankRepository.BankContext;
-        SetBankServicesOptions();
-        _bankRepository = new BankRepository<TUser, TCard, TBankAccount, TBank, TCredit>(ServicesSettings.Connection);
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="BankAccountRepository{TUser, TCard, TBankAccount, TBank, TCredit}"/> class.
-    /// </summary>
-    /// <param name="bankRepository">The bank repository.</param>
-    public BankAccountRepository(BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> bankRepository)
-    {
-        _bankRepository = bankRepository;
-        _applicationContext = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ApplicationContext ??
-                              new ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>(ServicesSettings.Connection);
-        _bankContext = _bankRepository.BankContext;
-        SetBankServicesOptions();
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="BankAccountRepository{TUser, TCard, TBankAccount, TBank, TCredit}"/> class.
-    /// </summary>
     /// <param name="connection">The connection string/</param>
     public BankAccountRepository(string connection)
     {
@@ -55,7 +30,9 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
                               new ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>(connection);
         _bankContext = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.BankContext ?? new BankContext<TUser, TCard, TBankAccount, TBank, TCredit>(connection);
         SetBankServicesOptions();
-        _bankRepository = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ServiceConfiguration?.BankRepository ?? new BankRepository<TUser, TCard, TBankAccount, TBank, TCredit>(connection);
+        _bankRepository = (BankRepository<TUser, TCard, TBankAccount, TBank, TCredit>?)
+            (BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ServiceConfiguration?.BankRepository 
+            ?? new BankRepository<TUser, TCard, TBankAccount, TBank, TCredit>(connection));
     }
 
     public IQueryable<TBankAccount> All =>

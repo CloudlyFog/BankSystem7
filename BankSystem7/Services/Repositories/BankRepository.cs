@@ -2,13 +2,13 @@
 using BankSystem7.Models;
 using BankSystem7.Services.Configuration;
 using BankSystem7.Services.Interfaces;
+using BankSystem7.Services.Interfaces.Base;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace BankSystem7.Services.Repositories;
 
-public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> : IRepository<TBank>,
-    IReaderServiceWithTracking<TBank>, IRepositoryAsync<TBank>
+public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> : IBankRepository<TBank>
     where TUser : User
     where TCard : Card
     where TBankAccount : BankAccount
