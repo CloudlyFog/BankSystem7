@@ -31,23 +31,38 @@ public class BankSystemBuilder<TUser, TCard, TBankAccount, TBank, TCredit> : Bui
 
     public override IServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>? Build()
     {
+        // Check if BuildBankAccountRepository is set to true in BuilderSettings, if not return null
         if (!BuilderSettings.BuildBankAccountRepository)
             return null;
 
+        // Call BuildServiceSettings method
         BuildServiceSettings();
+
+        // Call BuildDbContexts method
         BuildDbContexts();
 
+        // Get all methods in the current class
         var thisMethods = GetType().GetRuntimeMethods();
+
+        // Loop through all properties in BuilderSettings
         foreach (var builderSettingsProperty in BuilderSettings.GetType().GetProperties())
         {
+            // Check if the property value is true
             var buildAccess = builderSettingsProperty.GetValue(BuilderSettings)?.Equals(true);
+
+            // Check if the current class has a method with the same name as the property
             if (thisMethods.Any(method => method.Name.Equals(builderSettingsProperty.Name))
                 && buildAccess is true)
+            {
+                // Call the method with the same name as the property
                 thisMethods.FirstOrDefault(method => method.Name.Equals(builderSettingsProperty.Name))?.Invoke(this, null);
+            }
         }
 
+        // Call BuildBankServiceOptions method
         BuildBankServiceOptions();
 
+        // Return ServiceConfiguration
         return ServiceConfiguration;
     }
 
