@@ -1,8 +1,8 @@
 # Bank system 7
 This library provides opportunities for using likeness of bank system. You can handle not only users but also other models like banks, cards and etc.
 
-### Updates in version 0.5.3
-- Implemented "Builder" design pattern to initialize library's services. Old logic has been removed. Before updating to newer version of library ensure, that after updating You won't get critical errors.
+### Updates in version 0.5.4
+- Fixed bug in BankAccountRepository that due to occures exceptions when referring to property `All`.
 ****
 # Documentation
 
