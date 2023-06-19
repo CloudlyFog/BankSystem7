@@ -133,6 +133,8 @@ public class BankSystemBuilder<TUser, TCard, TBankAccount, TBank, TCredit> : Bui
         ServicesSettings.EnsureCreated = options.ConnectionConfiguration.EnsureCreated;
         ServicesSettings.InitializeAccess = true;
         ServicesSettings.DatabaseManagementSystemType = options.ConnectionConfiguration.DatabaseManagementSystemType;
+
+        ServiceConfiguration.Options.ConnectionConfiguration.Connection = options.ConnectionConfiguration.Connection = ServicesSettings.Connection;
     }
 
     internal override void BuildUserRepository()
