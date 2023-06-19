@@ -1,11 +1,12 @@
 ﻿using BankSystem7.Models;
 using BankSystem7.Services.Interfaces;
+using BankSystem7.Services.Interfaces.Base;
 using MongoDB.Driver;
 using System.Linq.Expressions;
 
 namespace BankSystem7.Services.Repositories;
 
-public sealed class OperationRepository : LoggerExecutor<OperationType>, IRepository<Operation>
+public sealed class OperationRepository : LoggerExecutor<OperationType>, IOperationRepository
 {
     private OperationService<Operation> _operationService;
 
