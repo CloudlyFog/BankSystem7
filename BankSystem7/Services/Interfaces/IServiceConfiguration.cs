@@ -19,5 +19,5 @@ public interface IServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredi
     public LoggerRepository? LoggerRepository { get; protected internal set; }
     public OperationRepository? OperationRepository { get; protected internal set; }
     public ILogger? Logger { get; protected internal set; }
-    internal ConfigurationOptions? Options { get; set; }
+    public ConfigurationOptions? Options { get; protected internal set; }
 }
