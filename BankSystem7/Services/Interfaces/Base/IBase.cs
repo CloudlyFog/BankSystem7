@@ -21,9 +21,9 @@ public interface ICardRepository<TCard> : IBase<TCard>, IRepository<TCard>,
 }
 
 public interface IBankAccountRepository<TUser, TBankAccount> : IBase<TBankAccount>, IRepository<TBankAccount>,
-    IReaderServiceWithTracking<TBankAccount>, IRepositoryAsync<TBankAccount> 
-    where TBankAccount : BankAccount
+    IReaderServiceWithTracking<TBankAccount>, IRepositoryAsync<TBankAccount>
     where TUser : User
+    where TBankAccount : BankAccount
 {
     /// <summary>
     /// The purpose of this method is to transfer a certain amount of money from one user to another
@@ -85,9 +85,46 @@ public interface IBankRepository<TUser, TBank> : IBase<TBank>, IRepository<TBank
     internal decimal CalculateBankAccountAmount(decimal accountAmountValue);
 }
 
-public interface ICreditRepository<TCredit> : IBase<TCredit>, IRepository<TCredit>,
-    IReaderServiceWithTracking<TCredit>, IRepositoryAsync<TCredit> where TCredit : Credit
+public interface ICreditRepository<TUser, TCredit> : IBase<TCredit>, IRepository<TCredit>,
+    IReaderServiceWithTracking<TCredit>, IRepositoryAsync<TCredit>
+    where TUser : User
+    where TCredit : Credit
 {
+    /// <summary>
+    /// gives to user credit with the definite amount of money
+    /// adds to the table field with credit's data of user
+    /// </summary>
+    /// <param name="user">from what account will withdraw money</param>
+    /// <param name="credit">credit entity from database</param>
+    /// <returns></returns>
+    public ExceptionModel TakeCredit(TUser? user, TCredit? credit);
+
+    /// <summary>
+    /// gives to user credit with the definite amount of money
+    /// adds to the table field with credit's data of user
+    /// </summary>
+    /// <param name="user">from what account will withdraw money</param>
+    /// <param name="credit">credit entity from database</param>
+    /// <returns></returns>
+    public Task<ExceptionModel> TakeCreditAsync(TUser? user, TCredit? credit);
+
+    /// <summary>
+    /// implements paying some amount of credit for full its repaying
+    /// </summary>
+    /// <param name="user">from what account will withdraw money</param>
+    /// <param name="credit">credit entity from database</param>
+    /// <param name="payAmount">amount of money for paying</param>
+    /// <returns></returns>
+    public ExceptionModel PayCredit(TUser? user, TCredit credit, decimal payAmount);
+
+    /// <summary>
+    /// implements paying some amount of credit for full its repaying
+    /// </summary>
+    /// <param name="user">from what account will withdraw money</param>
+    /// <param name="credit">credit entity from database</param>
+    /// <param name="payAmount">amount of money for paying</param>
+    /// <returns></returns>
+    public Task<ExceptionModel> PayCreditAsync(TUser? user, TCredit credit, decimal payAmount);
 }
 
 public interface IOperationRepository : IBase<Operation>, IRepository<Operation>

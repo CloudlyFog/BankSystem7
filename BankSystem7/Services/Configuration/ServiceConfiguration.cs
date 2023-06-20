@@ -24,7 +24,7 @@ public class ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit> : 
 
     public IBankRepository<TUser, TBank>? BankRepository { get; set; }
 
-    public ICreditRepository<TCredit>? CreditRepository { get; set; }
+    public ICreditRepository<TUser, TCredit>? CreditRepository { get; set; }
 
     public LoggerRepository? LoggerRepository { get; set; }
 

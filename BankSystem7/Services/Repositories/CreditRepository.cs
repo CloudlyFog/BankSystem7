@@ -8,7 +8,7 @@ using System.Linq.Expressions;
 
 namespace BankSystem7.Services.Repositories;
 
-public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit> : ICreditRepository<TCredit>
+public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit> : ICreditRepository<TUser, TCredit>
     where TUser : User
     where TCard : Card
     where TBankAccount : BankAccount
