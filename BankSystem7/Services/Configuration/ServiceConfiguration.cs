@@ -20,9 +20,9 @@ public class ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit> : 
     public IUserRepository<TUser>? UserRepository { get; set; }
 
     public ICardRepository<TCard>? CardRepository { get; set; }
-    public IBankAccountRepository<TBankAccount>? BankAccountRepository { get; set; }
+    public IBankAccountRepository<TUser, TBankAccount>? BankAccountRepository { get; set; }
 
-    public IBankRepository<TBank>? BankRepository { get; set; }
+    public IBankRepository<TUser, TBank>? BankRepository { get; set; }
 
     public ICreditRepository<TCredit>? CreditRepository { get; set; }
 

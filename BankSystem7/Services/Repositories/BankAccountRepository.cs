@@ -8,7 +8,7 @@ using System.Linq.Expressions;
 
 namespace BankSystem7.Services.Repositories;
 
-public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit> : IBankAccountRepository<TBankAccount>
+public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit> : IBankAccountRepository<TUser, TBankAccount>
     where TUser : User
     where TCard : Card
     where TBankAccount : BankAccount
@@ -45,14 +45,7 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
         _applicationContext.BankAccounts
             .Include(x => x.Bank)
             .Include(x => x.User.Card);
-
-    /// <summary>
-    /// The purpose of this method is to transfer a certain amount of money from one user to another
-    /// </summary>
-    /// <param name="from">The parameter represents the user who is transferring the money</param>
-    /// <param name="to">The parameter represents the user who is receiving the money</param>
-    /// <param name="transferAmount">The parameter represents the amount of money being transferred</param>
-    /// <returns></returns>
+    
     public ExceptionModel Transfer(TUser? from, TUser? to, decimal transferAmount)
     {
         // Check if the sender's bank account, receiver's bank account, and transfer amount are valid. If not, return an operation failed exception.
@@ -94,14 +87,7 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
         // Return an operation successful exception.
         return ExceptionModel.Ok;
     }
-
-    /// <summary>
-    /// The purpose of this method is to transfer a certain amount of money from one user to another
-    /// </summary>
-    /// <param name="from">The parameter represents the user who is transferring the money</param>
-    /// <param name="to">The parameter represents the user who is receiving the money</param>
-    /// <param name="transferAmount">The parameter represents the amount of money being transferred</param>
-    /// <returns></returns>
+    
     public async Task<ExceptionModel> TransferAsync(TUser? from, TUser? to, decimal transferAmount)
     {
         // Check if the sender's bank account, receiver's bank account, and transfer amount are valid. If not, return an operation failed exception.

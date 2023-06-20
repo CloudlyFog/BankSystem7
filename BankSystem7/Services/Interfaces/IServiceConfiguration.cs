@@ -15,9 +15,9 @@ public interface IServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredi
     public IUserRepository<TUser>? UserRepository { get; protected internal set; }
 
     public ICardRepository<TCard>? CardRepository { get; protected internal set; }
-    public IBankAccountRepository<TBankAccount>? BankAccountRepository { get; protected internal set; }
+    public IBankAccountRepository<TUser, TBankAccount>? BankAccountRepository { get; protected internal set; }
 
-    public IBankRepository<TBank>? BankRepository { get; protected internal set; }
+    public IBankRepository<TUser, TBank>? BankRepository { get; protected internal set; }
 
     public ICreditRepository<TCredit>? CreditRepository { get; protected internal set; }
 

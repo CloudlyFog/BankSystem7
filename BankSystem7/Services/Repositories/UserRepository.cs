@@ -14,9 +14,9 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
     where TBank : Bank
     where TCredit : Credit
 {
-    private readonly BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit> _bankAccountRepository;
+    private readonly IBankAccountRepository<TUser, TBankAccount> _bankAccountRepository;
     private readonly ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit> _applicationContext;
-    private readonly BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> _bankRepository;
+    private readonly IBankRepository<TUser, TBank> _bankRepository;
     private readonly CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> _cardRepository;
     private bool _disposed;
 
@@ -40,12 +40,11 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
                               (ServicesSettings.Connection);
     }
 
-    public UserRepository(IBankAccountRepository<TBankAccount> repository)
+    public UserRepository(IBankAccountRepository<TUser, TBankAccount> repository)
     {
-        _bankAccountRepository = (BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit>?)repository;
+        _bankAccountRepository = repository;
 
-        _bankRepository = (BankRepository<TUser, TCard, TBankAccount, TBank, TCredit>?)
-            (BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ServiceConfiguration?.BankRepository 
+        _bankRepository = (BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ServiceConfiguration?.BankRepository 
             ?? new BankRepository<TUser, TCard, TBankAccount, TBank, TCredit>(ServicesSettings.Connection));
 
         _cardRepository = (CardRepository<TUser, TCard, TBankAccount, TBank, TCredit>?)
