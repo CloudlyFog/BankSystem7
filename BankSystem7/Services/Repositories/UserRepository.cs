@@ -187,26 +187,14 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
 
     public void Dispose()
     {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    private void Dispose(bool disposing)
-    {
         if (_disposed)
             return;
-        if (disposing)
-        {
-            _bankAccountRepository.Dispose();
-            _bankRepository.Dispose();
-            _cardRepository.Dispose();
-            _applicationContext.Dispose();
-        }
-        _disposed = true;
-    }
 
-    ~UserRepository()
-    {
-        Dispose(false);
+        _bankAccountRepository?.Dispose();
+        _bankRepository?.Dispose();
+        _cardRepository?.Dispose();
+        _applicationContext?.Dispose();
+
+        _disposed = true;
     }
 }
