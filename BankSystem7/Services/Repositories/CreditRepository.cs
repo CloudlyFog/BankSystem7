@@ -419,7 +419,7 @@ public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>
             return bankAccountWithdraw;
         return ExceptionModel.Ok;
     }
-    
+
     public void Dispose()
     {
         if (_disposedValue)

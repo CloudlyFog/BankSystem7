@@ -47,7 +47,7 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         _bankRepository = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ServiceConfiguration?.BankRepository
             ?? new BankRepository<TUser, TCard, TBankAccount, TBank, TCredit>(ServicesSettings.Connection);
 
-        _cardRepository = (BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ServiceConfiguration?.CardRepository 
+        _cardRepository = (BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ServiceConfiguration?.CardRepository
             ?? new CardRepository<TUser, TCard, TBankAccount, TBank, TCredit>(_bankAccountRepository));
 
         _applicationContext = new ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>

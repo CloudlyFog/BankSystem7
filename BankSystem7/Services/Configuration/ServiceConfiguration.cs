@@ -16,7 +16,7 @@ public class ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit> : 
         new ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit>();
 
     private bool _disposed;
-    
+
     public IUserRepository<TUser>? UserRepository { get; set; }
 
     public ICardRepository<TCard>? CardRepository { get; set; }

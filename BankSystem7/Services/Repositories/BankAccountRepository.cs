@@ -1,6 +1,5 @@
 ﻿using BankSystem7.AppContext;
 using BankSystem7.Models;
-using BankSystem7.Services.Configuration;
 using BankSystem7.Services.Interfaces.Base;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
@@ -31,7 +30,7 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
         _bankContext = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.BankContext ?? new BankContext<TUser, TCard, TBankAccount, TBank, TCredit>(connection);
         SetBankServicesOptions();
         _bankRepository = (BankRepository<TUser, TCard, TBankAccount, TBank, TCredit>?)
-            (BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ServiceConfiguration?.BankRepository 
+            (BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ServiceConfiguration?.BankRepository
             ?? new BankRepository<TUser, TCard, TBankAccount, TBank, TCredit>(connection));
     }
 
@@ -45,7 +44,7 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
         _applicationContext.BankAccounts
             .Include(x => x.Bank)
             .Include(x => x.User.Card);
-    
+
     public ExceptionModel Transfer(TUser? from, TUser? to, decimal transferAmount)
     {
         // Check if the sender's bank account, receiver's bank account, and transfer amount are valid. If not, return an operation failed exception.
@@ -87,7 +86,7 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
         // Return an operation successful exception.
         return ExceptionModel.Ok;
     }
-    
+
     public async Task<ExceptionModel> TransferAsync(TUser? from, TUser? to, decimal transferAmount)
     {
         // Check if the sender's bank account, receiver's bank account, and transfer amount are valid. If not, return an operation failed exception.
@@ -466,7 +465,7 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
     {
         return from.Card.BankAccount.Bank != to.Card.BankAccount.Bank;
     }
-    
+
     public void Dispose()
     {
         if (_disposedValue)

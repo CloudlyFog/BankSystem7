@@ -1,5 +1,4 @@
-﻿using BankSystem7.AppContext;
-using BankSystem7.Models;
+﻿using BankSystem7.Models;
 
 namespace BankSystem7.Services.Interfaces.Base;
 
@@ -49,7 +48,7 @@ public interface IBankAccountRepository<TUser, TBankAccount> : IBase<TBankAccoun
 }
 
 public interface IBankRepository<TUser, TBank> : IBase<TBank>, IRepository<TBank>,
-    IReaderServiceWithTracking<TBank>, IRepositoryAsync<TBank> 
+    IReaderServiceWithTracking<TBank>, IRepositoryAsync<TBank>
     where TBank : Bank
     where TUser : User
 {
