@@ -3,7 +3,11 @@ using BankSystem7.Models;
 
 namespace BankSystem7.Services.Interfaces.Base;
 
-public interface IBase<TEntity>
+public interface IDependencyInjectionRegistrar
+{
+}
+
+public interface IBase<TEntity> : IDependencyInjectionRegistrar
 {
     /// <summary>
     /// returns collection of entities
