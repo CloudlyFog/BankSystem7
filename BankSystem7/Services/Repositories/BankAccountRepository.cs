@@ -466,30 +466,16 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
     {
         return from.Card.BankAccount.Bank != to.Card.BankAccount.Bank;
     }
-
-    // Public implementation of Dispose pattern callable by consumers.
+    
     public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    // Protected implementation of Dispose pattern.
-    private void Dispose(bool disposing)
     {
         if (_disposedValue)
             return;
-        if (disposing)
-        {
-            _bankContext.Dispose();
-            _bankRepository.Dispose();
-            _applicationContext.Dispose();
-        }
-        _disposedValue = true;
-    }
 
-    ~BankAccountRepository()
-    {
-        Dispose(false);
+        _bankContext?.Dispose();
+        _bankRepository?.Dispose();
+        _applicationContext?.Dispose();
+
+        _disposedValue = true;
     }
 }

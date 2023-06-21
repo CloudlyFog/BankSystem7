@@ -280,8 +280,14 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
 
     public void Dispose()
     {
-        Dispose(true);
-        GC.SuppressFinalize(this);
+        if (_disposedValue)
+            return;
+
+        _bankContext?.Dispose();
+        BankContext?.Dispose();
+        _applicationContext?.Dispose();
+
+        _disposedValue = true;
     }
 
     // Protected implementation of Dispose pattern.

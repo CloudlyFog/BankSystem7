@@ -168,25 +168,12 @@ public sealed class CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
     // Public implementation of Dispose pattern callable by consumers.
     public void Dispose()
     {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    // Private implementation of Dispose pattern.
-    private void Dispose(bool disposing)
-    {
         if (_disposedValue)
             return;
-        if (disposing)
-        {
-            _bankAccountRepository.Dispose();
-            _applicationContext.Dispose();
-        }
-        _disposedValue = true;
-    }
 
-    ~CardRepository()
-    {
-        Dispose(false);
+        _bankAccountRepository?.Dispose();
+        _applicationContext?.Dispose();
+
+        _disposedValue = true;
     }
 }

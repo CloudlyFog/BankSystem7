@@ -419,27 +419,15 @@ public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>
             return bankAccountWithdraw;
         return ExceptionModel.Ok;
     }
-
-    private void Dispose(bool disposing)
+    
+    public void Dispose()
     {
         if (_disposedValue)
             return;
-        if (disposing)
-        {
-            _bankContext.Dispose();
-            _applicationContext.Dispose();
-        }
+
+        _bankContext?.Dispose();
+        _applicationContext?.Dispose();
+
         _disposedValue = true;
-    }
-
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    ~CreditRepository()
-    {
-        Dispose(false);
     }
 }

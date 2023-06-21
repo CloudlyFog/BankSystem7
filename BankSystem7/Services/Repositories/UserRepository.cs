@@ -17,7 +17,7 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
     private readonly IBankAccountRepository<TUser, TBankAccount> _bankAccountRepository;
     private readonly ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit> _applicationContext;
     private readonly IBankRepository<TUser, TBank> _bankRepository;
-    private readonly CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> _cardRepository;
+    private readonly ICardRepository<TCard> _cardRepository;
     private bool _disposed;
 
     public UserRepository()
@@ -44,11 +44,10 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
     {
         _bankAccountRepository = repository;
 
-        _bankRepository = (BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ServiceConfiguration?.BankRepository 
-            ?? new BankRepository<TUser, TCard, TBankAccount, TBank, TCredit>(ServicesSettings.Connection));
+        _bankRepository = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ServiceConfiguration?.BankRepository
+            ?? new BankRepository<TUser, TCard, TBankAccount, TBank, TCredit>(ServicesSettings.Connection);
 
-        _cardRepository = (CardRepository<TUser, TCard, TBankAccount, TBank, TCredit>?)
-            (BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ServiceConfiguration?.CardRepository 
+        _cardRepository = (BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ServiceConfiguration?.CardRepository 
             ?? new CardRepository<TUser, TCard, TBankAccount, TBank, TCredit>(_bankAccountRepository));
 
         _applicationContext = new ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>
@@ -187,26 +186,14 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
 
     public void Dispose()
     {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    private void Dispose(bool disposing)
-    {
         if (_disposed)
             return;
-        if (disposing)
-        {
-            _bankAccountRepository.Dispose();
-            _bankRepository.Dispose();
-            _cardRepository.Dispose();
-            _applicationContext.Dispose();
-        }
-        _disposed = true;
-    }
 
-    ~UserRepository()
-    {
-        Dispose(false);
+        _bankAccountRepository?.Dispose();
+        _bankRepository?.Dispose();
+        _cardRepository?.Dispose();
+        _applicationContext?.Dispose();
+
+        _disposed = true;
     }
 }
