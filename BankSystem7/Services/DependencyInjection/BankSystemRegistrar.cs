@@ -1,10 +1,29 @@
-﻿using BankSystem7.Services.Interfaces.Base;
+﻿using BankSystem7.Models;
+using BankSystem7.Services.Interfaces.Base;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BankSystem7.Services.DependencyInjection;
 
 public sealed class BankSystemRegistrar
 {
+    public static ServiceProvider Inject<TUser, TCard, TBankAccount, TBank, TCredit>()
+        where TUser : User
+        where TCard : Card
+        where TBankAccount : BankAccount
+        where TBank : Bank
+        where TCredit : Credit
+    {
+        var services = new ServiceCollection();
+
+        var serviceConfiguration = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ServiceConfiguration;
+        var interfaces = serviceConfiguration.GetType().GetProperties();
+
+        foreach (var item in interfaces)
+            services.AddSingleton(item.PropertyType, item.GetValue(serviceConfiguration));
+
+        return services.BuildServiceProvider();
+    }
+
     public static ServiceProvider Inject(Type[] dependenciesTypes, object[] dependencies)
     {
         if (dependencies.Length != dependenciesTypes.Length)
