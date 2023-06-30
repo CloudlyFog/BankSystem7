@@ -59,10 +59,6 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
             .Include(x => x.Card.BankAccount.Bank)
             .AsNoTracking();
 
-    public IQueryable<TUser> AllWithTracking =>
-        _applicationContext.Users
-            .Include(x => x.Card.BankAccount.Bank);
-
     public ExceptionModel Create(TUser item)
     {
         if (item?.Card?.BankAccount?.Bank is null || item.Equals(User.Default))
