@@ -59,10 +59,6 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
             .Include(x => x.Card.BankAccount.Bank)
             .AsNoTracking();
 
-    public IQueryable<TUser> AllWithTracking =>
-        _applicationContext.Users
-            .Include(x => x.Card.BankAccount.Bank);
-
     public ExceptionModel Create(TUser item)
     {
         if (item?.Card?.BankAccount?.Bank is null || item.Equals(User.Default))
@@ -71,13 +67,13 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         if (Exist(x => x.ID.Equals(item.ID) || x.Name.Equals(item.Name) && x.Email.Equals(item.Email)))
             return ExceptionModel.OperationRestricted;
 
-        _applicationContext.Users.Add(item);
-
-        _applicationContext.UpdateTracker(item.Card.BankAccount.Bank, EntityState.Modified, delegate
+        _applicationContext.UpdateTracker(item.Card.BankAccount.Bank,  EntityState.Modified, delegate
         {
             item.Card.BankAccount.Bank.AccountAmount += _bankRepository.CalculateBankAccountAmount(item.Card.Amount);
         }, _applicationContext);
 
+        _applicationContext.Users.Add(item);
+        
         _applicationContext.SaveChanges();
         return ExceptionModel.Ok;
     }
@@ -90,12 +86,12 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         if (Exist(x => x.ID.Equals(item.ID) || x.Name.Equals(item.Name) && x.Email.Equals(item.Email)))
             return ExceptionModel.OperationRestricted;
 
-        _applicationContext.Users.Add(item);
-
         _applicationContext.UpdateTracker(item.Card.BankAccount.Bank, EntityState.Modified, delegate
         {
             item.Card.BankAccount.Bank.AccountAmount += _bankRepository.CalculateBankAccountAmount(item.Card.Amount);
         }, _applicationContext);
+
+        _applicationContext.Users.Add(item);
 
         await _applicationContext.SaveChangesAsync();
         return ExceptionModel.Ok;
