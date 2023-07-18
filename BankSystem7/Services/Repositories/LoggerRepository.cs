@@ -1,10 +1,11 @@
 ﻿using BankSystem7.Models;
 using MongoDB.Driver;
 using System.Linq.Expressions;
+using BankSystem7.Services.Interfaces.Base;
 
 namespace BankSystem7.Services.Repositories;
 
-public sealed class LoggerRepository
+public sealed class LoggerRepository : IDependencyInjectionRegistrar
 {
     private readonly OperationService<Report> _operationService;
 

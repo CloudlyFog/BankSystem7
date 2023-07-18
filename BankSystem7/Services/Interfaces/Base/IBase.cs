@@ -6,7 +6,7 @@ public interface IDependencyInjectionRegistrar
 {
 }
 
-public interface IBase<TEntity> : IDependencyInjectionRegistrar
+public interface IBase<out TEntity> : IDependencyInjectionRegistrar
 {
     /// <summary>
     /// returns collection of entities
