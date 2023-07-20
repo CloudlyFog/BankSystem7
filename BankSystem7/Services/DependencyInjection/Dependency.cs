@@ -11,5 +11,4 @@ public class Dependency
 
 public class DependencyCollection : ServiceCollection
 {
-    public Dependency[] Dependencies { get; set; }
 }

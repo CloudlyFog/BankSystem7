@@ -42,7 +42,7 @@ public static class BankSystemRegistrar
         return ProvideServices(dependenciesTypes, dependencies);
     }
 
-    public static ServiceCollection Inject(Dependency[] dependencies)
+    public static DependencyCollection Inject(Dependency[] dependencies)
     {
         return ProvideServices(dependencies);
     }
@@ -73,14 +73,17 @@ public static class BankSystemRegistrar
         return newServiceCollection;
     }
 
-    public static ServiceCollection Join(this Dependency[] dependencies)
+    public static DependencyCollection Join(this DependencyCollection[] dependencyCollections)
     {
-        var newServiceCollection = new ServiceCollection();
+        var newServiceCollection = new DependencyCollection();
 
-        foreach (var dependency in dependencies)
+        foreach (var dependencyCollection in dependencyCollections)
         {
-            newServiceCollection.Add(new ServiceDescriptor(dependency.DependencyType, 
-                x => dependency.DependencyImplementation, dependency.ServiceLifetime));
+            foreach (var dependency in dependencyCollection)
+            {
+                newServiceCollection.Add(new ServiceDescriptor(dependency.ServiceType,
+                    dependency.ImplementationFactory, dependency.Lifetime));
+            }
         }
 
         return newServiceCollection;
@@ -184,9 +187,9 @@ public static class BankSystemRegistrar
         return serviceCollection;
     }
     
-    private static ServiceCollection ProvideServices(Dependency[] dependencies)
+    private static DependencyCollection ProvideServices(Dependency[] dependencies)
     {
-        var serviceCollection = new ServiceCollection();
+        var serviceCollection = new DependencyCollection();
         foreach (var dependency in dependencies)
             serviceCollection.Add(new ServiceDescriptor(dependency.DependencyType,
                 x => dependency.DependencyImplementation, dependency.ServiceLifetime));
