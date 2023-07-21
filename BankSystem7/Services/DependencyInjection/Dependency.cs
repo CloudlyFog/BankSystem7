@@ -2,13 +2,7 @@
 
 namespace BankSystem7.Services.DependencyInjection;
 
-public class Dependency
-{
-    public required Type DependencyType { get; init; }
-    public required object DependencyImplementation { get; init; } 
-    public required ServiceLifetime ServiceLifetime { get; init; }
-}
+public record Dependency(Type DependencyType, object DependencyImplementation, ServiceLifetime ServiceLifetime);
 
-public class DependencyCollection : ServiceCollection
-{
-}
+
+public record TypedDependency(Type ServiceType, Type ImplementationType, ServiceLifetime ServiceLifetime);

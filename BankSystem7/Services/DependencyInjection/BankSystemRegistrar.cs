@@ -42,7 +42,12 @@ public static class BankSystemRegistrar
         return ProvideServices(dependenciesTypes, dependencies);
     }
 
-    public static DependencyCollection Inject(Dependency[] dependencies)
+    public static ServiceCollection Inject(Dependency[] dependencies)
+    {
+        return ProvideServices(dependencies);
+    }
+
+    public static ServiceCollection Inject(TypedDependency[] dependencies)
     {
         return ProvideServices(dependencies);
     }
@@ -53,36 +58,38 @@ public static class BankSystemRegistrar
         serviceCollection.AddSingleton(serviceProvider);
         return serviceCollection.BuildServiceProvider();
     }
+
+    public static ServiceProvider InjectItself(IServiceProvider serviceProvider, ServiceLifetime serviceLifetime)
+    {
+        return new ServiceCollection
+        {
+            new ServiceDescriptor(serviceProvider.GetType(), x => serviceProvider, serviceLifetime)
+        }.BuildServiceProvider();
+    }
     
     public static ServiceCollection Join(this ServiceCollection[] serviceCollections)
     {
         var newServiceCollection = new ServiceCollection();
         foreach (var serviceCollection in serviceCollections)
         {
-            foreach (var item in serviceCollection)
+            foreach (var dependency in serviceCollection)
             {
-                if (item.ImplementationInstance is null)
+                if (dependency?.ImplementationInstance is not null)
                 {
-                    newServiceCollection.AddSingleton(item.ServiceType);
+                    newServiceCollection.Add(new ServiceDescriptor(dependency.ServiceType,
+                        x => dependency?.ImplementationInstance, dependency.Lifetime));
                     continue;
                 }
-                newServiceCollection.AddSingleton(item.ServiceType, item.ImplementationInstance);
-            }
-        }
+                else if(dependency?.ImplementationFactory is not null)
+                {
+                    newServiceCollection.Add(new ServiceDescriptor(dependency.ServiceType,
+                    dependency?.ImplementationFactory, dependency.Lifetime));
+                    continue;
+                }
 
-        return newServiceCollection;
-    }
+                newServiceCollection.Add(new ServiceDescriptor(dependency.ServiceType, 
+                    dependency.ImplementationType, dependency.Lifetime));
 
-    public static DependencyCollection Join(this DependencyCollection[] dependencyCollections)
-    {
-        var newServiceCollection = new DependencyCollection();
-
-        foreach (var dependencyCollection in dependencyCollections)
-        {
-            foreach (var dependency in dependencyCollection)
-            {
-                newServiceCollection.Add(new ServiceDescriptor(dependency.ServiceType,
-                    dependency.ImplementationFactory, dependency.Lifetime));
             }
         }
 
@@ -187,12 +194,22 @@ public static class BankSystemRegistrar
         return serviceCollection;
     }
     
-    private static DependencyCollection ProvideServices(Dependency[] dependencies)
+    private static ServiceCollection ProvideServices(Dependency[] dependencies)
     {
-        var serviceCollection = new DependencyCollection();
+        var serviceCollection = new ServiceCollection();
         foreach (var dependency in dependencies)
             serviceCollection.Add(new ServiceDescriptor(dependency.DependencyType,
                 x => dependency.DependencyImplementation, dependency.ServiceLifetime));
+
+        return serviceCollection;
+    }
+    
+    private static ServiceCollection ProvideServices(TypedDependency[] dependencies)
+    {
+        var serviceCollection = new ServiceCollection();
+        foreach (var dependency in dependencies)
+            serviceCollection.Add(new ServiceDescriptor(dependency.ServiceType, 
+                dependency.ImplementationType, dependency.ServiceLifetime));
 
         return serviceCollection;
     }
