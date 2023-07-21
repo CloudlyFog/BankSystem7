@@ -16,6 +16,8 @@
 		<AnalysisLevel>latest-recommended</AnalysisLevel>
 		<PackageReleaseNotes>Check README file before update to newer version.</PackageReleaseNotes>
 		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<DocumentationFile>D:\BankSystem7\BankSystem7\docs\APIdocs.xml</DocumentationFile>
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
