@@ -1,64 +1,66 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <PackageVersion>0.5.5</PackageVersion>
-        <Authors>CloudlyFog</Authors>
-        <Copyright>Copyright (c) CloudlyFog 2023</Copyright>
-        <PackageReadmeFile>README.md</PackageReadmeFile>
-        <Description>This package was developed for common using and learning definite technology. It also let everybody to use bank system in its projects and change logic for your needs.</Description>
-        <PackageLicenseUrl>https://mit-license.org/</PackageLicenseUrl>
-        <PackageTags>bank;account;banksystem;credit;transfer;money;bankaccount</PackageTags>
-        <RepositoryUrl>https://github.com/CloudlyFog/BankSystem7</RepositoryUrl>
-        <AnalysisLevel>none</AnalysisLevel>
-        <PackageReleaseNotes>Check README file before update to newer version.</PackageReleaseNotes>
-        <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    </PropertyGroup>
+	<PropertyGroup>
+		<TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<PackageVersion>0.5.7</PackageVersion>
+		<Authors>CloudlyFog</Authors>
+		<Copyright>Copyright (c) CloudlyFog 2023</Copyright>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<Description>This package was developed for common using. It also let everybody to use bank system in its projects and change logic for your needs.</Description>
+		<PackageLicenseUrl>https://mit-license.org/</PackageLicenseUrl>
+		<PackageTags>bank;account;banksystem;credit;transfer;money;bankaccount</PackageTags>
+		<RepositoryUrl>https://github.com/CloudlyFog/BankSystem7</RepositoryUrl>
+		<AnalysisLevel>latest-recommended</AnalysisLevel>
+		<PackageReleaseNotes>Check README file before update to newer version.</PackageReleaseNotes>
+		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<DocumentationFile>D:\BankSystem7\BankSystem7\docs\APIdocs.xml</DocumentationFile>
+	</PropertyGroup>
 
-    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-      <WarningLevel>1</WarningLevel>
-    </PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+		<WarningLevel>1</WarningLevel>
+	</PropertyGroup>
 
-    <ItemGroup>
-      <Compile Remove="Middleware\**" />
-      <Compile Remove="Migrations\**" />
-      <EmbeddedResource Remove="Middleware\**" />
-      <EmbeddedResource Remove="Migrations\**" />
-      <None Remove="Middleware\**" />
-      <None Remove="Migrations\**" />
-    </ItemGroup>
+	<ItemGroup>
+		<Compile Remove="Middleware\**" />
+		<Compile Remove="Migrations\**" />
+		<EmbeddedResource Remove="Middleware\**" />
+		<EmbeddedResource Remove="Migrations\**" />
+		<None Remove="Middleware\**" />
+		<None Remove="Migrations\**" />
+	</ItemGroup>
 
-    <ItemGroup>
-      <None Remove="Services\Interfaces\BuilderBase.cs~RF15366b.TMP" />
-      <None Remove="Services\Interfaces\IServiceConfiguration.cs~RFca482.TMP" />
-      <None Remove="Services\Repositories\BankAccountRepository.cs~RF2b5f4d6f.TMP" />
-      <None Remove="Services\Repositories\CreditRepository.cs~RFb2d76ba.TMP" />
-    </ItemGroup>
+	<ItemGroup>
+		<None Remove="Services\Interfaces\BuilderBase.cs~RF15366b.TMP" />
+		<None Remove="Services\Interfaces\IServiceConfiguration.cs~RFca482.TMP" />
+		<None Remove="Services\Repositories\BankAccountRepository.cs~RF2b5f4d6f.TMP" />
+		<None Remove="Services\Repositories\CreditRepository.cs~RFb2d76ba.TMP" />
+	</ItemGroup>
 
-    <ItemGroup>
-        <None Include="docs/README.md" Pack="true" PackagePath="/" />
-    </ItemGroup>
-    
-    <ItemGroup>
-      <PackageReference Include="Microsoft.AspNetCore.Cryptography.KeyDerivation" Version="8.0.0-preview.2.23153.2" />
-      <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0-preview.2.23128.3" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0-preview.2.23128.3">
-        <PrivateAssets>all</PrivateAssets>
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      </PackageReference>
-      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.0-preview.2.23128.3" />
-      <PackageReference Include="MongoDB.Driver" Version="2.19.1" />
-      <PackageReference Include="MySql.EntityFrameworkCore" Version="7.0.0" />
-      <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-      <PackageReference Include="Npgsql" Version="8.0.0-preview.2" />
-      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0-preview.2" />
-      <PackageReference Include="NUnit" Version="3.13.3" />
-      <PackageReference Include="System.Data.HashFunction.Interfaces" Version="2.0.0" />
-      <PackageReference Include="System.Data.HashFunction.Jenkins" Version="2.0.0" />
-    </ItemGroup>
+	<ItemGroup>
+		<None Include="docs/README.md" Pack="true" PackagePath="/" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Cryptography.KeyDerivation" Version="8.0.0-preview.2.23153.2" />
+		<PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0-preview.2.23128.3" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0-preview.2.23128.3">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.0-preview.2.23128.3" />
+		<PackageReference Include="MongoDB.Driver" Version="2.19.1" />
+		<PackageReference Include="MySql.EntityFrameworkCore" Version="7.0.0" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="Npgsql" Version="8.0.0-preview.2" />
+		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0-preview.2" />
+		<PackageReference Include="NUnit" Version="3.13.3" />
+		<PackageReference Include="System.Data.HashFunction.Interfaces" Version="2.0.0" />
+		<PackageReference Include="System.Data.HashFunction.Jenkins" Version="2.0.0" />
+	</ItemGroup>
 
 </Project>

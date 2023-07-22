@@ -1,14 +1,13 @@
-﻿using BankSystem7.AppContext;
+using BankSystem7.AppContext;
 using BankSystem7.Models;
-using BankSystem7.Services.Configuration;
-using BankSystem7.Services.Interfaces;
+using BankSystem7.Services.Interfaces.Base;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 using System.Linq.Expressions;
 
 namespace BankSystem7.Services.Repositories;
 
-public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit> : IRepository<TBankAccount>, IRepositoryAsync<TBankAccount>
+public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit> : IBankAccountRepository<TUser, TBankAccount>
     where TUser : User
     where TCard : Card
     where TBankAccount : BankAccount
@@ -23,31 +22,6 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
     /// <summary>
     /// Initializes a new instance of the <see cref="BankAccountRepository{TUser, TCard, TBankAccount, TBank, TCredit}"/> class.
     /// </summary>
-    public BankAccountRepository()
-    {
-        _applicationContext = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ApplicationContext ??
-                              new ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>(ServicesSettings.Connection);
-        _bankContext = _bankRepository.BankContext;
-        SetBankServicesOptions();
-        _bankRepository = new BankRepository<TUser, TCard, TBankAccount, TBank, TCredit>(ServicesSettings.Connection);
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="BankAccountRepository{TUser, TCard, TBankAccount, TBank, TCredit}"/> class.
-    /// </summary>
-    /// <param name="bankRepository">The bank repository.</param>
-    public BankAccountRepository(BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> bankRepository)
-    {
-        _bankRepository = bankRepository;
-        _applicationContext = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ApplicationContext ??
-                              new ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>(ServicesSettings.Connection);
-        _bankContext = _bankRepository.BankContext;
-        SetBankServicesOptions();
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="BankAccountRepository{TUser, TCard, TBankAccount, TBank, TCredit}"/> class.
-    /// </summary>
     /// <param name="connection">The connection string/</param>
     public BankAccountRepository(string connection)
     {
@@ -55,7 +29,9 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
                               new ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>(connection);
         _bankContext = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.BankContext ?? new BankContext<TUser, TCard, TBankAccount, TBank, TCredit>(connection);
         SetBankServicesOptions();
-        _bankRepository = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ServiceConfiguration?.BankRepository ?? new BankRepository<TUser, TCard, TBankAccount, TBank, TCredit>(connection);
+        _bankRepository = (BankRepository<TUser, TCard, TBankAccount, TBank, TCredit>?)
+            (BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ServiceConfiguration?.BankRepository
+            ?? new BankRepository<TUser, TCard, TBankAccount, TBank, TCredit>(connection));
     }
 
     public IQueryable<TBankAccount> All =>
@@ -69,13 +45,6 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
             .Include(x => x.Bank)
             .Include(x => x.User.Card);
 
-    /// <summary>
-    /// The purpose of this method is to transfer a certain amount of money from one user to another
-    /// </summary>
-    /// <param name="from">The parameter represents the user who is transferring the money</param>
-    /// <param name="to">The parameter represents the user who is receiving the money</param>
-    /// <param name="transferAmount">The parameter represents the amount of money being transferred</param>
-    /// <returns></returns>
     public ExceptionModel Transfer(TUser? from, TUser? to, decimal transferAmount)
     {
         // Check if the sender's bank account, receiver's bank account, and transfer amount are valid. If not, return an operation failed exception.
@@ -118,13 +87,6 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
         return ExceptionModel.Ok;
     }
 
-    /// <summary>
-    /// The purpose of this method is to transfer a certain amount of money from one user to another
-    /// </summary>
-    /// <param name="from">The parameter represents the user who is transferring the money</param>
-    /// <param name="to">The parameter represents the user who is receiving the money</param>
-    /// <param name="transferAmount">The parameter represents the amount of money being transferred</param>
-    /// <returns></returns>
     public async Task<ExceptionModel> TransferAsync(TUser? from, TUser? to, decimal transferAmount)
     {
         // Check if the sender's bank account, receiver's bank account, and transfer amount are valid. If not, return an operation failed exception.
@@ -504,29 +466,15 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
         return from.Card.BankAccount.Bank != to.Card.BankAccount.Bank;
     }
 
-    // Public implementation of Dispose pattern callable by consumers.
     public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    // Protected implementation of Dispose pattern.
-    private void Dispose(bool disposing)
     {
         if (_disposedValue)
             return;
-        if (disposing)
-        {
-            _bankContext.Dispose();
-            _bankRepository.Dispose();
-            _applicationContext.Dispose();
-        }
-        _disposedValue = true;
-    }
 
-    ~BankAccountRepository()
-    {
-        Dispose(false);
+        _bankContext?.Dispose();
+        _bankRepository?.Dispose();
+        _applicationContext?.Dispose();
+
+        _disposedValue = true;
     }
 }

@@ -1,23 +1,23 @@
 ﻿using BankSystem7.AppContext;
 using BankSystem7.Models;
 using BankSystem7.Services.Configuration;
-using BankSystem7.Services.Interfaces;
+using BankSystem7.Services.Interfaces.Base;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace BankSystem7.Services.Repositories;
 
-public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> : IRepository<TUser>, IRepositoryAsync<TUser>
+public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> : IUserRepository<TUser>
     where TUser : User
     where TCard : Card
     where TBankAccount : BankAccount
     where TBank : Bank
     where TCredit : Credit
 {
-    private readonly BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit> _bankAccountRepository;
+    private readonly IBankAccountRepository<TUser, TBankAccount> _bankAccountRepository;
     private readonly ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit> _applicationContext;
-    private readonly BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> _bankRepository;
-    private readonly CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> _cardRepository;
+    private readonly IBankRepository<TUser, TBank> _bankRepository;
+    private readonly ICardRepository<TCard> _cardRepository;
     private bool _disposed;
 
     public UserRepository()
@@ -40,11 +40,16 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
                               (ServicesSettings.Connection);
     }
 
-    public UserRepository(BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit> repository)
+    public UserRepository(IBankAccountRepository<TUser, TBankAccount> repository)
     {
         _bankAccountRepository = repository;
-        _bankRepository = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ServiceConfiguration?.BankRepository ?? new BankRepository<TUser, TCard, TBankAccount, TBank, TCredit>(ServicesSettings.Connection);
-        _cardRepository = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ServiceConfiguration?.CardRepository ?? new CardRepository<TUser, TCard, TBankAccount, TBank, TCredit>(_bankAccountRepository);
+
+        _bankRepository = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ServiceConfiguration?.BankRepository
+            ?? new BankRepository<TUser, TCard, TBankAccount, TBank, TCredit>(ServicesSettings.Connection);
+
+        _cardRepository = (BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ServiceConfiguration?.CardRepository
+            ?? new CardRepository<TUser, TCard, TBankAccount, TBank, TCredit>(_bankAccountRepository));
+
         _applicationContext = new ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>
             (ServicesSettings.Connection);
     }
@@ -54,10 +59,6 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
             .Include(x => x.Card.BankAccount.Bank)
             .AsNoTracking();
 
-    public IQueryable<TUser> AllWithTracking =>
-        _applicationContext.Users
-            .Include(x => x.Card.BankAccount.Bank);
-
     public ExceptionModel Create(TUser item)
     {
         if (item?.Card?.BankAccount?.Bank is null || item.Equals(User.Default))
@@ -66,13 +67,13 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         if (Exist(x => x.ID.Equals(item.ID) || x.Name.Equals(item.Name) && x.Email.Equals(item.Email)))
             return ExceptionModel.OperationRestricted;
 
-        _applicationContext.Users.Add(item);
-
-        _applicationContext.UpdateTracker(item.Card.BankAccount.Bank, EntityState.Modified, delegate
+        _applicationContext.UpdateTracker(item.Card.BankAccount.Bank,  EntityState.Modified, delegate
         {
             item.Card.BankAccount.Bank.AccountAmount += _bankRepository.CalculateBankAccountAmount(item.Card.Amount);
         }, _applicationContext);
 
+        _applicationContext.Users.Add(item);
+        
         _applicationContext.SaveChanges();
         return ExceptionModel.Ok;
     }
@@ -85,12 +86,12 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         if (Exist(x => x.ID.Equals(item.ID) || x.Name.Equals(item.Name) && x.Email.Equals(item.Email)))
             return ExceptionModel.OperationRestricted;
 
-        _applicationContext.Users.Add(item);
-
         _applicationContext.UpdateTracker(item.Card.BankAccount.Bank, EntityState.Modified, delegate
         {
             item.Card.BankAccount.Bank.AccountAmount += _bankRepository.CalculateBankAccountAmount(item.Card.Amount);
         }, _applicationContext);
+
+        _applicationContext.Users.Add(item);
 
         await _applicationContext.SaveChangesAsync();
         return ExceptionModel.Ok;
@@ -181,26 +182,14 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
 
     public void Dispose()
     {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    private void Dispose(bool disposing)
-    {
         if (_disposed)
             return;
-        if (disposing)
-        {
-            _bankAccountRepository.Dispose();
-            _bankRepository.Dispose();
-            _cardRepository.Dispose();
-            _applicationContext.Dispose();
-        }
-        _disposed = true;
-    }
 
-    ~UserRepository()
-    {
-        Dispose(false);
+        _bankAccountRepository?.Dispose();
+        _bankRepository?.Dispose();
+        _cardRepository?.Dispose();
+        _applicationContext?.Dispose();
+
+        _disposed = true;
     }
 }

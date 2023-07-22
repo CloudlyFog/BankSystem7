@@ -1,15 +1,14 @@
 ﻿using BankSystem7.AppContext;
 using BankSystem7.Models;
 using BankSystem7.Services.Configuration;
-using BankSystem7.Services.Interfaces;
+using BankSystem7.Services.Interfaces.Base;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 using System.Linq.Expressions;
 
 namespace BankSystem7.Services.Repositories;
 
-public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit> : IRepository<TCredit>, IRepositoryAsync<TCredit>,
-    IReaderServiceWithTracking<TCredit>
+public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit> : ICreditRepository<TUser, TCredit>
     where TUser : User
     where TCard : Card
     where TBankAccount : BankAccount
@@ -421,26 +420,14 @@ public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>
         return ExceptionModel.Ok;
     }
 
-    private void Dispose(bool disposing)
+    public void Dispose()
     {
         if (_disposedValue)
             return;
-        if (disposing)
-        {
-            _bankContext.Dispose();
-            _applicationContext.Dispose();
-        }
+
+        _bankContext?.Dispose();
+        _applicationContext?.Dispose();
+
         _disposedValue = true;
-    }
-
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    ~CreditRepository()
-    {
-        Dispose(false);
     }
 }

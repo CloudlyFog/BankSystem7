@@ -1,21 +1,20 @@
 ﻿using BankSystem7.AppContext;
 using BankSystem7.Models;
 using BankSystem7.Services.Configuration;
-using BankSystem7.Services.Interfaces;
+using BankSystem7.Services.Interfaces.Base;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace BankSystem7.Services.Repositories;
 
-public sealed class CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> : IRepository<TCard>, IRepositoryAsync<TCard>,
-    IReaderServiceWithTracking<TCard>
+public sealed class CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> : ICardRepository<TCard>
     where TUser : User
     where TCard : Card
     where TBankAccount : BankAccount
     where TBank : Bank
     where TCredit : Credit
 {
-    private readonly BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit> _bankAccountRepository;
+    private readonly IBankAccountRepository<TUser, TBankAccount> _bankAccountRepository;
     private readonly ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit> _applicationContext;
     private bool _disposedValue;
 
@@ -26,7 +25,7 @@ public sealed class CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
                               new ApplicationContext<TUser, TCard, TBankAccount, TBank, TCredit>(ServicesSettings.Connection);
     }
 
-    public CardRepository(BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCredit> bankAccountRepository)
+    public CardRepository(IBankAccountRepository<TUser, TBankAccount> bankAccountRepository)
     {
         _bankAccountRepository = bankAccountRepository;
         _applicationContext = BankServicesOptions<TUser, TCard, TBankAccount, TBank, TCredit>.ApplicationContext ??
@@ -169,25 +168,12 @@ public sealed class CardRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
     // Public implementation of Dispose pattern callable by consumers.
     public void Dispose()
     {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    // Private implementation of Dispose pattern.
-    private void Dispose(bool disposing)
-    {
         if (_disposedValue)
             return;
-        if (disposing)
-        {
-            _bankAccountRepository.Dispose();
-            _applicationContext.Dispose();
-        }
-        _disposedValue = true;
-    }
 
-    ~CardRepository()
-    {
-        Dispose(false);
+        _bankAccountRepository?.Dispose();
+        _applicationContext?.Dispose();
+
+        _disposedValue = true;
     }
 }

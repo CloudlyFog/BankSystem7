@@ -1,14 +1,13 @@
 ﻿using BankSystem7.AppContext;
 using BankSystem7.Models;
 using BankSystem7.Services.Configuration;
-using BankSystem7.Services.Interfaces;
+using BankSystem7.Services.Interfaces.Base;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace BankSystem7.Services.Repositories;
 
-public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> : IRepository<TBank>,
-    IReaderServiceWithTracking<TBank>, IRepositoryAsync<TBank>
+public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> : IBankRepository<TUser, TBank>
     where TUser : User
     where TCard : Card
     where TBankAccount : BankAccount
@@ -273,15 +272,21 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
     /// </summary>
     /// <param name="accountAmountValue">The account amount value.</param>
     /// <returns></returns>
-    internal decimal CalculateBankAccountAmount(decimal accountAmountValue)
+    public decimal CalculateBankAccountAmount(decimal accountAmountValue)
     {
         return accountAmountValue - 0;
     }
 
     public void Dispose()
     {
-        Dispose(true);
-        GC.SuppressFinalize(this);
+        if (_disposedValue)
+            return;
+
+        _bankContext?.Dispose();
+        BankContext?.Dispose();
+        _applicationContext?.Dispose();
+
+        _disposedValue = true;
     }
 
     // Protected implementation of Dispose pattern.

@@ -5,18 +5,10 @@ namespace BankSystem7.Services.Interfaces;
 
 public interface IRepository<T> : IReaderService<T>, IWriterService<T>, IDisposable where T : class
 {
-    /// <summary>
-    /// returns collection of entities
-    /// </summary>
-    IQueryable<T> All { get; }
 }
 
 public interface IRepositoryAsync<T> : IReaderServiceAsync<T>, IWriterServiceAsync<T> where T : class
 {
-    /// <summary>
-    /// returns collection of entities
-    /// </summary>
-    IQueryable<T> All { get; }
 }
 
 public interface IReaderService<T> where T : class
