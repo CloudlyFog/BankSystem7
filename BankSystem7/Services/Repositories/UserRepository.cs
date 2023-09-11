@@ -64,7 +64,7 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         if (item?.Card?.BankAccount?.Bank is null || item.Equals(User.Default))
             return ExceptionModel.OperationFailed;
 
-        if (Exist(x => x.ID.Equals(item.ID) || x.Name.Equals(item.Name) && x.Email.Equals(item.Email)))
+        if (Exist(x => x.Id.Equals(item.Id) || x.Name.Equals(item.Name) && x.Email.Equals(item.Email)))
             return ExceptionModel.OperationRestricted;
 
         _applicationContext.UpdateTracker(item.Card.BankAccount.Bank,  EntityState.Modified, delegate
@@ -83,7 +83,7 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         if (item?.Card?.BankAccount?.Bank is null || item.Equals(User.Default))
             return ExceptionModel.OperationFailed;
 
-        if (Exist(x => x.ID.Equals(item.ID) || x.Name.Equals(item.Name) && x.Email.Equals(item.Email)))
+        if (Exist(x => x.Id.Equals(item.Id) || x.Name.Equals(item.Name) && x.Email.Equals(item.Email)))
             return ExceptionModel.OperationRestricted;
 
         _applicationContext.UpdateTracker(item.Card.BankAccount.Bank, EntityState.Modified, delegate
@@ -162,12 +162,12 @@ public sealed class UserRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
 
     public bool FitsConditions(TUser? item)
     {
-        return item?.Card?.BankAccount?.Bank is not null && Exist(x => x.ID == item.ID);
+        return item?.Card?.BankAccount?.Bank is not null && Exist(x => x.Id == item.Id);
     }
 
     public async Task<bool> FitsConditionsAsync(TUser? item)
     {
-        return item?.Card?.BankAccount?.Bank is not null && await ExistAsync(x => x.ID == item.ID);
+        return item?.Card?.BankAccount?.Bank is not null && await ExistAsync(x => x.Id == item.Id);
     }
 
     public TUser Get(Expression<Func<TUser, bool>> predicate)

@@ -115,7 +115,7 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
             return (ExceptionModel)operation.OperationStatus.GetHashCode();
 
         // Check if the user's card's bank account's bank is null or if the bank ID does not exist in the database
-        if (user?.Card?.BankAccount?.Bank is null || !Exist(x => x.ID == user.Card.BankAccount.Bank.ID))
+        if (user?.Card?.BankAccount?.Bank is null || !Exist(x => x.Id == user.Card.BankAccount.Bank.Id))
             return ExceptionModel.EntityIsNull;
 
         // If it is another bank transaction operation, add the transfer amount to the bank account amount of the user's card's bank
@@ -144,7 +144,7 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
             return (ExceptionModel)operation.OperationStatus.GetHashCode();
 
         // Check if the user's card's bank account's bank is null or if the bank ID does not exist in the database
-        if (user?.Card?.BankAccount?.Bank is null || !Exist(x => x.ID == user.Card.BankAccount.Bank.ID))
+        if (user?.Card?.BankAccount?.Bank is null || !Exist(x => x.Id == user.Card.BankAccount.Bank.Id))
             return ExceptionModel.EntityIsNull;
 
         // If it is another bank transaction operation, add the transfer amount to the bank account amount of the user's card's bank
@@ -166,7 +166,7 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         if (item is null)
             return ExceptionModel.EntityIsNull;
 
-        if (Exist(x => x.ID == item.ID))
+        if (Exist(x => x.Id == item.Id))
             return Update(item);
 
         _applicationContext.Add(item);
@@ -179,7 +179,7 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
         if (item is null)
             return ExceptionModel.EntityIsNull;
 
-        if (Exist(x => x.ID == item.ID))
+        if (Exist(x => x.Id == item.Id))
             return Update(item);
 
         _applicationContext.Add(item);
@@ -259,12 +259,12 @@ public sealed class BankRepository<TUser, TCard, TBankAccount, TBank, TCredit> :
 
     public bool FitsConditions(TBank? item)
     {
-        return item is not null && Exist(x => x.ID == item.ID);
+        return item is not null && Exist(x => x.Id == item.Id);
     }
 
     public async Task<bool> FitsConditionsAsync(TBank? item)
     {
-        return item is not null && await ExistAsync(x => x.ID == item.ID);
+        return item is not null && await ExistAsync(x => x.Id == item.Id);
     }
 
     /// <summary>

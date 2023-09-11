@@ -53,14 +53,14 @@ public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>
     /// <returns></returns>
     public ExceptionModel TakeCredit(TUser? user, TCredit? credit)
     {
-        if (user?.Card?.BankAccount?.Bank is null || credit is null || Exist(x => x.ID == credit.ID || x.UserID == user.ID))
+        if (user?.Card?.BankAccount?.Bank is null || credit is null || Exist(x => x.Id == credit.Id || x.UserId == user.Id))
             return ExceptionModel.EntityIsNull;
 
-        var operationAccrualToUserAccount = new Operation
+        var operationAccrualToUserAccount = new Operation(Guid.NewGuid())
         {
-            BankID = credit.BankID,
-            ReceiverID = credit.UserID,
-            SenderID = credit.BankID,
+            BankId = credit.BankId,
+            ReceiverId = credit.UserId,
+            SenderId = credit.BankId,
             TransferAmount = credit.CreditAmount
         };
         using var transaction = _applicationContext.Database.BeginTransaction(IsolationLevel.Serializable);
@@ -93,14 +93,14 @@ public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>
     /// <returns></returns>
     public async Task<ExceptionModel> TakeCreditAsync(TUser? user, TCredit? credit)
     {
-        if (user?.Card?.BankAccount?.Bank is null || credit is null || Exist(x => x.ID == credit.ID || x.UserID == user.ID))
+        if (user?.Card?.BankAccount?.Bank is null || credit is null || Exist(x => x.Id == credit.Id || x.UserId == user.Id))
             return ExceptionModel.EntityIsNull;
 
-        var operationAccrualToUserAccount = new Operation
+        var operationAccrualToUserAccount = new Operation(Guid.NewGuid())
         {
-            BankID = credit.BankID,
-            ReceiverID = credit.UserID,
-            SenderID = credit.BankID,
+            BankId = credit.BankId,
+            ReceiverId = credit.UserId,
+            SenderId = credit.BankId,
             TransferAmount = credit.CreditAmount
         };
         await using var transaction = await _applicationContext.Database.BeginTransactionAsync(IsolationLevel.Serializable);
@@ -133,14 +133,14 @@ public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>
     /// <returns></returns>
     public ExceptionModel PayCredit(TUser? user, TCredit credit, decimal payAmount)
     {
-        if (user?.Card?.BankAccount?.Bank is null || credit is null || !Exist(x => x.ID == credit.ID || x.UserID == user.ID))
+        if (user?.Card?.BankAccount?.Bank is null || credit is null || !Exist(x => x.Id == credit.Id || x.UserId == user.Id))
             return ExceptionModel.EntityIsNull;
 
-        var operationWithdrawFromUserAccount = new Operation()
+        var operationWithdrawFromUserAccount = new Operation(Guid.NewGuid())
         {
-            BankID = credit.BankID,
-            ReceiverID = credit.BankID,
-            SenderID = credit.UserID,
+            BankId = credit.BankId,
+            ReceiverId = credit.BankId,
+            SenderId = credit.UserId,
             TransferAmount = payAmount
         };
 
@@ -174,14 +174,14 @@ public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>
     /// <returns></returns>
     public async Task<ExceptionModel> PayCreditAsync(TUser? user, TCredit credit, decimal payAmount)
     {
-        if (user?.Card?.BankAccount?.Bank is null || credit is null || !Exist(x => x.ID == credit.ID || x.UserID == user.ID))
+        if (user?.Card?.BankAccount?.Bank is null || credit is null || !Exist(x => x.Id == credit.Id || x.UserId == user.Id))
             return ExceptionModel.EntityIsNull;
 
-        var operationWithdrawFromUserAccount = new Operation()
+        var operationWithdrawFromUserAccount = new Operation(Guid.NewGuid())
         {
-            BankID = credit.BankID,
-            ReceiverID = credit.BankID,
-            SenderID = credit.UserID,
+            BankId = credit.BankId,
+            ReceiverId = credit.BankId,
+            SenderId = credit.UserId,
             TransferAmount = payAmount
         };
 
@@ -211,7 +211,7 @@ public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>
         if (item is null)
             return ExceptionModel.EntityIsNull;
 
-        if (Exist(x => x.ID == item.ID))
+        if (Exist(x => x.Id == item.Id))
             return ExceptionModel.OperationFailed;
 
         item.User = null;
@@ -226,7 +226,7 @@ public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>
         if (item is null)
             return ExceptionModel.EntityIsNull;
 
-        if (Exist(x => x.ID == item.ID))
+        if (Exist(x => x.Id == item.Id))
             return ExceptionModel.OperationFailed;
 
         item.User = null;
@@ -308,12 +308,12 @@ public sealed class CreditRepository<TUser, TCard, TBankAccount, TBank, TCredit>
 
     public bool FitsConditions(TCredit? item)
     {
-        return item is not null && Exist(x => x.ID == item.ID);
+        return item is not null && Exist(x => x.Id == item.Id);
     }
 
     public async Task<bool> FitsConditionsAsync(TCredit? item)
     {
-        return item is not null && await ExistAsync(x => x.ID == item.ID);
+        return item is not null && await ExistAsync(x => x.Id == item.Id);
     }
 
     private ExceptionModel UpdateCreditStateAfterPayCredit(TCredit credit, Operation operationWithdrawFromUserAccount)

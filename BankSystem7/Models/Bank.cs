@@ -7,20 +7,20 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace BankSystem7.Models;
 
 [Table("Banks")]
-public class Bank
+public class Bank : Entity
 {
     [NotMapped]
-    public static readonly Bank Default = new()
+    public static readonly Bank Default = new(Guid.Empty)
     {
-        ID = Guid.Empty,
         BankName = "bankName",
         AccountAmount = 0,
         Credits = new List<Credit>(),
         BankAccounts = new List<BankAccount>(),
     };
 
-    [Key]
-    public Guid ID { get; set; } = Guid.NewGuid();
+    public Bank(Guid id) : base(id)
+    {
+    }
 
     public string BankName { get; set; } = string.Empty;
     public List<Credit> Credits { get; set; } = new();
@@ -29,11 +29,6 @@ public class Bank
     [Precision(18, 2)]
     public decimal AccountAmount { get; set; }
 
-    public override int GetHashCode()
-    {
-        return ID.GetHashCode();
-    }
-
     public override string? ToString()
     {
         return this.ConvertToString();
@@ -41,20 +36,17 @@ public class Bank
 }
 
 [BsonIgnoreExtraElements]
-public class Operation
+public class Operation : Entity
 {
-    public Guid ID { get; set; } = Guid.NewGuid();
-    public Guid? BankID { get; set; } = Guid.NewGuid();
-    public Guid? ReceiverID { get; set; } = Guid.NewGuid();
-    public Guid? SenderID { get; set; } = Guid.NewGuid();
+    public Operation(Guid id) : base(id)
+    {
+    }
+    public Guid? BankId { get; set; } = Guid.NewGuid();
+    public Guid? ReceiverId { get; set; } = Guid.NewGuid();
+    public Guid? SenderId { get; set; } = Guid.NewGuid();
     public decimal TransferAmount { get; set; }
     public StatusOperationCode OperationStatus { get; set; } = StatusOperationCode.Ok;
     public OperationKind OperationKind { get; set; }
-
-    public override int GetHashCode()
-    {
-        return ID.GetHashCode();
-    }
 
     public override string? ToString()
     {
@@ -63,35 +55,35 @@ public class Operation
 }
 
 [Table("Credits")]
-public class Credit
+public class Credit : Entity
 {
     [NotMapped]
-    public static readonly Credit Default = new()
+    public static readonly Credit Default = new(Guid.Empty)
     {
-        ID = Guid.Empty,
         OperationStatus = StatusOperationCode.Error,
     };
 
-    private Credit()
+    private Credit(Guid id) : base(id)
     {
     }
 
-    public Credit(decimal creditAmount, decimal interestRate, DateTime repaymentDate, User user = null, Bank bank = null)
+    public Credit(
+        decimal creditAmount, 
+        decimal interestRate, 
+        DateTime repaymentDate, 
+        User user = null, 
+        Bank bank = null) : base(Guid.NewGuid())
     {
-        ID = Guid.NewGuid();
-        UserID = user.ID;
-        BankID = bank.ID;
+        UserId = user.Id;
+        BankId = bank.Id;
         CreditAmount = creditAmount;
         InterestRate = interestRate;
         RepaymentDate = repaymentDate;
         RepaymentAmount = CalculateRepaymentAmount();
     }
 
-    [Key]
-    public Guid ID { get; set; } = Guid.NewGuid();
-
-    public Guid? BankID { get; set; }
-    public Guid? UserID { get; set; }
+    public Guid? BankId { get; set; }
+    public Guid? UserId { get; set; }
     public decimal CreditAmount { get; set; }
     public decimal InterestRate { get; set; }
     public decimal RepaymentAmount { get; set; }
@@ -114,11 +106,6 @@ public class Credit
         return monthlyPayment * repaymentDateMonth;
     }
 
-    public override int GetHashCode()
-    {
-        return ID.GetHashCode();
-    }
-
     public override string? ToString()
     {
         return this.ConvertToString();
@@ -126,34 +113,30 @@ public class Credit
 }
 
 [Table("BankAccounts")]
-public class BankAccount
+public class BankAccount : Entity
 {
     [NotMapped]
-    public static readonly BankAccount Default = new()
+    public static readonly BankAccount Default = new(Guid.Empty)
     {
-        ID = Guid.Empty,
-        BankID = Guid.Empty,
-        UserID = Guid.Empty,
+        BankId = Guid.Empty,
+        UserId = Guid.Empty,
         PhoneNumber = "123456789",
     };
 
-    public BankAccount(User user, Bank bank)
+    public BankAccount(User user, Bank bank) : base(Guid.NewGuid())
     {
         PhoneNumber = user.PhoneNumber;
-        UserID = user.ID;
+        UserId = user.Id;
         Bank = bank;
-        BankID = bank.ID;
+        BankId = bank.Id;
     }
 
-    private BankAccount()
+    private BankAccount(Guid id) : base(id)
     {
     }
 
-    [Key]
-    public Guid ID { get; set; } = Guid.NewGuid();
-
-    public Guid? BankID { get; set; } = Guid.NewGuid();
-    public Guid? UserID { get; set; } = Guid.Empty;
+    public Guid? BankId { get; set; } = Guid.NewGuid();
+    public Guid? UserId { get; set; } = Guid.Empty;
     public Card? Card { get; set; }
     public Bank? Bank { get; set; }
     public User? User { get; set; }
@@ -163,7 +146,7 @@ public class BankAccount
 
     public override int GetHashCode()
     {
-        return ID.GetHashCode();
+        return Id.GetHashCode();
     }
 
     public override string? ToString()
@@ -191,14 +174,14 @@ public class Card
         CVV = SetCvv(cvv);
         if (user is null)
             return;
-        UserID = user.ID;
+        UserID = user.Id;
         User = user;
 
         if (bankAccount is null)
             return;
 
         BankAccount = bankAccount;
-        BankAccountID = bankAccount.ID;
+        BankAccountID = bankAccount.Id;
         Amount = bankAccount.BankAccountAmount;
 
         BankAccount.Bank = bankAccount.Bank;

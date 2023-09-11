@@ -1,16 +1,14 @@
 using BankSystem7.Extensions;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BankSystem7.Models;
 
 [Table("Users")]
-public class User
+public class User : Entity
 {
     [NotMapped]
-    public static readonly User Default = new()
+    public static readonly User Default = new(Guid.Empty)
     {
-        ID = Guid.Empty,
         Name = "name",
         Email = "email",
         Password = "password",
@@ -18,9 +16,9 @@ public class User
         Age = 0,
     };
 
-    [Key]
-    public Guid? ID { get; set; } = Guid.NewGuid();
-
+    public User(Guid id) : base(id)
+    {
+    }
     public string Name { get; set; } = string.Empty;
 
     public string Email { get; set; } = string.Empty;
@@ -36,11 +34,6 @@ public class User
 
     [NotMapped]
     public ExceptionModel Exception { get; set; } = ExceptionModel.Ok;
-
-    public override int GetHashCode()
-    {
-        return ID.GetHashCode();
-    }
 
     public override string? ToString()
     {

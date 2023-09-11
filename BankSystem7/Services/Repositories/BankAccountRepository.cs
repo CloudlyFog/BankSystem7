@@ -52,7 +52,7 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
             return ExceptionModel.OperationFailed;
 
         // Check if the sender's bank account and receiver's bank account exist in the database. If not, return an operation failed exception.
-        if (!Exist(x => x.ID == from.Card.BankAccount.ID) || !Exist(x => x.ID == to.Card.BankAccount.ID))
+        if (!Exist(x => x.Id == from.Card.BankAccount.Id) || !Exist(x => x.Id == to.Card.BankAccount.Id))
             return ExceptionModel.OperationFailed;
 
         // Begin a new transaction with repeatable read isolation level.
@@ -94,7 +94,7 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
             return ExceptionModel.OperationFailed;
 
         // Check if the sender's bank account and receiver's bank account exist in the database. If not, return an operation failed exception.
-        if (!Exist(x => x.ID == from.Card.BankAccount.ID) || !Exist(x => x.ID == to.Card.BankAccount.ID))
+        if (!Exist(x => x.Id == from.Card.BankAccount.Id) || !Exist(x => x.Id == to.Card.BankAccount.Id))
             return ExceptionModel.OperationFailed;
 
         // Begin a new transaction with repeatable read isolation level.
@@ -145,11 +145,11 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
         CheckBankAccount(item.Card.BankAccount);
 
         // Create a new operation object with the necessary information
-        var operation = new Operation
+        var operation = new Operation(Guid.NewGuid())
         {
-            BankID = item.Card.BankAccount.Bank.ID,
-            SenderID = item.Card.BankAccount.Bank.ID,
-            ReceiverID = item.ID,
+            BankId = item.Card.BankAccount.Bank.Id,
+            SenderId = item.Card.BankAccount.Bank.Id,
+            ReceiverId = item.Id,
             TransferAmount = amountAccrual,
             OperationKind = OperationKind.Accrual
         };
@@ -184,11 +184,11 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
         CheckBankAccount(item.Card.BankAccount);
 
         // Create a new operation object with the necessary information
-        var operation = new Operation
+        var operation = new Operation(Guid.NewGuid())
         {
-            BankID = item.Card.BankAccount.Bank.ID,
-            SenderID = item.Card.BankAccount.Bank.ID,
-            ReceiverID = item.ID,
+            BankId = item.Card.BankAccount.Bank.Id,
+            SenderId = item.Card.BankAccount.Bank.Id,
+            ReceiverId = item.Id,
             TransferAmount = amountAccrual,
             OperationKind = OperationKind.Accrual
         };
@@ -223,11 +223,11 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
         CheckBankAccount(item.Card.BankAccount);
 
         // Create a new operation object with relevant information
-        var operation = new Operation
+        var operation = new Operation(Guid.NewGuid())
         {
-            BankID = item.Card.BankAccount.Bank.ID,
-            SenderID = item.ID,
-            ReceiverID = item.Card.BankAccount.Bank.ID,
+            BankId = item.Card.BankAccount.Bank.Id,
+            SenderId = item.Id,
+            ReceiverId = item.Card.BankAccount.Bank.Id,
             TransferAmount = amountAccrual,
             OperationKind = OperationKind.Withdraw
         };
@@ -262,11 +262,11 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
         CheckBankAccount(item.Card.BankAccount);
 
         // Create a new operation object with relevant information
-        var operation = new Operation
+        var operation = new Operation(Guid.NewGuid())
         {
-            BankID = item.Card.BankAccount.Bank.ID,
-            SenderID = item.ID,
-            ReceiverID = item.Card.BankAccount.Bank.ID,
+            BankId = item.Card.BankAccount.Bank.Id,
+            SenderId = item.Id,
+            ReceiverId = item.Card.BankAccount.Bank.Id,
             TransferAmount = amountAccrual,
             OperationKind = OperationKind.Withdraw
         };
@@ -287,7 +287,7 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
 
     public ExceptionModel Create(TBankAccount item)
     {
-        if (item is null || Exist(x => x.ID == item.ID) || item.Bank is null)
+        if (item is null || Exist(x => x.Id == item.Id) || item.Bank is null)
             return ExceptionModel.EntityIsNull;
         _bankContext.BankAccounts.Add(item);
         _bankContext.SaveChanges();
@@ -296,7 +296,7 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
 
     public async Task<ExceptionModel> CreateAsync(TBankAccount item)
     {
-        if (item is null || Exist(x => x.ID == item.ID) || item.Bank is null)
+        if (item is null || Exist(x => x.Id == item.Id) || item.Bank is null)
             return ExceptionModel.EntityIsNull;
         _bankContext.BankAccounts.Add(item);
         await _bankContext.SaveChangesAsync();
@@ -385,12 +385,12 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
 
     public bool FitsConditions(TBankAccount? item)
     {
-        return item?.Bank is not null && Exist(x => x.ID == item.ID);
+        return item?.Bank is not null && Exist(x => x.Id == item.Id);
     }
 
     public async Task<bool> FitsConditionsAsync(TBankAccount? item)
     {
-        return item?.Bank is not null && await ExistAsync(x => x.ID == item.ID);
+        return item?.Bank is not null && await ExistAsync(x => x.Id == item.Id);
     }
 
     /// <summary>
@@ -423,11 +423,11 @@ public sealed class BankAccountRepository<TUser, TCard, TBankAccount, TBank, TCr
         if (item is null)
             throw new ArgumentNullException(nameof(item));
 
-        if (!_applicationContext.Users.AsNoTracking().Select(x => x.ID).Any(x => x == item.UserID))
-            throw new KeyNotFoundException($"Entity of user with id {{{item.ID}}} wasn't found.");
+        if (!_applicationContext.Users.AsNoTracking().Select(x => x.Id).Any(x => x == item.UserId))
+            throw new KeyNotFoundException($"Entity of user with id {{{item.Id}}} wasn't found.");
 
-        if (!Exist(x => x.ID == item.ID))
-            throw new KeyNotFoundException($"Entity of bank with id {{{item.ID}}} wasn't found");
+        if (!Exist(x => x.Id == item.Id))
+            throw new KeyNotFoundException($"Entity of bank with id {{{item.Id}}} wasn't found");
     }
 
     /// <summary>

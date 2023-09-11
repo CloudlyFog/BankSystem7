@@ -29,7 +29,7 @@ public sealed class OperationRepository : LoggerExecutor<OperationType>, IOperat
 
     public ExceptionModel Create(Operation item)
     {
-        if (item is null || Exist(x => x.ID == item.ID))
+        if (item is null || Exist(x => x.Id == item.Id))
             return ExceptionModel.OperationFailed;
         _operationService.Collection.InsertOne(item);
 
@@ -42,7 +42,7 @@ public sealed class OperationRepository : LoggerExecutor<OperationType>, IOperat
             return ExceptionModel.OperationFailed;
 
         var filter = Builders<Operation>.Filter
-            .Eq(x => x.ID, item.ID);
+            .Eq(x => x.Id, item.Id);
         var update = Builders<Operation>.Update
             .Set(x => x, item);
         _operationService.Collection.UpdateOne(filter, update);
@@ -55,7 +55,7 @@ public sealed class OperationRepository : LoggerExecutor<OperationType>, IOperat
         if (!FitsConditions(item))
             return ExceptionModel.OperationFailed;
         var filter = Builders<Operation>.Filter
-            .Eq(x => x.ID, item.ID);
+            .Eq(x => x.Id, item.Id);
 
         _operationService.Collection.DeleteOne(filter);
         return ExceptionModel.Ok;
@@ -76,7 +76,7 @@ public sealed class OperationRepository : LoggerExecutor<OperationType>, IOperat
         if (item is null)
             return false;
 
-        if (!Exist(x => x.ID == item.ID))
+        if (!Exist(x => x.Id == item.Id))
             return false;
 
         return true;

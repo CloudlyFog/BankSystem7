@@ -44,7 +44,7 @@ internal sealed class BankContext<TUser, TCard, TBankAccount, TBank, TCredit> : 
         // Find(Builders<Operation>.Filter.Eq(predicate)).Any() equals
         // Operations.Any(predicate)
         // we find and in the same time check is there object in database
-        if (_operationService.Collection.Find(Builders<Operation>.Filter.Eq(x => x.ID, operation.ID)).Any())
+        if (_operationService.Collection.Find(Builders<Operation>.Filter.Eq(x => x.Id, operation.Id)).Any())
             return ExceptionModel.EntityNotExist;
 
         operation.OperationStatus = GetStatusOperation(operation, operationKind);
@@ -68,7 +68,7 @@ internal sealed class BankContext<TUser, TCard, TBankAccount, TBank, TCredit> : 
         // Find(Builders<Operation>.Filter.Eq(predicate)).Any() equals
         // Operations.Any(predicate)
         // we find and in the same time check is there object in database
-        if (await _operationService.Collection.Find(Builders<Operation>.Filter.Eq(x => x.ID, operation.ID)).AnyAsync())
+        if (await _operationService.Collection.Find(Builders<Operation>.Filter.Eq(x => x.Id, operation.Id)).AnyAsync())
             return ExceptionModel.EntityNotExist;
 
         operation.OperationStatus = GetStatusOperation(operation, operationKind);
@@ -88,10 +88,10 @@ internal sealed class BankContext<TUser, TCard, TBankAccount, TBank, TCredit> : 
     {
         if (operation is null)
             return ExceptionModel.EntityIsNull;
-        if (_operationService.Collection.Find(Builders<Operation>.Filter.Eq(x => x.ID, operation.ID)).Any())
+        if (_operationService.Collection.Find(Builders<Operation>.Filter.Eq(x => x.Id, operation.Id)).Any())
             return ExceptionModel.EntityNotExist;
 
-        _operationService.Collection.DeleteOne(x => x.ID == operation.ID);
+        _operationService.Collection.DeleteOne(x => x.Id == operation.Id);
         return ExceptionModel.Ok;
     }
 
@@ -104,10 +104,10 @@ internal sealed class BankContext<TUser, TCard, TBankAccount, TBank, TCredit> : 
     {
         if (operation is null)
             return ExceptionModel.EntityIsNull;
-        if (await _operationService.Collection.Find(Builders<Operation>.Filter.Eq(x => x.ID, operation.ID)).AnyAsync())
+        if (await _operationService.Collection.Find(Builders<Operation>.Filter.Eq(x => x.Id, operation.Id)).AnyAsync())
             return ExceptionModel.EntityNotExist;
 
-        await _operationService.Collection.DeleteOneAsync(x => x.ID == operation.ID);
+        await _operationService.Collection.DeleteOneAsync(x => x.Id == operation.Id);
         return ExceptionModel.Ok;
     }
 
@@ -216,27 +216,27 @@ internal sealed class BankContext<TUser, TCard, TBankAccount, TBank, TCredit> : 
     /// <exception cref="ArgumentNullException"></exception>
     private StatusOperationCode GetStatusOperation(Operation? operationModel, OperationKind operationKind)
     {
-        if (operationModel is null || !Banks.AsNoTracking().Any(x => x.ID == operationModel.BankID))
+        if (operationModel is null || !Banks.AsNoTracking().Any(x => x.Id == operationModel.BankId))
             return StatusOperationCode.Error;
 
         if (operationKind == OperationKind.Accrual)
         {
             // Check if the receiver ID exists in the Users table without tracking changes
-            if (!Users.AsNoTracking().Select(x => x.ID).Any(x => x == operationModel.ReceiverID))
+            if (!Users.AsNoTracking().Select(x => x.Id).Any(x => x == operationModel.ReceiverId))
                 return StatusOperationCode.Error;
 
             // Check if the sender ID exists in the Banks table and if the account amount is less than the transfer amount
-            if (Banks.AsNoTracking().FirstOrDefault(x => x.ID == operationModel.SenderID)?.AccountAmount < operationModel.TransferAmount)
+            if (Banks.AsNoTracking().FirstOrDefault(x => x.Id == operationModel.SenderId)?.AccountAmount < operationModel.TransferAmount)
                 return StatusOperationCode.Restricted;
         }
         else if (operationKind == OperationKind.Withdraw)
         {
             // Check if the SenderID of the operationModel exists in the Users table
-            if (!Users.AsNoTracking().Select(x => x.ID).Any(x => x == operationModel.SenderID))
+            if (!Users.AsNoTracking().Select(x => x.Id).Any(x => x == operationModel.SenderId))
                 return StatusOperationCode.Error;
 
             // Check if the SenderID of the operationModel has enough funds in their bank account
-            if (BankAccounts.AsNoTracking().FirstOrDefault(x => x.UserID == operationModel.SenderID)?.BankAccountAmount < operationModel.TransferAmount)
+            if (BankAccounts.AsNoTracking().FirstOrDefault(x => x.UserId == operationModel.SenderId)?.BankAccountAmount < operationModel.TransferAmount)
                 return StatusOperationCode.Restricted;
         }
 

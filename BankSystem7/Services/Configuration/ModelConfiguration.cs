@@ -22,7 +22,7 @@ public class ModelConfiguration
         ConfigureDecimalColumnTypes(modelBuilder);
 
         modelBuilder.Entity<User>().Ignore(user => user.Exception);
-        modelBuilder.Entity<User>().HasIndex(x => x.ID);
+        modelBuilder.Entity<User>().HasIndex(x => x.Id);
 
         InitializeModelConfigurations(modelBuilder, modelConfigurations);
     }
@@ -61,13 +61,13 @@ public class ModelConfiguration
         modelBuilder.Entity<Credit>()
             .HasOne(credit => credit.Bank)
             .WithMany(bank => bank.Credits)
-            .HasForeignKey(credit => credit.BankID);
+            .HasForeignKey(credit => credit.BankId);
 
         // user
         modelBuilder.Entity<Credit>()
             .HasOne(credit => credit.User)
             .WithOne(user => user.Credit)
-            .HasForeignKey<Credit>(credit => credit.UserID);
+            .HasForeignKey<Credit>(credit => credit.UserId);
     }
 
     private static void ConfigureCardRelationships(ModelBuilder modelBuilder)
@@ -92,6 +92,6 @@ public class ModelConfiguration
         modelBuilder.Entity<BankAccount>()
             .HasOne(account => account.Bank)
             .WithMany(bank => bank.BankAccounts)
-            .HasForeignKey(account => account.BankID);
+            .HasForeignKey(account => account.BankId);
     }
 }
