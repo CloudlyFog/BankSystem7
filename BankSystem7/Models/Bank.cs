@@ -1,4 +1,5 @@
-﻿using BankSystem7.Extensions;
+﻿using BankSystem7.Entities;
+using BankSystem7.Extensions;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Bson.Serialization.Attributes;
 using System.ComponentModel.DataAnnotations;

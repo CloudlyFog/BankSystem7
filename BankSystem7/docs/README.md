@@ -5,11 +5,10 @@ This library provides opportunities for using likeness of bank system. You can h
 
   
 
-###  Updates in version 0.5.7
+###  Updates in version 0.5.8
 
-- API docs was moved to file APIdocs.md.
-- Added base entity class - Entity. It'll manage base functionality of model or entity.
-- Changed name of property "ID" to "Id" in all entities (i.e. models).
+- Moved class Entity to folder Entities (namespace BankSystem7.Entities);
+- Updated project's package description;
 ****
 
 ####  **Remember!**

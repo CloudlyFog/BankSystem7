@@ -1,3 +1,4 @@
+using BankSystem7.Entities;
 using BankSystem7.Extensions;
 using System.ComponentModel.DataAnnotations.Schema;
 

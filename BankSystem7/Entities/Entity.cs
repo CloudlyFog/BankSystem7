@@ -1,4 +1,4 @@
-﻿namespace BankSystem7;
+﻿namespace BankSystem7.Entities;
 
 public abstract class Entity : IEquatable<Entity>
 {
