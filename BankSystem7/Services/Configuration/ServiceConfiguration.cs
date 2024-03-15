@@ -20,19 +20,19 @@ public class ServiceConfiguration<TUser, TCard, TBankAccount, TBank, TCredit> : 
     public IUserRepository<TUser>? UserRepository { get; set; }
 
     public ICardRepository<TCard>? CardRepository { get; set; }
-    public IBankAccountRepository<TUser, TBankAccount>? BankAccountRepository { get; set; }
+    public IBankAccountRepository<TUser, TBankAccount>? BankAccountRepository { get; protected internal set; }
 
-    public IBankRepository<TUser, TBank>? BankRepository { get; set; }
+    public IBankRepository<TUser, TBank>? BankRepository { get; protected internal set; }
 
-    public ICreditRepository<TUser, TCredit>? CreditRepository { get; set; }
+    public ICreditRepository<TUser, TCredit>? CreditRepository { get; protected internal set; }
 
-    public LoggerRepository? LoggerRepository { get; set; }
+    public LoggerRepository? LoggerRepository { get; protected internal set; }
 
-    public IOperationRepository? OperationRepository { get; set; }
+    public IOperationRepository? OperationRepository { get; protected internal set; }
 
-    public ILogger? Logger { get; set; }
+    public ILogger? Logger { get; protected internal set; }
 
-    public ConfigurationOptions? Options { get; set; }
+    public ConfigurationOptions? Options { get; protected internal set; }
 
     internal static ConfigurationOptions? ServiceConfigurationOptions { get; set; }
 

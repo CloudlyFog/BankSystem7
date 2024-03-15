@@ -85,7 +85,7 @@ public interface IBankRepository<TUser, TBank> : IBase<TBank>, IRepository<TBank
     /// </summary>
     /// <param name="accountAmountValue">The account amount value.</param>
     /// <returns></returns>
-    internal decimal CalculateBankAccountAmount(decimal accountAmountValue);
+    public decimal CalculateBankAccountAmount(decimal accountAmountValue);
 }
 
 public interface ICreditRepository<TUser, TCredit> : IBase<TCredit>, IRepository<TCredit>,
