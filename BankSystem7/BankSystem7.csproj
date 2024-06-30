@@ -1,19 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
+		<TargetFrameworks>net8.0</TargetFrameworks>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-		<PackageVersion>0.5.8</PackageVersion>
+		<PackageVersion>1.0.0</PackageVersion>
 		<Authors>CloudlyFog</Authors>
 		<Copyright>Copyright (c) CloudlyFog 2023</Copyright>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<Description>This library provides opportunities for using likeness of bank system. You can handle not only users but also other models like banks, cards and etc.</Description>
+		<Description>A system that allows you to perform transactions using virtual funds within the store. It consists of several components, including database management and an extensive API.</Description>
 		<PackageLicenseUrl>https://mit-license.org/</PackageLicenseUrl>
 		<PackageTags>bank;account;banksystem;credit;transfer;money;bankaccount</PackageTags>
 		<RepositoryUrl>https://github.com/CloudlyFog/BankSystem7</RepositoryUrl>
 		<AnalysisLevel>latest-recommended</AnalysisLevel>
+		<LangVersion>preview</LangVersion>
 		<PackageReleaseNotes>Check README file before update to newer version.</PackageReleaseNotes>
 		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
@@ -35,10 +36,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Remove="Services\Interfaces\BuilderBase.cs~RF15366b.TMP" />
-		<None Remove="Services\Interfaces\IServiceConfiguration.cs~RFca482.TMP" />
-		<None Remove="Services\Repositories\BankAccountRepository.cs~RF2b5f4d6f.TMP" />
-		<None Remove="Services\Repositories\CreditRepository.cs~RFb2d76ba.TMP" />
+		<None Remove="BankAggregate\BankAccountAggregate\BankAccountRepository.cs~RF9537a65.TMP" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -60,6 +58,7 @@
 		<PackageReference Include="Npgsql" Version="8.0.0-preview.2" />
 		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0-preview.2" />
 		<PackageReference Include="NUnit" Version="3.13.3" />
+		<PackageReference Include="Serilog.AspNetCore" Version="8.0.2-dev-00338" />
 		<PackageReference Include="System.Data.HashFunction.Interfaces" Version="2.0.0" />
 		<PackageReference Include="System.Data.HashFunction.Jenkins" Version="2.0.0" />
 	</ItemGroup>

@@ -1,9 +1,6 @@
-
 #  Bank system 7
 
 This library provides opportunities for using likeness of bank system. You can handle not only users but also other models like banks, cards and etc.
-
-  
 
 ###  Updates in version 0.5.8
 
@@ -19,6 +16,6 @@ In any situations when Your program, OS or something else was broken, **only You
 
 ##  Conclusion
 
-Downloading and next using this package is your responsible and only You decide use it or not. All exceptions and crashes of your projects is responsible on You. We was tested our product in many tests and have a conclusion in which says that all methods and logic of project are working correctly. So, we wish You luck. 
+Downloading and next using this package is your responsible and only You decide use it or not. All exceptions and crashes of your projects is responsible on You. We was tested our product in many tests and have a conclusion in which says that all methods and logic of project are working correctly. So, we wish You luck.
 
 **Sincerely, hayako.**

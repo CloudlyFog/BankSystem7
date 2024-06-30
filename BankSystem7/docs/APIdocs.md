@@ -1,9 +1,6 @@
-
 #  Documentation
 
 ##  Structure of project
-
-  
 
 1. Folder **AppContext** is folder where contains context classes for interaction with database without business logic.
 
@@ -23,8 +20,6 @@
 
 9. Folder **Repositories** is folder with all business logic of project. Only there simple developer has access.
 
-  
-
 ##  How to interact with library?
 
 The library provides ways to pass and use own models. For example, You can inherit Your class from base class User and pass it as type to an instance of `BankSystemBuilder`
@@ -37,8 +32,6 @@ Developer can interact with library with:
 
 2. `builder.Services.AddNationBankSystem<...>()` service in ASP.NET.
 
-  
-
 And by following next steps:
 
 1. Create field of the class `ConfigurationOptions` that handles settings of services.
@@ -49,11 +42,7 @@ And by following next steps:
 
 4. Interact with repositories throughout public properties of the created field of the interface `IServiceConfiguration`.
 
-  
-
 New feature for library is adding services to internal DI in ASP.Net application. For that You have to write something like this:
-
-  
 
 1. in Program.cs
 
@@ -126,8 +115,6 @@ But use only one of the above approaches to use service.
 
 Now You can don't specify LoggerOptions because by default logger is disabled.
 
-  
-
 1. in Your controller
 
 ```
@@ -141,7 +128,6 @@ public UsersController(IServiceConfiguration<User, Card, BankAccount, Bank, Cred
 ```
 
 And all will work fine.
-  
 
 ##  API documentation
 
@@ -149,15 +135,11 @@ And all will work fine.
 
 There are 3 classes context:
 
-  
-
 1. **GenericDbContext** - main db context class that handles all needed operations.
 
 2. **ApplicationContext** - configures GenericDbContext to context class for this library.
 
 3. **BankContext** - is responsible for handling operations when use ApplicationContext is impossible.
-
-  
 
 ####  API GenericDbContext
 
@@ -173,21 +155,13 @@ There are 3 classes context:
 
 5. `public void AvoidChanges(object[]? entities, DbContext context)` - ensures that passed entities won't be changed during call method `SaveChanges()`.
 
-  
-
 ####  API ApplicationContext
-
-  
 
 **Methods:**
 
 1. `internal ExceptionModel AvoidDuplication(Bank item)` - implements function for avoiding duplication in table Banks in the database.
 
-  
-
 **Properties:**
-
-  
 
 1. `protected internal DbSet<User> Users { get; set; }` - an instance of the table `Users` in database.
 
@@ -197,11 +171,7 @@ There are 3 classes context:
 
 4. `protected internal DbSet<Credit> Credits { get; set; }` - an instance of the table `Credits` in database.
 
-  
-
 ####  API BankContext
-
-  
 
 **Methods:**
 
@@ -223,11 +193,7 @@ There are 3 classes context:
 
 9. `private StatusOperationCode GetStatusOperation(Operation operation, OperationKind operationKind)` - returns status of operation for next handling of operation.
 
-  
-
 **Properties:**
-
-  
 
 1. `public DbSet<User> Users { get; set; }` - an instance of the table `Users` in database.
 
@@ -237,13 +203,9 @@ There are 3 classes context:
 
 4. `public DbSet<BankAccount> BankAccounts { get; set; }` - an instance of the table `BankAccounts` in database.
 
-  
-
 ###  Services
 
 Services are dividing on 3 sub-folders:
-
-  
 
 1. **Configuration**
 
@@ -251,19 +213,13 @@ Services are dividing on 3 sub-folders:
 
 3. **Repositories**
 
-  
-
 And some classes that don't belong to any of folders:
-
-  
 
 1. `BankServiceOptions` - defines options that used by internal services.
 
 2. `Logger` - service for logging some info about repositories operations.
 
 3. `OperationService` - provides connection to mongodb services.
-
-  
 
 ###  Configuration
 
@@ -275,13 +231,11 @@ Here located services for configuring library.
 
 3. `ServiceConifiguration` - service that handles all services that there are in the library.
 
-  
   ### DependencyInjection
- 
+
   Here located services that provide easy ways to use Dependency Injection in project.
   1. `BankSystemRegistrar` - service that contains methods to use Dependency Injection.
   2. `Dependency` - file contains 2 models: `Dependency` and `TypedDependency`. They contains properties to collect all needed data to use methods in `BankSystemRegistrar`.
-
 
 ###  Interfaces (and abstract classes)
 
@@ -291,17 +245,11 @@ Here located interfaces which describes behavior of inherited repo-classes.
 
 - `IQueryable<T> All { get; }` - implements getting a sequence of the objects from database.
 
-  
-
 2. **Interface**  `IRepositoryAsync<T> : IReaderServiceAsync<T>, IWriterServiceAsync<T> where T : class` - interface for implement standard library logic asynchronously.
 
 - `IQueryable<T> All { get; }` - implements getting a sequence of the objects from database.
 
-  
-
 3. **Interface**  `IReaderServiceAsync<T> where T : class` - interface for implement reading data from database asynchronously.
-
-  
 
 Methods
 
@@ -311,11 +259,7 @@ Methods
 
 - `Task<bool> FitsConditionsAsync(T? item);` - implements logic for checking on conditions true of passed entity asynchronously.
 
-  
-
 4. **Interface**  `IWriterServiceAsync<in T> where T : class` - interface for implement writing, updating and deleting data in database
-
-  
 
 Methods
 
@@ -325,11 +269,7 @@ Methods
 
 - `Task<ExceptionModel> DeleteAsync(T item);` - implements deleting entity from database asynchronously.
 
-  
-
 5. **Interface**  `IReaderService<T> where T : class` - interface for implement reading data from database.
-
-  
 
 Methods
 
@@ -339,11 +279,7 @@ Methods
 
 - `bool FitsConditions(T? item);` - implements logic for checking on conditions true of passed entity.
 
-  
-
 6. **Interface**  `IReaderServiceWithTracking<T> where T : class` - interface for implement reading data from database with another type of parameters.
-
-  
 
 Methods
 
@@ -355,11 +291,7 @@ Properties
 
 - `IQueryable<T> AllWithTracking { get; }` - implements getting a sequence of the objects from database.
 
-  
-
 7. **Interface**  `IWriterService<in T> where T : class` - interface for implement writing, updating and deleting data in database
-
-  
 
 Methods
 
@@ -369,11 +301,7 @@ Methods
 
 - `ExceptionModel Delete(T item);` - implements deleting entity from database.
 
-  
-
 8. **Interface**  `ILogger` - interface that provides standard set for logging
-
-  
 
 Methods
 
@@ -381,31 +309,21 @@ Methods
 
 - `ExceptionModel Log(IEnumerable<Report> reports);` - implements logging collection of reports in database.
 
-  
-
 Properties
 
 - `public bool IsReused { get; set; }` - defines possibility use already initialized logger.
 
 - `public LoggerOptions LoggerOptions { get; set; }` - defines options for logger configuration.
 
-  
-
 9. **Abstract class**  `LoggerExecutor<TOperationType> where TOperationType : Enum` - simple implementation of service for added reports to logger queue
-
-  
 
 Methods
 
 - `virtual void Log(ExceptionModel exceptionModel, string methodName, string className, TOperationType operationType, ICollection<GeneralReport<TOperationType>> reports)` - implements standard logic of inserting log data to logger queue. Can be overrided.
 
-  
-
 ###  Repositories
 
 Repositories are implementation of various interfaces and working with context classes for interact with database.
-
-  
 
 1. `BankRepository` - implements interface `IRepository<T>` for handling bank model, contains methods for accrual or withdraw money from bank account and bank.
 
@@ -421,13 +339,9 @@ Repositories are implementation of various interfaces and working with context c
 
 7. `OperationRepository` - implements interface `IRepository<T>` for handling operations.
 
-  
-
 ##  When cause exception or error?
 
 There are a lot of points when you can catch an exception or error while using api of project but we describe some of them:
-
-  
 
 1. You use default connection string instead of Your. Can happen so that on Your machine won't database with name which was specified in default connection string.
 
@@ -459,6 +373,5 @@ protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 **Example**:
 
 You want to delete operation therefore You have to use method `DeleteOperation(...)` but You use method `CreateOperation(...)` and of course You'll get an exception because method `CreateOperation(...)`has return type `ExceptionModel` and it'll returns `ExceptionModel.OperationFailed` because the same operation already exist in the database which You are using.
-
 
 ### Sincerely, hayako.

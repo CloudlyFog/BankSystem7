@@ -4,35 +4,116 @@
         <name>BankSystem7</name>
     </assembly>
     <members>
-        <member name="M:BankSystem7.AppContext.BankContext`5.CreateOperation(BankSystem7.Models.Operation,BankSystem7.Models.OperationKind)">
+        <member name="P:BankSystem7.ApplicationAggregate.Connection.ConnectionConfigurationBase.EnsureDeleted">
+            <summary>
+            Manages database deletion during initializing library
+            </summary>
+        </member>
+        <member name="P:BankSystem7.ApplicationAggregate.Connection.ConnectionConfigurationBase.EnsureCreated">
+            <summary>
+            Manages database creation during initializing library
+            </summary>
+        </member>
+        <member name="P:BankSystem7.ApplicationAggregate.Connection.ConnectionConfigurationBase.Connection">
+            <summary>
+            Takes connection string for database
+            </summary>
+        </member>
+        <member name="P:BankSystem7.ApplicationAggregate.Connection.ConnectionConfigurationBase.DatabaseName">
+            <summary>
+            Takes name of database. If You don't want to change connection details, You can just specify it
+            </summary>
+        </member>
+        <member name="P:BankSystem7.ApplicationAggregate.Connection.ConnectionConfigurationBase.DatabaseManagementSystemType">
+            <summary>
+            Manages type of Database management system that will be used
+            </summary>
+        </member>
+        <member name="P:BankSystem7.ApplicationAggregate.Connection.ConnectionConfigurationBase.Credentials">
+            <summary>
+            Takes credentials for establishing connection with database
+            </summary>
+        </member>
+        <member name="P:BankSystem7.ApplicationAggregate.Connection.MicrosoftConnectionConfiguration.Pooling">
+            <summary>
+            Manages connections pooling
+            </summary>
+        </member>
+        <member name="P:BankSystem7.ApplicationAggregate.Connection.MicrosoftConnectionConfiguration.Encrypt">
+            <summary>
+            Manages encrypting TCP/IP traffic
+            </summary>
+        </member>
+        <member name="P:BankSystem7.ApplicationAggregate.Connection.MicrosoftConnectionConfiguration.Server">
+            <summary>
+            Takes server name of sql server
+            </summary>
+        </member>
+        <member name="P:BankSystem7.ApplicationAggregate.Connection.MicrosoftConnectionConfiguration.IntegratedSecurity">
+            <summary>
+            Manages Windows Authentication behavior
+            </summary>
+        </member>
+        <member name="P:BankSystem7.ApplicationAggregate.Connection.MicrosoftConnectionConfiguration.PersistSecurityInfo">
+            <summary>
+            Specifies whether the data source can persist sensitive authentication information
+            such as a password
+            </summary>
+        </member>
+        <member name="P:BankSystem7.ApplicationAggregate.Connection.MicrosoftConnectionConfiguration.TrustServerCertificate">
+            <summary>
+            Manages server certificates
+            </summary>
+        </member>
+        <member name="P:BankSystem7.ApplicationAggregate.Connection.NpgsqlConnectionConfiguration.Host">
+            <summary>
+            Takes name of host for establishing connection with database
+            </summary>
+        </member>
+        <member name="P:BankSystem7.ApplicationAggregate.Connection.NpgsqlConnectionConfiguration.Port">
+            <summary>
+            Takes port for establishing connection with database
+            </summary>
+        </member>
+        <member name="P:BankSystem7.ApplicationAggregate.Credentials.CredentialsBase.Username">
+            <summary>
+            Takes user name/id for establishing connection with database
+            </summary>
+        </member>
+        <member name="P:BankSystem7.ApplicationAggregate.Credentials.CredentialsBase.Password">
+            <summary>
+            Takes password of user for establishing connection with database
+            </summary>
+        </member>
+        <member name="M:BankSystem7.ApplicationAggregate.Data.BankContext.CreateOperation(BankSystem7.BankAggregate.OperationAggregate.Operation,BankSystem7.BankAggregate.OperationKind)">
             <summary>
             creates transaction operation
             </summary>
             <param name="operation"></param>
             <param name="operationKind"></param>
         </member>
-        <member name="M:BankSystem7.AppContext.BankContext`5.CreateOperationAsync(BankSystem7.Models.Operation,BankSystem7.Models.OperationKind)">
+        <member name="M:BankSystem7.ApplicationAggregate.Data.BankContext.CreateOperationAsync(BankSystem7.BankAggregate.OperationAggregate.Operation,BankSystem7.BankAggregate.OperationKind,System.Threading.CancellationToken)">
             <summary>
             creates transaction operation
             </summary>
             <param name="operation"></param>
             <param name="operationKind"></param>
         </member>
-        <member name="M:BankSystem7.AppContext.BankContext`5.DeleteOperation(BankSystem7.Models.Operation)">
+        <member name="M:BankSystem7.ApplicationAggregate.Data.BankContext.DeleteOperation(BankSystem7.BankAggregate.OperationAggregate.Operation)">
             <summary>
             delete transaction operation
             </summary>
             <param name="operation"></param>
             <exception cref="T:System.ArgumentNullException"></exception>
         </member>
-        <member name="M:BankSystem7.AppContext.BankContext`5.DeleteOperationAsync(BankSystem7.Models.Operation)">
+        <member name="M:BankSystem7.ApplicationAggregate.Data.BankContext.DeleteOperationAsync(BankSystem7.BankAggregate.OperationAggregate.Operation,System.Threading.CancellationToken)">
             <summary>
             delete transaction operation
             </summary>
             <param name="operation"></param>
             <exception cref="T:System.ArgumentNullException"></exception>
         </member>
-        <member name="M:BankSystem7.AppContext.BankContext`5.BankAccountWithdraw(BankSystem7.Models.User,BankSystem7.Models.Bank,BankSystem7.Models.Operation)">
+        <member name="M:BankSystem7.ApplicationAggregate.Data.BankContext.BankAccountWithdraw(BankSystem7.UserAggregate.User,BankSystem7.BankAggregate.Bank,BankSystem7.BankAggregate.OperationAggregate.Operation)">
             <summary>
             withdraw money from user bank account and accrual to bank's account
             </summary>
@@ -41,7 +122,7 @@
             <param name="operation"></param>
             <exception cref="T:System.Exception"></exception>
         </member>
-        <member name="M:BankSystem7.AppContext.BankContext`5.BankAccountWithdrawAsync(BankSystem7.Models.User,BankSystem7.Models.Bank,BankSystem7.Models.Operation)">
+        <member name="M:BankSystem7.ApplicationAggregate.Data.BankContext.BankAccountWithdrawAsync(BankSystem7.UserAggregate.User,BankSystem7.BankAggregate.Bank,BankSystem7.BankAggregate.OperationAggregate.Operation,System.Threading.CancellationToken)">
             <summary>
             withdraw money from user bank account and accrual to bank's account
             </summary>
@@ -50,7 +131,7 @@
             <param name="operation"></param>
             <exception cref="T:System.Exception"></exception>
         </member>
-        <member name="M:BankSystem7.AppContext.BankContext`5.BankAccountAccrual(BankSystem7.Models.User,BankSystem7.Models.Bank,BankSystem7.Models.Operation)">
+        <member name="M:BankSystem7.ApplicationAggregate.Data.BankContext.BankAccountAccrual(BankSystem7.UserAggregate.User,BankSystem7.BankAggregate.Bank,BankSystem7.BankAggregate.OperationAggregate.Operation)">
             <summary>
             accrual money to user bank account from bank's account
             </summary>
@@ -59,7 +140,7 @@
             <param name="operation"></param>
             <exception cref="T:System.Exception"></exception>
         </member>
-        <member name="M:BankSystem7.AppContext.BankContext`5.BankAccountAccrualAsync(BankSystem7.Models.User,BankSystem7.Models.Bank,BankSystem7.Models.Operation)">
+        <member name="M:BankSystem7.ApplicationAggregate.Data.BankContext.BankAccountAccrualAsync(BankSystem7.UserAggregate.User,BankSystem7.BankAggregate.Bank,BankSystem7.BankAggregate.OperationAggregate.Operation,System.Threading.CancellationToken)">
             <summary>
             accrual money to user bank account from bank's account
             </summary>
@@ -68,7 +149,7 @@
             <param name="operation"></param>
             <exception cref="T:System.Exception"></exception>
         </member>
-        <member name="M:BankSystem7.AppContext.BankContext`5.GetStatusOperation(BankSystem7.Models.Operation,BankSystem7.Models.OperationKind)">
+        <member name="M:BankSystem7.ApplicationAggregate.Data.BankContext.GetStatusOperation(BankSystem7.BankAggregate.OperationAggregate.Operation,BankSystem7.BankAggregate.OperationKind)">
             <summary>
             check:
             1) is exist user with the same ID and bank with the same BankID as a sender or reciever in the database.
@@ -81,38 +162,38 @@
             <returns>status of operation, default - Ok or Successfully</returns>
             <exception cref="T:System.ArgumentNullException"></exception>
         </member>
-        <member name="M:BankSystem7.AppContext.GenericDbContext.UpdateTracker``1(``0,Microsoft.EntityFrameworkCore.EntityState,System.Action,Microsoft.EntityFrameworkCore.DbContext)">
+        <member name="M:BankSystem7.ApplicationAggregate.Data.GenericDbContext.UpdateTracker``1(``0,Microsoft.EntityFrameworkCore.EntityState,System.Action,Microsoft.EntityFrameworkCore.DbContext)">
             <summary>
-            Method updates states of entity. You should use this method with method <see cref="M:BankSystem7.AppContext.GenericDbContext.AvoidChanges(System.Object[],Microsoft.EntityFrameworkCore.DbContext)"/> for the best state tracking of entities
+            Method updates states of entity. You should use this method with method <see cref="M:BankSystem7.ApplicationAggregate.Data.GenericDbContext.AvoidChanges(System.Object[],Microsoft.EntityFrameworkCore.DbContext)"/> for the best state tracking of entities
             </summary>
             <param name="item">entity whose state will be changed</param>
             <param name="state">future state of <see cref="!:item"/></param>
-            <param name="action">action that will invoked after state of entity will be changed. Usually as action you should use method <see cref="M:BankSystem7.AppContext.GenericDbContext.AvoidChanges(System.Object[],Microsoft.EntityFrameworkCore.DbContext)"/></param>
+            <param name="action">action that will invoked after state of entity will be changed. Usually as action you should use method <see cref="M:BankSystem7.ApplicationAggregate.Data.GenericDbContext.AvoidChanges(System.Object[],Microsoft.EntityFrameworkCore.DbContext)"/></param>
             <param name="context">context that will handle state changing</param>
-            <typeparam name="T">type of <see cref="!:item"/></typeparam>
+            <typeparam name="TEntity">type of <see cref="!:item"/></typeparam>
         </member>
-        <member name="M:BankSystem7.AppContext.GenericDbContext.UpdateTrackerRange(System.Object[],Microsoft.EntityFrameworkCore.EntityState,System.Action,Microsoft.EntityFrameworkCore.DbContext)">
+        <member name="M:BankSystem7.ApplicationAggregate.Data.GenericDbContext.UpdateTrackerRange(System.Object[],Microsoft.EntityFrameworkCore.EntityState,System.Action,Microsoft.EntityFrameworkCore.DbContext)">
             <summary>
-            Method updates states of entities. You should use this method with method <see cref="M:BankSystem7.AppContext.GenericDbContext.AvoidChanges(System.Object[],Microsoft.EntityFrameworkCore.DbContext)"/> for the best state tracking of entities
+            Method updates states of entities. You should use this method with method <see cref="M:BankSystem7.ApplicationAggregate.Data.GenericDbContext.AvoidChanges(System.Object[],Microsoft.EntityFrameworkCore.DbContext)"/> for the best state tracking of entities
             </summary>
             <param name="items">array of entities whose state will be changed</param>
             <param name="state">future state of <see cref="!:items"/></param>
-            <param name="action">action that will invoked after state of entity will be changed. Usually as action you should use method <see cref="M:BankSystem7.AppContext.GenericDbContext.AvoidChanges(System.Object[],Microsoft.EntityFrameworkCore.DbContext)"/></param>
+            <param name="action">action that will invoked after state of entity will be changed. Usually as action you should use method <see cref="M:BankSystem7.ApplicationAggregate.Data.GenericDbContext.AvoidChanges(System.Object[],Microsoft.EntityFrameworkCore.DbContext)"/></param>
             <param name="context">context that will handle state changing</param>
         </member>
-        <member name="M:BankSystem7.AppContext.GenericDbContext.AvoidChanges(System.Object[],Microsoft.EntityFrameworkCore.DbContext)">
+        <member name="M:BankSystem7.ApplicationAggregate.Data.GenericDbContext.AvoidChanges(System.Object[],Microsoft.EntityFrameworkCore.DbContext)">
             <summary>
             Method ensures that passed entities won't be changed during call method SaveChanges()
             </summary>
             <param name="entities">entities that shouldn't be changed</param>
             <param name="context">specifies what's context will handle operation</param>
         </member>
-        <member name="M:BankSystem7.AppContext.GenericDbContext.DatabaseHandle">
+        <member name="M:BankSystem7.ApplicationAggregate.Data.GenericDbContext.DatabaseHandle(BankSystem7.Configuration.ConfigurationOptions)">
             <summary>
             Handles creating and deleting database
             </summary>
         </member>
-        <member name="M:BankSystem7.AppContext.GenericDbContext.SetDatabaseManagementSystemType(Microsoft.EntityFrameworkCore.DbContextOptionsBuilder,BankSystem7.Services.Configuration.DatabaseManagementSystemType)">
+        <member name="M:BankSystem7.ApplicationAggregate.Data.GenericDbContext.SetDatabaseManagementSystemType(Microsoft.EntityFrameworkCore.DbContextOptionsBuilder,BankSystem7.Configuration.DatabaseManagementSystemType)">
             <summary>
             This method sets the database management system type for the given DbContextOptionsBuilder object.
             </summary>
@@ -120,126 +201,7 @@
             <param name="dbmsType">Type of the DBMS.</param>
             <exception cref="T:System.ArgumentOutOfRangeException">dbmsType - null</exception>
         </member>
-        <member name="P:BankSystem7.Models.Connection.ConnectionConfigurationBase.EnsureDeleted">
-            <summary>
-            Manages database deletion during initializing library
-            </summary>
-        </member>
-        <member name="P:BankSystem7.Models.Connection.ConnectionConfigurationBase.EnsureCreated">
-            <summary>
-            Manages database creation during initializing library
-            </summary>
-        </member>
-        <member name="P:BankSystem7.Models.Connection.ConnectionConfigurationBase.Connection">
-            <summary>
-            Takes connection string for database
-            </summary>
-        </member>
-        <member name="P:BankSystem7.Models.Connection.ConnectionConfigurationBase.DatabaseName">
-            <summary>
-            Takes name of database. If You don't want to change connection details, You can just specify it
-            </summary>
-        </member>
-        <member name="P:BankSystem7.Models.Connection.ConnectionConfigurationBase.DatabaseManagementSystemType">
-            <summary>
-            Manages type of Database management system that will be used
-            </summary>
-        </member>
-        <member name="P:BankSystem7.Models.Connection.ConnectionConfigurationBase.Credentials">
-            <summary>
-            Takes credentials for establishing connection with database
-            </summary>
-        </member>
-        <member name="P:BankSystem7.Models.Connection.MicrosoftConnectionConfiguration.Pooling">
-            <summary>
-            Manages connections pooling
-            </summary>
-        </member>
-        <member name="P:BankSystem7.Models.Connection.MicrosoftConnectionConfiguration.Encrypt">
-            <summary>
-            Manages encrypting TCP/IP traffic
-            </summary>
-        </member>
-        <member name="P:BankSystem7.Models.Connection.MicrosoftConnectionConfiguration.Server">
-            <summary>
-            Takes server name of sql server
-            </summary>
-        </member>
-        <member name="P:BankSystem7.Models.Connection.MicrosoftConnectionConfiguration.IntegratedSecurity">
-            <summary>
-            Manages Windows Authentication behavior
-            </summary>
-        </member>
-        <member name="P:BankSystem7.Models.Connection.MicrosoftConnectionConfiguration.PersistSecurityInfo">
-            <summary>
-            Specifies whether the data source can persist sensitive authentication information
-            such as a password
-            </summary>
-        </member>
-        <member name="P:BankSystem7.Models.Connection.MicrosoftConnectionConfiguration.TrustServerCertificate">
-            <summary>
-            Manages server certificates
-            </summary>
-        </member>
-        <member name="P:BankSystem7.Models.Connection.NpgsqlConnectionConfiguration.Host">
-            <summary>
-            Takes name of host for establishing connection with database
-            </summary>
-        </member>
-        <member name="P:BankSystem7.Models.Connection.NpgsqlConnectionConfiguration.Port">
-            <summary>
-            Takes port for establishing connection with database
-            </summary>
-        </member>
-        <member name="P:BankSystem7.Models.Credentials.CredentialsBase.Username">
-            <summary>
-            Takes user name/id for establishing connection with database
-            </summary>
-        </member>
-        <member name="P:BankSystem7.Models.Credentials.CredentialsBase.Password">
-            <summary>
-            Takes password of user for establishing connection with database
-            </summary>
-        </member>
-        <member name="M:BankSystem7.Models.SecurePasswordHasher.Hash(System.String)">
-            <summary>
-            Creates a hash from a password.
-            </summary>
-            <param name="password">The password.</param>
-            <param name="iterations">Number of iterations.</param>
-            <returns>The hash.</returns>
-        </member>
-        <member name="T:BankSystem7.Models.ExceptionModel">
-            <summary>
-            defines model of possible exceptions of returns of methods
-            </summary>
-        </member>
-        <member name="T:BankSystem7.Services.Configuration.ConfigurationOptions">
-            <summary>
-            Manages settings for library
-            </summary>
-        </member>
-        <member name="P:BankSystem7.Services.Configuration.ConfigurationOptions.LoggerOptions">
-            <summary>
-            Takes settings for logger
-            <seealso cref="T:BankSystem7.Services.Logger`5"/>
-            </summary>
-        </member>
-        <member name="P:BankSystem7.Services.Configuration.ConfigurationOptions.OperationOptions">
-            <summary>
-            Takes settings for OperationService (i.e. OperationRepository)
-            <seealso cref="T:BankSystem7.Services.OperationService`1"/>
-            </summary>
-        </member>
-        <member name="P:BankSystem7.Services.Configuration.ConfigurationOptions.Contexts">
-            <summary>
-            Manages models configuration.
-            Key - db context class that inherit from <see cref="T:BankSystem7.AppContext.GenericDbContext"/> and contains DbSet for models.
-            Value - <see cref="T:BankSystem7.Services.Configuration.ModelConfiguration"/> class that tunes relationships between models.
-            <seealso cref="T:Microsoft.EntityFrameworkCore.DbContext"/> <seealso cref="T:Microsoft.EntityFrameworkCore.ModelBuilder"/>
-            </summary>
-        </member>
-        <member name="M:BankSystem7.Services.DependencyInjection.BankSystemRegistrar.Inject(System.Collections.Generic.IEnumerable{System.Object})">
+        <member name="M:BankSystem7.ApplicationAggregate.Dependencies.BankSystemRegistrar.Inject(System.Collections.Generic.IEnumerable{System.Object})">
             <summary>
             This method takes in a collection of objects called "dependencies" and returns a ServiceCollection.
             It is used to inject the dependencies into the ServiceCollection
@@ -247,7 +209,7 @@
             <param name="dependencies"></param>
             <returns></returns>
         </member>
-        <member name="M:BankSystem7.Services.DependencyInjection.BankSystemRegistrar.CheckLength(System.Type[],System.Object[])">
+        <member name="M:BankSystem7.ApplicationAggregate.Dependencies.BankSystemRegistrar.CheckLength(System.Type[],System.Object[])">
             <summary>
             This method checks if the lengths of the arrays "dependenciesTypes" and "dependencies" are equal.
             If they are not equal, it throws an InvalidOperationException with a specific error message indicating
@@ -257,14 +219,14 @@
             <param name="dependencies">array of dependency objects</param>
             <exception cref="T:System.InvalidOperationException">caused when lengths of the arrays "dependenciesTypes" and "dependencies" aren't equal</exception>
         </member>
-        <member name="M:BankSystem7.Services.DependencyInjection.BankSystemRegistrar.CheckLength(System.Object[][])">
+        <member name="M:BankSystem7.ApplicationAggregate.Dependencies.BankSystemRegistrar.CheckLength(System.Object[][])">
             <summary>
             This method checks if the lengths of the arrays are equal.
             </summary>
             <param name="objects">arrays whose length values will be checked</param>
             <exception cref="T:System.InvalidOperationException">caused when lengths of the arrays "dependenciesTypes" and "dependencies" aren't equal</exception>
         </member>
-        <member name="M:BankSystem7.Services.DependencyInjection.BankSystemRegistrar.ProvideServices(System.Type[],System.Object[])">
+        <member name="M:BankSystem7.ApplicationAggregate.Dependencies.BankSystemRegistrar.ProvideServices(System.Type[],System.Object[])">
             <summary>
             This method is a helper method that is used to provide a collection of services to be used in a dependency injection container.
             </summary>
@@ -272,275 +234,180 @@
             <param name="dependencies">array of dependency objects</param>
             <returns></returns>
         </member>
-        <member name="M:BankSystem7.Services.DependencyInjection.BankSystemRegistrar.ProvideServices(System.Collections.Generic.IEnumerable{System.Type})">
+        <member name="M:BankSystem7.ApplicationAggregate.Dependencies.BankSystemRegistrar.ProvideServices(System.Collections.Generic.IEnumerable{System.Type})">
             <summary>
             This method is a helper method that is used to provide a collection of services to be used in a dependency injection container.
             </summary>
             <param name="dependenciesTypes">array of dependency types</param>
             <returns></returns>
         </member>
-        <member name="M:BankSystem7.Services.DependencyInjection.BankSystemRegistrar.ProvideServices(System.Collections.Generic.IEnumerable{System.Object})">
+        <member name="M:BankSystem7.ApplicationAggregate.Dependencies.BankSystemRegistrar.ProvideServices(System.Collections.Generic.IEnumerable{System.Object})">
             <summary>
             This method is a helper method that is used to provide a collection of services to be used in a dependency injection container.
             </summary>
             <param name="dependencies">array of dependency objects</param>
             <returns></returns>
         </member>
-        <member name="P:BankSystem7.Services.Interfaces.Base.IBase`1.All">
+        <member name="P:BankSystem7.ApplicationAggregate.Interfaces.IBase`1.Entities">
             <summary>
             returns collection of entities
             </summary>
         </member>
-        <member name="M:BankSystem7.Services.Interfaces.Base.IBankAccountRepository`2.Transfer(`0,`0,System.Decimal)">
-            <summary>
-            The purpose of this method is to transfer a certain amount of money from one user to another
-            </summary>
-            <param name="from">The parameter represents the user who is transferring the money</param>
-            <param name="to">The parameter represents the user who is receiving the money</param>
-            <param name="transferAmount">The parameter represents the amount of money being transferred</param>
-            <returns></returns>
-        </member>
-        <member name="M:BankSystem7.Services.Interfaces.Base.IBankAccountRepository`2.TransferAsync(`0,`0,System.Decimal)">
-            <summary>
-            The purpose of this method is to transfer a certain amount of money from one user to another
-            </summary>
-            <param name="from">The parameter represents the user who is transferring the money</param>
-            <param name="to">The parameter represents the user who is receiving the money</param>
-            <param name="transferAmount">The parameter represents the amount of money being transferred</param>
-            <returns></returns>
-        </member>
-        <member name="M:BankSystem7.Services.Interfaces.Base.IBankRepository`2.BankAccountAccrual(`0,BankSystem7.Models.Operation)">
-            <summary>
-            accrual money to user bank account from bank's account
-            </summary>
-            <param name="user">where will accrued money</param>
-            <param name="operation">data of ongoing operation</param>
-        </member>
-        <member name="M:BankSystem7.Services.Interfaces.Base.IBankRepository`2.BankAccountAccrualAsync(`0,BankSystem7.Models.Operation)">
-            <summary>
-            accrual money to user bank account from bank's account
-            </summary>
-            <param name="user">where will accrued money</param>
-            <param name="operation">data of ongoing operation</param>
-        </member>
-        <member name="M:BankSystem7.Services.Interfaces.Base.IBankRepository`2.BankAccountWithdraw(`0,BankSystem7.Models.Operation)">
-            <summary>
-            withdraw money from user bank account and accrual to bank's account
-            </summary>
-            <param name="user">where will accrued money</param>
-            <param name="operation">data of ongoing operation</param>
-        </member>
-        <member name="M:BankSystem7.Services.Interfaces.Base.IBankRepository`2.BankAccountWithdrawAsync(`0,BankSystem7.Models.Operation)">
-            <summary>
-            withdraw money from user bank account and accrual to bank's account
-            </summary>
-            <param name="user">where will accrued money</param>
-            <param name="operation">data of ongoing operation</param>
-        </member>
-        <member name="M:BankSystem7.Services.Interfaces.Base.IBankRepository`2.CalculateBankAccountAmount(System.Decimal)">
-            <summary>
-            Calculates the bank account amount.
-            </summary>
-            <param name="accountAmountValue">The account amount value.</param>
-            <returns></returns>
-        </member>
-        <member name="M:BankSystem7.Services.Interfaces.Base.ICreditRepository`2.TakeCredit(`0,`1)">
-            <summary>
-            gives to user credit with the definite amount of money
-            adds to the table field with credit's data of user
-            </summary>
-            <param name="user">from what account will withdraw money</param>
-            <param name="credit">credit entity from database</param>
-            <returns></returns>
-        </member>
-        <member name="M:BankSystem7.Services.Interfaces.Base.ICreditRepository`2.TakeCreditAsync(`0,`1)">
-            <summary>
-            gives to user credit with the definite amount of money
-            adds to the table field with credit's data of user
-            </summary>
-            <param name="user">from what account will withdraw money</param>
-            <param name="credit">credit entity from database</param>
-            <returns></returns>
-        </member>
-        <member name="M:BankSystem7.Services.Interfaces.Base.ICreditRepository`2.PayCredit(`0,`1,System.Decimal)">
-            <summary>
-            implements paying some amount of credit for full its repaying
-            </summary>
-            <param name="user">from what account will withdraw money</param>
-            <param name="credit">credit entity from database</param>
-            <param name="payAmount">amount of money for paying</param>
-            <returns></returns>
-        </member>
-        <member name="M:BankSystem7.Services.Interfaces.Base.ICreditRepository`2.PayCreditAsync(`0,`1,System.Decimal)">
-            <summary>
-            implements paying some amount of credit for full its repaying
-            </summary>
-            <param name="user">from what account will withdraw money</param>
-            <param name="credit">credit entity from database</param>
-            <param name="payAmount">amount of money for paying</param>
-            <returns></returns>
-        </member>
-        <member name="T:BankSystem7.Services.Interfaces.LoggerExecutor`1">
-            <summary>
-            Simple implementation of service for added reports to logger queue
-            </summary>
-        </member>
-        <member name="M:BankSystem7.Services.Interfaces.IReaderService`1.Get(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}})">
+        <member name="M:BankSystem7.ApplicationAggregate.Interfaces.Readers.IReader`1.Get(BankSystem7.ApplicationAggregate.Options.EntityFindOptions{`0})">
             <summary>
             returns entity with specified predicate from database
+            if you'll pass only a predicate, it will return an entity from the database
+            and 'll skip check in cache
             </summary>
-            <param name="predicate">predicate for function expression</param>
+            <param name="entityFindOptions"></param>
             <returns></returns>
         </member>
-        <member name="M:BankSystem7.Services.Interfaces.IReaderService`1.Exist(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}})">
+        <member name="M:BankSystem7.ApplicationAggregate.Interfaces.Readers.IReader`1.Exist(BankSystem7.ApplicationAggregate.Options.EntityFindOptions{`0})">
             <summary>
             returns true or false depending exists entity in the database or not
             </summary>
+            <param name="id">entity id</param>
             <param name="predicate">predicate for function expression</param>
             <returns></returns>
         </member>
-        <member name="M:BankSystem7.Services.Interfaces.IReaderService`1.FitsConditions(`0)">
+        <member name="M:BankSystem7.ApplicationAggregate.Interfaces.Readers.IReader`1.FitsConditions(`0)">
             <summary>
-            checks if the passed item meets the conditions
+            checks if the passed entity meets the conditions
             </summary>
-            <param name="item">inherited model type</param>
+            <param name="entity">inherited model type</param>
             <returns></returns>
         </member>
-        <member name="M:BankSystem7.Services.Interfaces.IReaderServiceAsync`1.GetAsync(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}})">
+        <member name="M:BankSystem7.ApplicationAggregate.Interfaces.Readers.IReaderAsync`1.GetAsync(BankSystem7.ApplicationAggregate.Options.EntityFindOptions{`0},System.Threading.CancellationToken)">
             <summary>
             returns entity with specified predicate from database
+            if you'll pass only a predicate, it will return an entity from the database
+            and 'll skip check in cache
             </summary>
-            <param name="predicate">predicate for function expression</param>
+            <param name="entityFindOptions"></param>
             <returns></returns>
         </member>
-        <member name="M:BankSystem7.Services.Interfaces.IReaderServiceAsync`1.ExistAsync(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}})">
+        <member name="M:BankSystem7.ApplicationAggregate.Interfaces.Readers.IReaderAsync`1.ExistAsync(BankSystem7.ApplicationAggregate.Options.EntityFindOptions{`0},System.Threading.CancellationToken)">
             <summary>
             returns true or false depending exists entity in the database or not
             </summary>
-            <param name="predicate">predicate for function expression</param>
+            <param name="entityFindOptions"></param>
             <returns></returns>
         </member>
-        <member name="M:BankSystem7.Services.Interfaces.IReaderServiceAsync`1.FitsConditionsAsync(`0)">
+        <member name="M:BankSystem7.ApplicationAggregate.Interfaces.Readers.IReaderAsync`1.FitsConditionsAsync(`0,System.Threading.CancellationToken)">
             <summary>
-            checks if the passed item meets the conditions
+            checks if the passed entity meets the conditions
             </summary>
-            <param name="item">inherited model type</param>
+            <param name="entity">inherited model type</param>
             <returns></returns>
         </member>
-        <member name="P:BankSystem7.Services.Interfaces.IReaderServiceWithTracking`1.AllWithTracking">
+        <member name="P:BankSystem7.ApplicationAggregate.Interfaces.Readers.IReaderTracking`1.EntitiesTracking">
             <summary>
             returns collection of entities
             </summary>
         </member>
-        <member name="M:BankSystem7.Services.Interfaces.IReaderServiceWithTracking`1.GetWithTracking(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}})">
+        <member name="M:BankSystem7.ApplicationAggregate.Interfaces.Readers.IReaderTracking`1.GetTracking(BankSystem7.ApplicationAggregate.Options.EntityFindOptions{`0})">
             <summary>
             returns entity with specified predicate from database
             </summary>
-            <param name="predicate">predicate for function expression</param>
+            <param name="entityFindOptions"></param>
             <returns></returns>
         </member>
-        <member name="M:BankSystem7.Services.Interfaces.IReaderServiceWithTracking`1.ExistWithTracking(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}})">
+        <member name="M:BankSystem7.ApplicationAggregate.Interfaces.Readers.IReaderTracking`1.ExistTracking(BankSystem7.ApplicationAggregate.Options.EntityFindOptions{`0})">
             <summary>
             returns true or false depending exists entity in the database or not
             </summary>
-            <param name="predicate">predicate for function expression</param>
+            <param name="entityFindOptions"></param>
             <returns></returns>
         </member>
-        <member name="M:BankSystem7.Services.Interfaces.IWriterService`1.Create(`0)">
+        <member name="M:BankSystem7.ApplicationAggregate.Interfaces.Writers.IWriter`1.Create(`0)">
             <summary>
             adds entity to database
             </summary>
-            <param name="item">inherited model type</param>
+            <param name="entity">inherited model type</param>
             <returns></returns>
         </member>
-        <member name="M:BankSystem7.Services.Interfaces.IWriterService`1.Update(`0)">
+        <member name="M:BankSystem7.ApplicationAggregate.Interfaces.Writers.IWriter`1.Update(`0)">
             <summary>
             updates entity in database
             </summary>
-            <param name="item">inherited model type</param>
+            <param name="entity">inherited model type</param>
             <returns></returns>
         </member>
-        <member name="M:BankSystem7.Services.Interfaces.IWriterService`1.Delete(`0)">
+        <member name="M:BankSystem7.ApplicationAggregate.Interfaces.Writers.IWriter`1.Delete(`0)">
             <summary>
             deletes entity in database
             </summary>
-            <param name="item">inherited model type</param>
+            <param name="entity">inherited model type</param>
             <returns></returns>
         </member>
-        <member name="M:BankSystem7.Services.Interfaces.IWriterServiceAsync`1.CreateAsync(`0)">
+        <member name="M:BankSystem7.ApplicationAggregate.Interfaces.Writers.IWriterAsync`1.CreateAsync(`0,System.Threading.CancellationToken)">
             <summary>
             adds entity to database
             </summary>
-            <param name="item">inherited model type</param>
+            <param name="entity">inherited model type</param>
             <returns></returns>
         </member>
-        <member name="M:BankSystem7.Services.Interfaces.IWriterServiceAsync`1.UpdateAsync(`0)">
+        <member name="M:BankSystem7.ApplicationAggregate.Interfaces.Writers.IWriterAsync`1.UpdateAsync(`0,System.Threading.CancellationToken)">
             <summary>
             updates entity in database
             </summary>
-            <param name="item">inherited model type</param>
+            <param name="entity">inherited model type</param>
             <returns></returns>
         </member>
-        <member name="M:BankSystem7.Services.Interfaces.IWriterServiceAsync`1.DeleteAsync(`0)">
+        <member name="M:BankSystem7.ApplicationAggregate.Interfaces.Writers.IWriterAsync`1.DeleteAsync(`0,System.Threading.CancellationToken)">
             <summary>
             deletes entity in database
             </summary>
-            <param name="item">inherited model type</param>
+            <param name="entity">inherited model type</param>
             <returns></returns>
         </member>
-        <member name="M:BankSystem7.Services.Repositories.BankAccountRepository`5.#ctor(System.String)">
-            <summary>
-            Initializes a new instance of the <see cref="T:BankSystem7.Services.Repositories.BankAccountRepository`5"/> class.
-            </summary>
-            <param name="connection">The connection string/</param>
-        </member>
-        <member name="M:BankSystem7.Services.Repositories.BankAccountRepository`5.Accrual(`0,System.Decimal)">
+        <member name="M:BankSystem7.BankAggregate.BankAccountAggregate.BankAccountRepository.Accrual(BankSystem7.UserAggregate.User,System.Decimal)">
             <summary>
             asynchronously accrual money on account with the same user id
             </summary>
             <param name="item"></param>
             <param name="amountAccrual"></param>
-            <returns>object of <see cref="T:BankSystem7.Models.ExceptionModel"/></returns>
+            <returns>object of <see cref="T:BankSystem7.UserAggregate.ExceptionModel"/></returns>
         </member>
-        <member name="M:BankSystem7.Services.Repositories.BankAccountRepository`5.AccrualAsync(`0,System.Decimal)">
+        <member name="M:BankSystem7.BankAggregate.BankAccountAggregate.BankAccountRepository.AccrualAsync(BankSystem7.UserAggregate.User,System.Decimal,System.Threading.CancellationToken)">
             <summary>
             asynchronously accrual money on account with the same user id
             </summary>
             <param name="item"></param>
             <param name="amountAccrual"></param>
-            <returns>object of <see cref="T:BankSystem7.Models.ExceptionModel"/></returns>
+            <returns>object of <see cref="T:BankSystem7.UserAggregate.ExceptionModel"/></returns>
         </member>
-        <member name="M:BankSystem7.Services.Repositories.BankAccountRepository`5.Withdraw(`0,System.Decimal)">
+        <member name="M:BankSystem7.BankAggregate.BankAccountAggregate.BankAccountRepository.Withdraw(BankSystem7.UserAggregate.User,System.Decimal)">
             <summary>
             withdraw money from account with the same user id
             </summary>
             <param name="item"></param>
             <param name="amountAccrual"></param>
-            <returns>object of <see cref="T:BankSystem7.Models.ExceptionModel"/></returns>
+            <returns>object of <see cref="T:BankSystem7.UserAggregate.ExceptionModel"/></returns>
         </member>
-        <member name="M:BankSystem7.Services.Repositories.BankAccountRepository`5.WithdrawAsync(`0,System.Decimal)">
+        <member name="M:BankSystem7.BankAggregate.BankAccountAggregate.BankAccountRepository.WithdrawAsync(BankSystem7.UserAggregate.User,System.Decimal,System.Threading.CancellationToken)">
             <summary>
             withdraw money from account with the same user id
             </summary>
             <param name="item"></param>
             <param name="amountAccrual"></param>
-            <returns>object of <see cref="T:BankSystem7.Models.ExceptionModel"/></returns>
+            <returns>object of <see cref="T:BankSystem7.UserAggregate.ExceptionModel"/></returns>
         </member>
-        <member name="M:BankSystem7.Services.Repositories.BankAccountRepository`5.Update(`2)">
+        <member name="M:BankSystem7.BankAggregate.BankAccountAggregate.BankAccountRepository.Update(BankSystem7.BankAggregate.BankAccountAggregate.BankAccount)">
             <summary>
             updates only BankAccount. Referenced user won't be changed
             </summary>
             <param name="item"></param>
             <returns></returns>
         </member>
-        <member name="M:BankSystem7.Services.Repositories.BankAccountRepository`5.Delete(`2)">
+        <member name="M:BankSystem7.BankAggregate.BankAccountAggregate.BankAccountRepository.Delete(BankSystem7.BankAggregate.BankAccountAggregate.BankAccount)">
             <summary>
             removes bank account of user from database
             </summary>
             <param name="item"></param>
-            <returns>object of <see cref="T:BankSystem7.Models.ExceptionModel"/></returns>
+            <returns>object of <see cref="T:BankSystem7.UserAggregate.ExceptionModel"/></returns>
         </member>
-        <member name="M:BankSystem7.Services.Repositories.BankAccountRepository`5.CheckBankAccount(BankSystem7.Models.BankAccount)">
+        <member name="M:BankSystem7.BankAggregate.BankAccountAggregate.BankAccountRepository.CheckBankAccount(BankSystem7.BankAggregate.BankAccountAggregate.BankAccount)">
              <summary>
              <para>
              The method checks if the BankAccount object is null and throws an exception if it is.
@@ -567,19 +434,7 @@
              Entity of bank with id {{{item.ID}}} wasn't found
              </exception>
         </member>
-        <member name="M:BankSystem7.Services.Repositories.BankAccountRepository`5.SetBankServicesOptions">
-            <summary>
-            It sets the bank context and application context for the bank services using the generic types
-            <typeparamref name="TUser"/>
-            <typeparamref name="TCard"/>
-            <typeparamref name="TBankAccount"/>
-            <typeparamref name="TBank"/> and
-            <typeparamref name="TCredit"/>.
-            The bank context and application context are set to the values of the private fields
-            _bankContext and _applicationContext, respectively. This method is likely called during the initialization of the bank services.
-            </summary>
-        </member>
-        <member name="M:BankSystem7.Services.Repositories.BankAccountRepository`5.AnotherBankTransactionOperation(`0,`0)">
+        <member name="M:BankSystem7.BankAggregate.BankAccountAggregate.BankAccountRepository.AnotherBankTransactionOperation(BankSystem7.UserAggregate.User,BankSystem7.UserAggregate.User)">
              <summary>
              <para>
              The method returns a boolean value. Inside the method, there is a single line of code that checks
@@ -596,42 +451,53 @@
              <param name="to">The parameter represents the user who is receiving the money</param>
              <returns></returns>
         </member>
-        <member name="M:BankSystem7.Services.Repositories.BankRepository`5.BankAccountAccrual(`0,BankSystem7.Models.Operation)">
+        <member name="M:BankSystem7.BankAggregate.BankAccountAggregate.IBankAccountRepository.Transfer(BankSystem7.UserAggregate.User,BankSystem7.UserAggregate.User,System.Decimal)">
             <summary>
-            accrual money to user bank account from bank's account
+            The purpose of this method is to transfer a certain amount of money from one user to another
             </summary>
-            <param name="user">where will accrued money</param>
-            <param name="operation">data of ongoing operation</param>
-        </member>
-        <member name="M:BankSystem7.Services.Repositories.BankRepository`5.BankAccountAccrualAsync(`0,BankSystem7.Models.Operation)">
-            <summary>
-            accrual money to user bank account from bank's account
-            </summary>
-            <param name="user">where will accrued money</param>
-            <param name="operation">data of ongoing operation</param>
-        </member>
-        <member name="M:BankSystem7.Services.Repositories.BankRepository`5.BankAccountWithdraw(`0,BankSystem7.Models.Operation)">
-            <summary>
-            withdraw money from user bank account and accrual to bank's account
-            </summary>
-            <param name="user">where will accrued money</param>
-            <param name="operation">data of ongoing operation</param>
-        </member>
-        <member name="M:BankSystem7.Services.Repositories.BankRepository`5.BankAccountWithdrawAsync(`0,BankSystem7.Models.Operation)">
-            <summary>
-            withdraw money from user bank account and accrual to bank's account
-            </summary>
-            <param name="user">where will accrued money</param>
-            <param name="operation">data of ongoing operation</param>
-        </member>
-        <member name="M:BankSystem7.Services.Repositories.BankRepository`5.CalculateBankAccountAmount(System.Decimal)">
-            <summary>
-            Calculates the bank account amount.
-            </summary>
-            <param name="accountAmountValue">The account amount value.</param>
+            <param name="from">The parameter represents the user who is transferring the money</param>
+            <param name="to">The parameter represents the user who is receiving the money</param>
+            <param name="transferAmount">The parameter represents the amount of money being transferred</param>
             <returns></returns>
         </member>
-        <member name="M:BankSystem7.Services.Repositories.CardRepository`5.Create(`1)">
+        <member name="M:BankSystem7.BankAggregate.BankAccountAggregate.IBankAccountRepository.TransferAsync(BankSystem7.UserAggregate.User,BankSystem7.UserAggregate.User,System.Decimal,System.Threading.CancellationToken)">
+            <summary>
+            The purpose of this method is to transfer a certain amount of money from one user to another
+            </summary>
+            <param name="from">The parameter represents the user who is transferring the money</param>
+            <param name="to">The parameter represents the user who is receiving the money</param>
+            <param name="transferAmount">The parameter represents the amount of money being transferred</param>
+            <returns></returns>
+        </member>
+        <member name="M:BankSystem7.BankAggregate.BankRepository.BankAccountAccrual(BankSystem7.UserAggregate.User,BankSystem7.BankAggregate.OperationAggregate.Operation)">
+            <summary>
+            accrual money to user bank account from bank's account
+            </summary>
+            <param name="user">where will accrued money</param>
+            <param name="operation">data of ongoing operation</param>
+        </member>
+        <member name="M:BankSystem7.BankAggregate.BankRepository.BankAccountAccrualAsync(BankSystem7.UserAggregate.User,BankSystem7.BankAggregate.OperationAggregate.Operation,System.Threading.CancellationToken)">
+            <summary>
+            accrual money to user bank account from bank's account
+            </summary>
+            <param name="user">where will accrued money</param>
+            <param name="operation">data of ongoing operation</param>
+        </member>
+        <member name="M:BankSystem7.BankAggregate.BankRepository.BankAccountWithdraw(BankSystem7.UserAggregate.User,BankSystem7.BankAggregate.OperationAggregate.Operation)">
+            <summary>
+            withdraw money from user bank account and accrual to bank's account
+            </summary>
+            <param name="user">where will accrued money</param>
+            <param name="operation">data of ongoing operation</param>
+        </member>
+        <member name="M:BankSystem7.BankAggregate.BankRepository.BankAccountWithdrawAsync(BankSystem7.UserAggregate.User,BankSystem7.BankAggregate.OperationAggregate.Operation,System.Threading.CancellationToken)">
+            <summary>
+            withdraw money from user bank account and accrual to bank's account
+            </summary>
+            <param name="user">where will accrued money</param>
+            <param name="operation">data of ongoing operation</param>
+        </member>
+        <member name="M:BankSystem7.BankAggregate.CardAggregate.CardRepository.Create(BankSystem7.BankAggregate.CardAggregate.Card)">
             <summary>
             use this method only for creating new card.
             if you'll try to use this method in designing card you'll get big bug which 'll force you program work wrong.
@@ -639,7 +505,7 @@
             <param name="item"></param>
             <returns></returns>
         </member>
-        <member name="M:BankSystem7.Services.Repositories.CreditRepository`5.TakeCredit(`0,`4)">
+        <member name="M:BankSystem7.BankAggregate.CreditAggregate.CreditRepository.TakeCredit(BankSystem7.UserAggregate.User,BankSystem7.BankAggregate.CreditAggregate.Credit)">
             <summary>
             gives to user credit with the definite amount of money
             adds to the table field with credit's data of user
@@ -648,7 +514,7 @@
             <param name="credit">credit entity from database</param>
             <returns></returns>
         </member>
-        <member name="M:BankSystem7.Services.Repositories.CreditRepository`5.TakeCreditAsync(`0,`4)">
+        <member name="M:BankSystem7.BankAggregate.CreditAggregate.CreditRepository.TakeCreditAsync(BankSystem7.UserAggregate.User,BankSystem7.BankAggregate.CreditAggregate.Credit,System.Threading.CancellationToken)">
             <summary>
             gives to user credit with the definite amount of money
             adds to the table field with credit's data of user
@@ -657,7 +523,7 @@
             <param name="credit">credit entity from database</param>
             <returns></returns>
         </member>
-        <member name="M:BankSystem7.Services.Repositories.CreditRepository`5.PayCredit(`0,`4,System.Decimal)">
+        <member name="M:BankSystem7.BankAggregate.CreditAggregate.CreditRepository.PayCredit(BankSystem7.UserAggregate.User,BankSystem7.BankAggregate.CreditAggregate.Credit,System.Decimal)">
             <summary>
             implements paying some amount of credit for full its repaying
             </summary>
@@ -666,7 +532,7 @@
             <param name="payAmount">amount of money for paying</param>
             <returns></returns>
         </member>
-        <member name="M:BankSystem7.Services.Repositories.CreditRepository`5.PayCreditAsync(`0,`4,System.Decimal)">
+        <member name="M:BankSystem7.BankAggregate.CreditAggregate.CreditRepository.PayCreditAsync(BankSystem7.UserAggregate.User,BankSystem7.BankAggregate.CreditAggregate.Credit,System.Decimal,System.Threading.CancellationToken)">
             <summary>
             implements paying some amount of credit for full its repaying
             </summary>
@@ -674,6 +540,106 @@
             <param name="credit">credit entity from database</param>
             <param name="payAmount">amount of money for paying</param>
             <returns></returns>
+        </member>
+        <member name="M:BankSystem7.BankAggregate.CreditAggregate.ICreditRepository.TakeCredit(BankSystem7.UserAggregate.User,BankSystem7.BankAggregate.CreditAggregate.Credit)">
+            <summary>
+            gives to user credit with the definite amount of money
+            adds to the table field with credit's data of user
+            </summary>
+            <param name="user">from what account will withdraw money</param>
+            <param name="credit">credit entity from database</param>
+            <returns></returns>
+        </member>
+        <member name="M:BankSystem7.BankAggregate.CreditAggregate.ICreditRepository.TakeCreditAsync(BankSystem7.UserAggregate.User,BankSystem7.BankAggregate.CreditAggregate.Credit,System.Threading.CancellationToken)">
+            <summary>
+            gives to user credit with the definite amount of money
+            adds to the table field with credit's data of user
+            </summary>
+            <param name="user">from what account will withdraw money</param>
+            <param name="credit">credit entity from database</param>
+            <returns></returns>
+        </member>
+        <member name="M:BankSystem7.BankAggregate.CreditAggregate.ICreditRepository.PayCredit(BankSystem7.UserAggregate.User,BankSystem7.BankAggregate.CreditAggregate.Credit,System.Decimal)">
+            <summary>
+            implements paying some amount of credit for full its repaying
+            </summary>
+            <param name="user">from what account will withdraw money</param>
+            <param name="credit">credit entity from database</param>
+            <param name="payAmount">amount of money for paying</param>
+            <returns></returns>
+        </member>
+        <member name="M:BankSystem7.BankAggregate.CreditAggregate.ICreditRepository.PayCreditAsync(BankSystem7.UserAggregate.User,BankSystem7.BankAggregate.CreditAggregate.Credit,System.Decimal,System.Threading.CancellationToken)">
+            <summary>
+            implements paying some amount of credit for full its repaying
+            </summary>
+            <param name="user">from what account will withdraw money</param>
+            <param name="credit">credit entity from database</param>
+            <param name="payAmount">amount of money for paying</param>
+            <returns></returns>
+        </member>
+        <member name="M:BankSystem7.BankAggregate.IBankRepository.BankAccountAccrual(BankSystem7.UserAggregate.User,BankSystem7.BankAggregate.OperationAggregate.Operation)">
+            <summary>
+            accrual money to user bank account from bank's account
+            </summary>
+            <param name="user">where will accrued money</param>
+            <param name="operation">data of ongoing operation</param>
+        </member>
+        <member name="M:BankSystem7.BankAggregate.IBankRepository.BankAccountAccrualAsync(BankSystem7.UserAggregate.User,BankSystem7.BankAggregate.OperationAggregate.Operation,System.Threading.CancellationToken)">
+            <summary>
+            accrual money to user bank account from bank's account
+            </summary>
+            <param name="user">where will accrued money</param>
+            <param name="operation">data of ongoing operation</param>
+        </member>
+        <member name="M:BankSystem7.BankAggregate.IBankRepository.BankAccountWithdraw(BankSystem7.UserAggregate.User,BankSystem7.BankAggregate.OperationAggregate.Operation)">
+            <summary>
+            withdraw money from user bank account and accrual to bank's account
+            </summary>
+            <param name="user">where will accrued money</param>
+            <param name="operation">data of ongoing operation</param>
+        </member>
+        <member name="M:BankSystem7.BankAggregate.IBankRepository.BankAccountWithdrawAsync(BankSystem7.UserAggregate.User,BankSystem7.BankAggregate.OperationAggregate.Operation,System.Threading.CancellationToken)">
+            <summary>
+            withdraw money from user bank account and accrual to bank's account
+            </summary>
+            <param name="user">where will accrued money</param>
+            <param name="operation">data of ongoing operation</param>
+        </member>
+        <member name="M:BankSystem7.BankAggregate.IBankRepository.CalculateBankAccountAmount(System.Decimal)">
+            <summary>
+            Calculates the bank account amount.
+            </summary>
+            <param name="accountAmountValue">The account amount value.</param>
+            <returns></returns>
+        </member>
+        <member name="T:BankSystem7.Configuration.ConfigurationOptions">
+            <summary>
+            Manages settings for library
+            </summary>
+        </member>
+        <member name="P:BankSystem7.Configuration.ConfigurationOptions.ModelConfigurationAssembly">
+            <summary>
+            From where will be token implementations of <see cref="T:BankSystem7.Configuration.ModelConfiguration"/>.
+            Only this implementation will be used
+            </summary>
+        </member>
+        <member name="P:BankSystem7.Configuration.ConfigurationOptions.OperationOptions">
+            <summary>
+            Takes settings for OperationService (i.e. OperationRepository)
+            <seealso cref="T:BankSystem7.BankAggregate.OperationAggregate.OperationService`1"/>
+            </summary>
+        </member>
+        <member name="M:BankSystem7.UserAggregate.SecurePasswordHasher.Hash(System.String)">
+            <summary>
+            Creates a hash from a password.
+            </summary>
+            <param name="password">The password.</param>
+            <returns>The hash.</returns>
+        </member>
+        <member name="T:BankSystem7.UserAggregate.ExceptionModel">
+            <summary>
+            defines model of possible exceptions of returns of methods
+            </summary>
         </member>
     </members>
 </doc>
