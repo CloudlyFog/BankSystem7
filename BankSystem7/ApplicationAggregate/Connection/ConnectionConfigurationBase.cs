@@ -18,7 +18,7 @@ public abstract class ConnectionConfigurationBase
     /// <summary>
     /// Takes connection string for database
     /// </summary>
-    public string? Connection { get; set; } = null;
+    public string? ConnectionString { get; set; } = null;
 
     /// <summary>
     /// Takes name of database. If You don't want to change connection details, You can just specify it

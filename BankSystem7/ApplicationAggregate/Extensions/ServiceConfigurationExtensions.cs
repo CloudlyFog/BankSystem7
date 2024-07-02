@@ -1,4 +1,5 @@
 ﻿using BankSystem7.ApplicationAggregate.Data;
+using BankSystem7.ApplicationAggregate.Helpers;
 using BankSystem7.BankAggregate;
 using BankSystem7.BankAggregate.BankAccountAggregate;
 using BankSystem7.BankAggregate.CardAggregate;
@@ -45,15 +46,15 @@ public static class ServiceConfigurationExtensions
     private static DbContextOptionsBuilder SetDbContext(IServiceCollection services, ConfigurationOptions options)
     {
         var builder = new DbContextOptionsBuilder();
-        var connection = ServiceSettings.GetConnectionString(options.ConnectionConfiguration.DatabaseManagementSystemType,
+        options.ConnectionConfiguration.ConnectionString = DatabaseConnectionStringHelper.GetConnectionString(options.ConnectionConfiguration.DatabaseManagementSystemType,
                                                              options.ConnectionConfiguration,
                                                              options.Credentials);
 
         return options.ConnectionConfiguration.DatabaseManagementSystemType switch
         {
-            DatabaseManagementSystemType.MicrosoftSqlServer => builder.UseSqlServer(connection),
-            DatabaseManagementSystemType.PostgreSql => builder.UseNpgsql(connection),
-            DatabaseManagementSystemType.MySql => builder.UseMySQL(connection),
+            DatabaseManagementSystemType.MicrosoftSqlServer => builder.UseSqlServer(options.ConnectionConfiguration.ConnectionString),
+            DatabaseManagementSystemType.PostgreSql => builder.UseNpgsql(options.ConnectionConfiguration.ConnectionString),
+            DatabaseManagementSystemType.MySql => builder.UseMySQL(options.ConnectionConfiguration.ConnectionString),
             _ => builder.UseMemoryCache(services.BuildServiceProvider().GetRequiredService<IMemoryCache>()),
         };
     }

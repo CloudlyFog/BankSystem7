@@ -5,7 +5,7 @@ namespace BankSystem7.ApplicationAggregate.Connection;
 
 public class MySqlConnectionConfiguration : ConnectionConfigurationBase
 {
-    public string? Server { get; set; } = ServiceSettings.DefaultServer;
-    public string? Port { get; set; } = ServiceSettings.DefaultPort;
+    public string? Server { get; set; }
+    public string? Port { get; set; }
     public MySqlSslMode SslMode { get; set; } = MySqlSslMode.Prefered;
 }

@@ -23,7 +23,7 @@ public class MicrosoftConnectionConfiguration : ConnectionConfigurationBase
     /// <summary>
     /// Takes server name of sql server
     /// </summary>
-    public string? Server { get; set; } = ServiceSettings.DefaultServer;
+    public string? Server { get; set; }
 
     /// <summary>
     /// Manages Windows Authentication behavior

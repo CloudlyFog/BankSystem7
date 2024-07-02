@@ -143,41 +143,9 @@ public class GenericDbContext : DbContext
     /// </summary>
     private void DatabaseHandle(ConfigurationOptions options)
     {
-        if (!ServiceSettings.InitializeAccess || ServiceSettings.Ensured)
-            return;
-
         if (options.ConnectionConfiguration.EnsureDeleted)
             Database.EnsureDeleted();
         if (options.ConnectionConfiguration.EnsureCreated)
             Database.EnsureCreated();
-        ServiceSettings.Ensured = true;
-        ServiceSettings.InitializeAccess = false;
-    }
-
-    /// <summary>
-    /// This method sets the database management system type for the given DbContextOptionsBuilder object.
-    /// </summary>
-    /// <param name="optionsBuilder">The options builder.</param>
-    /// <param name="dbmsType">Type of the DBMS.</param>
-    /// <exception cref="ArgumentOutOfRangeException">dbmsType - null</exception>
-    private void SetDatabaseManagementSystemType(DbContextOptionsBuilder optionsBuilder, DatabaseManagementSystemType dbmsType)
-    {
-        switch (dbmsType)
-        {
-            case DatabaseManagementSystemType.MicrosoftSqlServer:
-                optionsBuilder.UseSqlServer(ServiceSettings.Connection, o => o.CommandTimeout(20));
-                break;
-
-            case DatabaseManagementSystemType.PostgreSql:
-                optionsBuilder.UseNpgsql(ServiceSettings.Connection, o => o.CommandTimeout(20));
-                break;
-
-            case DatabaseManagementSystemType.MySql:
-                optionsBuilder.UseMySQL(ServiceSettings.Connection, o => o.CommandTimeout(20));
-                break;
-
-            default:
-                throw new ArgumentOutOfRangeException(nameof(dbmsType), dbmsType, null);
-        }
     }
 }

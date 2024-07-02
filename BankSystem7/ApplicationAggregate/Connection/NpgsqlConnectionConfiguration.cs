@@ -1,5 +1,5 @@
-﻿using BankSystem7.Configuration;
-using BankSystem7.ApplicationAggregate.Credentials;
+﻿using BankSystem7.ApplicationAggregate.Credentials;
+using BankSystem7.ApplicationAggregate.Helpers;
 
 namespace BankSystem7.ApplicationAggregate.Connection;
 
@@ -13,10 +13,10 @@ public class NpgsqlConnectionConfiguration : ConnectionConfigurationBase
     /// <summary>
     /// Takes name of host for establishing connection with database
     /// </summary>
-    public string? Host { get; set; } = ServiceSettings.DefaultHost;
+    public string? Host { get; set; } = DatabaseConnectionStringHelper.DefaultHost;
 
     /// <summary>
     /// Takes port for establishing connection with database
     /// </summary>
-    public string? Port { get; set; } = ServiceSettings.DefaultPort;
+    public string? Port { get; set; } = DatabaseConnectionStringHelper.DefaultPort;
 }
