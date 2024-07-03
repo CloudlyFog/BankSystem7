@@ -12,6 +12,7 @@ namespace BankSystem7.ApplicationAggregate.Data;
 public sealed class BankContext : GenericDbContext
 {
     private readonly OperationService<Operation> _operationService;
+
     public BankContext(ConfigurationOptions options) : base(options)
     {
         _operationService = new OperationService<Operation>();

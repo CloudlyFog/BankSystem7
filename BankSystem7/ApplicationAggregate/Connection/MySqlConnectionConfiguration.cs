@@ -1,5 +1,4 @@
-﻿using BankSystem7.Configuration;
-using MySql.Data.MySqlClient;
+﻿using MySql.Data.MySqlClient;
 
 namespace BankSystem7.ApplicationAggregate.Connection;
 

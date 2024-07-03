@@ -2,7 +2,6 @@
 using BankSystem7.ApplicationAggregate.Entities;
 using BankSystem7.BankAggregate.BankAccountAggregate;
 using BankSystem7.BankAggregate.CreditAggregate;
-using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
 
 namespace BankSystem7.BankAggregate;

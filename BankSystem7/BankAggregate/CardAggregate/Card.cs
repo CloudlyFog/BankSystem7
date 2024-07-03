@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 using BankSystem7.ApplicationAggregate.Entities;
 using BankSystem7.BankAggregate.BankAccountAggregate;
 using BankSystem7.UserAggregate;
@@ -44,8 +43,10 @@ public class Card : Entity
     }
 
     public Guid? BankAccountID { get; set; } = Guid.Empty;
+
     public Guid? UserId
     { get; set; } = Guid.Empty;
+
     public decimal Amount { get; set; }
     public DateTime Expiration { get; } = DateTime.Now.AddYears(4);
     public CardKind CardKind { get; set; } = CardKind.DebitCard;

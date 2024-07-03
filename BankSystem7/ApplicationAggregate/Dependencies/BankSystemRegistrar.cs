@@ -6,7 +6,6 @@ namespace BankSystem7.ApplicationAggregate.Dependencies;
 
 public static class BankSystemRegistrar
 {
-
     public static ServiceCollection Inject(Type[] dependenciesTypes, object[] dependencies)
     {
         return ProvideServices(dependenciesTypes, dependencies);

@@ -14,6 +14,7 @@ public sealed class Operation : Entity
         SenderId = Guid.Empty,
         OperationStatus = StatusOperationCode.Error,
     };
+
     public Operation(Guid id) : base(id)
     {
     }

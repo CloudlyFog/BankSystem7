@@ -4,6 +4,7 @@ using BankSystem7.BankAggregate.OperationAggregate;
 using BankSystem7.UserAggregate;
 
 namespace BankSystem7.BankAggregate;
+
 public interface IBankRepository : IRepository<Bank>,
     IReaderTracking<Bank>, IRepositoryAsync<Bank>
 {

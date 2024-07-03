@@ -16,7 +16,6 @@ public class ApplicationContext : GenericDbContext
     protected internal DbSet<Bank> Banks { get; set; } = null!;
     protected internal DbSet<Credit> Credits { get; set; } = null!;
 
-
     public ApplicationContext(ConfigurationOptions options) : base(options)
     {
     }

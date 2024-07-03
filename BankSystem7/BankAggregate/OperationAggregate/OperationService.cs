@@ -1,6 +1,7 @@
 ﻿using MongoDB.Driver;
 
 namespace BankSystem7.BankAggregate.OperationAggregate;
+
 internal sealed class OperationService<TOperation> where TOperation : class
 {
     public const string DefaultConnection = "mongodb://localhost:27017";
@@ -9,7 +10,6 @@ internal sealed class OperationService<TOperation> where TOperation : class
     private IMongoDatabase _database;
     private MongoClientSettings _settings;
     private MongoClient _client;
-
 
     public OperationService()
     {

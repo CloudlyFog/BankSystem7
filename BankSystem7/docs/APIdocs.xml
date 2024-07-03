@@ -14,7 +14,7 @@
             Manages database creation during initializing library
             </summary>
         </member>
-        <member name="P:BankSystem7.ApplicationAggregate.Connection.ConnectionConfigurationBase.Connection">
+        <member name="P:BankSystem7.ApplicationAggregate.Connection.ConnectionConfigurationBase.ConnectionString">
             <summary>
             Takes connection string for database
             </summary>
@@ -192,14 +192,6 @@
             <summary>
             Handles creating and deleting database
             </summary>
-        </member>
-        <member name="M:BankSystem7.ApplicationAggregate.Data.GenericDbContext.SetDatabaseManagementSystemType(Microsoft.EntityFrameworkCore.DbContextOptionsBuilder,BankSystem7.Configuration.DatabaseManagementSystemType)">
-            <summary>
-            This method sets the database management system type for the given DbContextOptionsBuilder object.
-            </summary>
-            <param name="optionsBuilder">The options builder.</param>
-            <param name="dbmsType">Type of the DBMS.</param>
-            <exception cref="T:System.ArgumentOutOfRangeException">dbmsType - null</exception>
         </member>
         <member name="M:BankSystem7.ApplicationAggregate.Dependencies.BankSystemRegistrar.Inject(System.Collections.Generic.IEnumerable{System.Object})">
             <summary>

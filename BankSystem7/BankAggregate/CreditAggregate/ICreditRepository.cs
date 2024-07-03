@@ -3,6 +3,7 @@ using BankSystem7.ApplicationAggregate.Interfaces.Readers;
 using BankSystem7.UserAggregate;
 
 namespace BankSystem7.BankAggregate.CreditAggregate;
+
 public interface ICreditRepository : IRepository<Credit>,
     IReaderTracking<Credit>, IRepositoryAsync<Credit>
 {

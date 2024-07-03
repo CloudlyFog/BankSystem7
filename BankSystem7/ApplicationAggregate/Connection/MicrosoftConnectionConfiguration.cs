@@ -1,5 +1,4 @@
-﻿using BankSystem7.Configuration;
-using BankSystem7.ApplicationAggregate.Credentials;
+﻿using BankSystem7.ApplicationAggregate.Credentials;
 
 namespace BankSystem7.ApplicationAggregate.Connection;
 
