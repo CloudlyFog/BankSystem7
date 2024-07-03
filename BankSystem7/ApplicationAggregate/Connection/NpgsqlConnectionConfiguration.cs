@@ -13,10 +13,10 @@ public class NpgsqlConnectionConfiguration : ConnectionConfigurationBase
     /// <summary>
     /// Takes name of host for establishing connection with database
     /// </summary>
-    public string? Host { get; set; } = DatabaseConnectionStringHelper.DefaultHost;
+    public string? Host { get; set; }
 
     /// <summary>
     /// Takes port for establishing connection with database
     /// </summary>
-    public string? Port { get; set; } = DatabaseConnectionStringHelper.DefaultPort;
+    public string? Port { get; set; }
 }

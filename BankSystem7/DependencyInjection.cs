@@ -11,9 +11,9 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 
-namespace BankSystem7.ApplicationAggregate.Extensions;
+namespace BankSystem7;
 
-public static class ServiceConfigurationExtensions
+public static class DependencyInjection
 {
     public static IServiceCollection AddBankSystem(this IServiceCollection services, ConfigurationOptions options)
     {
