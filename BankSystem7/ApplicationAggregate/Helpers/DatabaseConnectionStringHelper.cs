@@ -37,8 +37,10 @@ internal static class DatabaseConnectionStringHelper
     private static string GetMicrosoftSqlServerConnectionString(ConnectionConfigurationBase connectionConfiguration,
         CredentialsBase credentials)
     {
-        var microsoftCredentials = (MicrosoftCredentials)credentials;
         var microsoftConnectionConfiguration = (MicrosoftConnectionConfiguration)connectionConfiguration;
+        if (microsoftConnectionConfiguration is null)
+            return string.Empty;
+
         var connection = new StringBuilder();
         connection.Append(
             $"Server={microsoftConnectionConfiguration.Server};Database={microsoftConnectionConfiguration.DatabaseName};");
@@ -47,7 +49,10 @@ internal static class DatabaseConnectionStringHelper
             $"Persist Security Info={microsoftConnectionConfiguration.PersistSecurityInfo};Pooling={microsoftConnectionConfiguration.Pooling};");
         connection.Append(
             $"Encrypt={microsoftConnectionConfiguration.Encrypt};TrustServerCertificate={microsoftConnectionConfiguration.TrustServerCertificate};");
-        connection.Append($"User Id={microsoftCredentials.Username};Password={microsoftCredentials.Password};");
+
+        var microsoftCredentials = (MicrosoftCredentials)credentials;
+        if (microsoftCredentials is not null)
+            connection.Append($"User Id={microsoftCredentials.Username};Password={microsoftCredentials.Password};");
         return connection.ToString();
     }
 
@@ -56,6 +61,9 @@ internal static class DatabaseConnectionStringHelper
     {
         var npgsqlCredentials = (NpgsqlCredentials)credentials;
         var npgsqlConnectionConfiguration = (NpgsqlConnectionConfiguration)connectionConfiguration;
+        if (npgsqlCredentials is null || npgsqlConnectionConfiguration is null)
+            return string.Empty;
+
         var connection = new StringBuilder();
         connection.Append($"Server={npgsqlConnectionConfiguration.Host};Port={npgsqlConnectionConfiguration.Port};");
         connection.Append($"Database={npgsqlConnectionConfiguration.DatabaseName};User Id={npgsqlCredentials.Username};Password={npgsqlCredentials.Password}");
@@ -67,6 +75,9 @@ internal static class DatabaseConnectionStringHelper
     {
         var mysqlCredentials = (MySqlCredentials)credentials;
         var mysqlConnectionConfiguration = (MySqlConnectionConfiguration)connectionConfiguration;
+        if (mysqlCredentials is null || mysqlConnectionConfiguration is null)
+            return string.Empty;
+
         var connection = new StringBuilder();
         connection.Append($"Server={mysqlConnectionConfiguration.Server};Port={mysqlConnectionConfiguration.Port};");
         connection.Append($"Database={mysqlConnectionConfiguration.DatabaseName};Uid={mysqlCredentials.Username};Pwd={mysqlCredentials.Password};");

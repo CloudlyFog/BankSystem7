@@ -1,13 +1,10 @@
-﻿using BankSystem7.ApplicationAggregate.Credentials;
-using BankSystem7.ApplicationAggregate.Helpers;
-
-namespace BankSystem7.ApplicationAggregate.Connection;
+﻿namespace BankSystem7.ApplicationAggregate.Connection;
 
 public class NpgsqlConnectionConfiguration : ConnectionConfigurationBase
 {
     public NpgsqlConnectionConfiguration()
     {
-        Credentials = new NpgsqlCredentials();
+        DatabaseManagementSystemType = Configuration.DatabaseManagementSystemType.PostgreSql;
     }
 
     /// <summary>

@@ -1,12 +1,10 @@
-﻿using BankSystem7.ApplicationAggregate.Credentials;
-
-namespace BankSystem7.ApplicationAggregate.Connection;
+﻿namespace BankSystem7.ApplicationAggregate.Connection;
 
 public class MicrosoftConnectionConfiguration : ConnectionConfigurationBase
 {
     public MicrosoftConnectionConfiguration()
     {
-        Credentials = new MicrosoftCredentials();
+        DatabaseManagementSystemType = Configuration.DatabaseManagementSystemType.MicrosoftSqlServer;
     }
 
     /// <summary>

@@ -14,16 +14,16 @@ public class ConfigurationOptions
     /// From where will be token implementations of <see cref="ModelConfiguration"/>.
     /// Only this implementation will be used
     /// </summary>
-    public Assembly ModelConfigurationAssembly { get; init; }
+    public Assembly ModelConfigurationAssembly { get; set; }
 
     /// <summary>
     /// Takes settings for OperationService (i.e. OperationRepository)
     /// <seealso cref="OperationService{T}"/>
     /// </summary>
-    public OperationServiceOptions? OperationOptions { get; init; }
+    public OperationServiceOptions? OperationOptions { get; set; }
 
-    public CredentialsBase Credentials { get; init; }
-    public ConnectionConfigurationBase ConnectionConfiguration { get; init; }
+    public CredentialsBase Credentials { get; set; }
+    public ConnectionConfigurationBase ConnectionConfiguration { get; set; }
 }
 
 public enum DatabaseManagementSystemType

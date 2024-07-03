@@ -28,10 +28,5 @@ public abstract class ConnectionConfigurationBase
     /// <summary>
     /// Manages type of Database management system that will be used
     /// </summary>
-    public DatabaseManagementSystemType DatabaseManagementSystemType { get; init; } = DatabaseManagementSystemType.MicrosoftSqlServer;
-
-    /// <summary>
-    /// Takes credentials for establishing connection with database
-    /// </summary>
-    public CredentialsBase? Credentials { get; set; }
+    public DatabaseManagementSystemType DatabaseManagementSystemType { get; protected set; }
 }
