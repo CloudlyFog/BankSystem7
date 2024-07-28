@@ -1,5 +1,4 @@
-﻿using BankSystem7.ApplicationAggregate.Credentials;
-using BankSystem7.Configuration;
+﻿using BankSystem7.Configuration;
 
 namespace BankSystem7.ApplicationAggregate.Connection;
 
@@ -18,15 +17,20 @@ public abstract class ConnectionConfigurationBase
     /// <summary>
     /// Takes connection string for database
     /// </summary>
-    public string? ConnectionString { get; set; } = null;
+    public string? ConnectionString { get; set; }
 
     /// <summary>
     /// Takes name of database. If You don't want to change connection details, You can just specify it
     /// </summary>
-    public string? DatabaseName { get; set; } = null;
+    public string? DatabaseName { get; set; }
 
     /// <summary>
     /// Manages type of Database management system that will be used
     /// </summary>
     public DatabaseManagementSystemType DatabaseManagementSystemType { get; protected set; }
+}
+
+public interface IConnectionConfiguration
+{
+    public TConnectionConfiguration CreateEmpty<TConnectionConfiguration>();
 }

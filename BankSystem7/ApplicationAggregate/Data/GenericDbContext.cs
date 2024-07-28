@@ -84,8 +84,8 @@ public class GenericDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        if (_configurationOptions.ModelConfigurationAssembly is not null)
-            modelBuilder.ApplyConfigurationsFromAssembly(_configurationOptions.ModelConfigurationAssembly);
+        if (_configurationOptions.Database.ModelConfigurationAssembly is not null)
+            modelBuilder.ApplyConfigurationsFromAssembly(_configurationOptions.Database.ModelConfigurationAssembly);
         else
             new ModelConfiguration().Invoke(modelBuilder);
 
@@ -143,9 +143,9 @@ public class GenericDbContext : DbContext
     /// </summary>
     private void DatabaseHandle(ConfigurationOptions options)
     {
-        if (options.ConnectionConfiguration.EnsureDeleted)
+        if (options.Database.ConnectionConfiguration.EnsureDeleted)
             Database.EnsureDeleted();
-        if (options.ConnectionConfiguration.EnsureCreated)
+        if (options.Database.ConnectionConfiguration.EnsureCreated)
             Database.EnsureCreated();
     }
 }

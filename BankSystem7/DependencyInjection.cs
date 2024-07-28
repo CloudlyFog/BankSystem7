@@ -46,15 +46,15 @@ public static class DependencyInjection
     private static DbContextOptionsBuilder SetDbContext(IServiceCollection services, ConfigurationOptions options)
     {
         var builder = new DbContextOptionsBuilder();
-        options.ConnectionConfiguration.ConnectionString = DatabaseConnectionStringHelper.GetConnectionString(options.ConnectionConfiguration.DatabaseManagementSystemType,
-                                                             options.ConnectionConfiguration,
-                                                             options.Credentials);
+        options.Database.ConnectionConfiguration.ConnectionString = DatabaseConnectionStringHelper.GetConnectionString(options.Database.ConnectionConfiguration.DatabaseManagementSystemType,
+                                                             options.Database.ConnectionConfiguration,
+                                                             options.Database.Credentials);
 
-        return options.ConnectionConfiguration.DatabaseManagementSystemType switch
+        return options.Database.ConnectionConfiguration.DatabaseManagementSystemType switch
         {
-            DatabaseManagementSystemType.MicrosoftSqlServer => builder.UseSqlServer(options.ConnectionConfiguration.ConnectionString),
-            DatabaseManagementSystemType.PostgreSql => builder.UseNpgsql(options.ConnectionConfiguration.ConnectionString),
-            DatabaseManagementSystemType.MySql => builder.UseMySQL(options.ConnectionConfiguration.ConnectionString),
+            DatabaseManagementSystemType.MicrosoftSqlServer => builder.UseSqlServer(options.Database.ConnectionConfiguration.ConnectionString),
+            DatabaseManagementSystemType.PostgreSql => builder.UseNpgsql(options.Database.ConnectionConfiguration.ConnectionString),
+            DatabaseManagementSystemType.MySql => builder.UseMySQL(options.Database.ConnectionConfiguration.ConnectionString),
             _ => builder.UseMemoryCache(services.BuildServiceProvider().GetRequiredService<IMemoryCache>()),
         };
     }

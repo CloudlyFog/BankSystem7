@@ -25,7 +25,7 @@ public class MicrosoftConnectionConfiguration : ConnectionConfigurationBase
     /// <summary>
     /// Manages Windows Authentication behavior
     /// </summary>
-    public IntegratedSecurityType IntegratedSecurity { get; set; } = IntegratedSecurityType.False;
+    public IntegratedSecurityType IntegratedSecurity { get; internal set; } = IntegratedSecurityType.False;
 
     /// <summary>
     /// Specifies whether the data source can persist sensitive authentication information
